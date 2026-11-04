@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Builds Package\ElinBridge for Elin. References the game's own assemblies
+       read-only; nothing is copied from the game folder into the output. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>ElinBridge</AssemblyName>
+    <RootNamespace>ElinAutoplay</RootNamespace>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <DebugType>none</DebugType>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>..\dist\ElinBridge\</OutputPath>
+    <ElinDir>C:\Program Files (x86)\Steam\steamapps\common\Elin</ElinDir>
+    <Managed>$(ElinDir)\Elin_Data\Managed</Managed>
+    <!-- netstandard's own facades come from the SDK reference pack; skip the game's copies -->
+    <NoWarn>$(NoWarn);MSB3277;CS0436</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(Managed)\*.dll"
+               Exclude="$(Managed)\mscorlib.dll;$(Managed)\netstandard.dll;$(Managed)\System*.dll;$(Managed)\Mono*.dll;$(Managed)\Microsoft*.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="$(ElinDir)\BepInEx\core\BepInEx.Core.dll"><Private>false</Private></Reference>
+    <Reference Include="$(ElinDir)\BepInEx\core\BepInEx.Unity.dll"><Private>false</Private></Reference>
+    <Reference Include="$(ElinDir)\BepInEx\core\0Harmony.dll"><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="package.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

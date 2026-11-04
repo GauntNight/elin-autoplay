@@ -1,0 +1,147 @@
+<title>{{TITLE}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Pixelify+Sans:wght@500;700&display=swap">
+<style>
+/* Template for tools/summary_page.py (first used for run 05, 2026-10-17).
+   Layout: one reading column (46rem) for text; diagrams break out to a wider band (68rem) that
+   scrolls sideways on its own. */
+:root {
+  --bg: #f2f5f0;
+  --surface: #ffffff;
+  --fg: #1b221e;
+  --muted: #56635a;
+  --rule: #d5ddd2;
+  --accent: #33683a;
+  --accent-soft: #e0eddc;
+  --amber: #8f540a;
+  --amber-soft: #fbeed6;
+  --red: #a3392b;
+  --red-soft: #f8e0db;
+  --display: "Pixelify Sans", "Courier New", ui-monospace, monospace;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --cols: [wide-start] minmax(0, 1fr) [col-start] minmax(0, 46rem) [col-end] minmax(0, 1fr) [wide-end];
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111714; --surface: #18201b; --fg: #e1e8e0; --muted: #98a69c; --rule: #2a352e;
+    --accent: #8ac487; --accent-soft: #1d3221; --amber: #e2a84e; --amber-soft: #33281a;
+    --red: #ec8a7b; --red-soft: #3a1f1b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111714; --surface: #18201b; --fg: #e1e8e0; --muted: #98a69c; --rule: #2a352e;
+  --accent: #8ac487; --accent-soft: #1d3221; --amber: #e2a84e; --amber-soft: #33281a;
+  --red: #ec8a7b; --red-soft: #3a1f1b; color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 1rem/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2.5rem 4rem;
+}
+main { display: grid; gap: 3rem; }
+header, section, footer { display: grid; grid-template-columns: var(--cols); row-gap: 1rem; }
+header > *, section > *, footer > * { grid-column: col; min-width: 0; }
+header { row-gap: .6rem; }
+
+.eyebrow {
+  font: 500 .78rem/1.3 var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  font: 700 clamp(2.6rem, 8vw, 4rem)/1 var(--display);
+  margin: 0;
+  color: var(--accent);
+  text-wrap: balance;
+}
+.lede { max-width: 40rem; }
+h2 { font: 600 1.35rem/1.25 var(--body); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: .15em; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code { font: .88em var(--mono); background: var(--accent-soft); padding: .05em .3em; border-radius: 3px; overflow-wrap: anywhere; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+th, td { text-align: left; vertical-align: top; padding: .5rem .75rem .5rem 0; border-bottom: 1px solid var(--rule); }
+th { font: 500 .75rem/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: .9rem; white-space: nowrap; }
+tr > :first-child { font-weight: 500; }
+
+.goals { display: grid; border-top: 1px solid var(--rule); }
+.goal {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  gap: .25rem 1rem;
+  align-items: baseline;
+  padding: .7rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.goal .id { font: 700 1.05rem/1 var(--display); color: var(--muted); }
+.goal .name { font-weight: 600; }
+.goal .detail { grid-column: 2 / -1; color: var(--muted); font-size: .93rem; }
+.goal .by { font: .8rem var(--mono); }
+.pill {
+  font: 500 .72rem/1 var(--mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .3rem .5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.pill.done { background: var(--accent-soft); color: var(--accent); }
+.pill.going { background: var(--amber-soft); color: var(--amber); }
+.pill.open { background: var(--red-soft); color: var(--red); }
+
+section > figure { grid-column: wide; width: 100%; max-width: 68rem; justify-self: center; margin: 0; display: grid; gap: .75rem; }
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1.25rem;
+  overflow-x: auto;
+}
+.diagram pre.mermaid { margin: 0; display: flex; justify-content: center; min-width: min-content; }
+figcaption {
+  width: 100%;
+  max-width: 46rem;
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.25rem;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.key { display: inline-flex; align-items: center; gap: .4rem; }
+.sw { width: .9rem; height: .9rem; border-radius: 2px; border: 1.5px solid; flex: none; }
+pre.code { margin: 0; overflow-x: auto; font: .85rem/1.5 var(--mono); background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 1rem; }
+
+ul, ol { margin: 0; padding-left: 1.25rem; display: grid; gap: .45rem; }
+li::marker { color: var(--muted); }
+strong { font-weight: 600; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 1rem; font-size: .85rem; color: var(--muted); }
+
+@media (max-width: 520px) {
+  .goal { grid-template-columns: 2.2rem minmax(0, 1fr); }
+  .goal .pill { grid-column: 2; justify-self: start; }
+}
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">{{EYEBROW}}</div>
+    <h1>{{H1}}</h1>
+{{LEDE}}
+  </header>
+{{BODY}}
+  <footer><p>{{FOOTER}}</p></footer>
+</main>

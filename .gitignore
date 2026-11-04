@@ -1,0 +1,41 @@
+# The repo is scripts and rules. A game's logs and records stay on the player's PC; tools/newgame.py makes blank ones from templates/.
+/runs/
+/archive/
+/knowledge/goals.md
+/knowledge/goals-done.md
+/knowledge/milestones.csv
+/knowledge/fights.csv
+/knowledge/travel.csv
+*.log
+
+# Working records of how this was built
+/docs/review-*.md
+/docs/first-hour-test.md
+/docs/discovery/
+/docs/ollama-plan.md
+
+# Screenshots stay local: a capture can hold whatever the game shows.
+*.png
+!docs/**/*.png
+
+# build output
+bin/
+obj/
+__pycache__/
+.cache/
+mod/dist/
+.claude/settings.local.json
+
+# Game data exported by tools/kb.py (rebuilt per game version; not ours to redistribute)
+knowledge/game/
+
+# Repo-local Ollama: models, logs and the semantic index (rebuilt by tools; large)
+.ollama/
+knowledge/vectors/
+
+# Local notes and the words publishcheck.py looks for: never published
+CLAUDE.local.md
+.publish-terms
+
+# The player, world and goals of this machine (elin-setup): never published
+player.md

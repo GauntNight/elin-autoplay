@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Meta>
+  <title>ElinBridge</title>
+  <id>elin_autoplay_bridge</id>
+  <author>elin-autoplay</author>
+  <loadPriority>100</loadPriority>
+  <!-- The GAME version this mod targets, not the mod's own version: the loader
+       skips a package "made for game" older than it accepts (0.1.0 was skipped). -->
+  <version>0.23.355</version>
+  <description>Local-only (127.0.0.1) state and command bridge for the elin-autoplay agent.</description>
+</Meta>

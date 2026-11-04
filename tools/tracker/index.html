@@ -1,0 +1,408 @@
+<style>
+.rt { display: flex; flex-direction: column; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); font-variant-numeric: tabular-nums; }
+.rt-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.rt-take { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); margin: var(--cds-gap-xs) 0 0; max-width: 72ch; }
+.rt-key { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-lg); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-sm); }
+.rt-key span { display: inline-flex; align-items: center; gap: var(--cds-gap-xs); }
+.rt-key i { display: inline-block; width: 14px; height: 0; border-top: 2px dashed var(--cds-chart-reference); }
+.rt-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: var(--cds-gap-md); }
+.rt-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 5.5rem; }
+.rt-tile .k { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rt-tile .v { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.15; }
+.rt-tile .d { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rt-secs { display: flex; flex-direction: column; gap: var(--cds-gap-xl); }
+.rt-sec { display: flex; flex-direction: column; gap: var(--cds-gap-sm); }
+.rt-sec > h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.rt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--cds-gap-md); }
+.rt-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; display: flex; flex-direction: column; }
+.rt-card h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.rt-card .n { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 2px 0 var(--cds-gap-sm); }
+.rt-chart { position: relative; min-height: 150px; }
+.rt-chart svg { display: block; overflow: visible; }
+.rt-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; z-index: 2; }
+.rt-tip .h { color: var(--cds-text-secondary); }
+.rt-fail { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: 150px; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.rt-fail.bad::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+.rt-tablebox { max-height: 28rem; overflow: auto; }
+.rt-table { border-collapse: collapse; font-size: var(--cds-font-size-caption); width: 100%; }
+.rt-table th, .rt-table td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.rt-table th.l, .rt-table td.l { text-align: left; }
+.rt-table th { position: sticky; top: 0; background: var(--color-panel); font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); }
+.rt-table tr.ev td { color: var(--color-fg-muted); font-style: italic; }
+.rt [data-dash-source-state=empty] { color: transparent; }
+.rt [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+@media (prefers-reduced-motion: no-preference) {
+  .rt-chart.drawn svg .mk { animation: rt-in var(--cds-dur-slow) var(--cds-ease-out) both; }
+  @keyframes rt-in { from { opacity: 0; } to { opacity: 1; } }
+}
+</style>
+
+<div class="rt">
+  <header class="rt-head" id="top">
+    <h1>Elin Run Tracker</h1>
+    <p class="rt-take dash-skeleton" id="take" data-source="latest">&nbsp;</p>
+    <div class="rt-key">
+      <span><i></i>The 2026-10-19 review: the system refactored by Claude Fable 5.1 between runs 12 and 13</span>
+      <span>Hover a chart for each run's numbers and the model that played it</span>
+    </div>
+  </header>
+
+  <section class="rt-sec" id="latest">
+    <h2>Latest run against the one before</h2>
+    <div class="rt-tiles" id="tiles"></div>
+  </section>
+
+  <section class="rt-sec" id="refactor">
+    <h2>Before and after the refactor</h2>
+    <div class="rt-card">
+      <h3>Average per run</h3>
+      <div class="n">Runs 01–12 on the first system against runs 13 and later on the refactored one. Two runs after is a small sample.</div>
+      <div class="rt-tablebox">
+        <table class="rt-table" id="cmp" data-source="refactor" data-row-key="metric">
+          <thead><tr><th class="l" data-field="metric">Measure</th><th data-field="before">Runs 01–12</th><th data-field="after">Runs 13+</th><th data-field="change">Change</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="rt-secs" id="sections"></div>
+
+  <section class="rt-sec" id="all">
+    <h2>Every run</h2>
+    <div class="rt-card">
+      <h3>The tracker's table</h3>
+      <div class="n">One row a run, plus the review between runs 12 and 13. A blank cell means the run log didn't record it.</div>
+      <div class="rt-tablebox">
+        <table class="rt-table" id="tbl" data-source="stats" data-row-key="point"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+dash.calc('latest', {
+  inputs: ['stats'],
+  title: 'Latest run against the one before',
+  description: 'Headline measures for the last run and the run before it.',
+  fn: (stats) => {
+    const runs = stats.filter((x) => x.kind === 'run');
+    const a = runs[runs.length - 1] || {}, b = runs[runs.length - 2] || {};
+    const val = (x) => (x === '' || x == null ? null : +x);
+    const pick = [['Points per hour', 'points_per_hour'], ['Level', 'level'], ['Exp per hour', 'exp_per_hour'], ['Orens per hour (gross)', 'orens_per_hour'],
+      ['Rent per hour', 'rent_per_hour'], ['Errors per hour', 'errors_per_hour'], ['Wealth', 'wealth'], ['Deaths', 'deaths']];
+    return pick.map(([metric, f]) => {
+      const latest = val(a[f]), previous = val(b[f]);
+      return { metric, run: a.point, latest, previous,
+        change: latest !== null && previous !== null ? Math.round((latest - previous) * 100) / 100 : null };
+    });
+  },
+});
+
+dash.calc('refactor', {
+  inputs: ['stats'],
+  title: 'Before and after the refactor',
+  description: 'The mean per run of each measure: runs 01-12 against runs 13 and later.',
+  fn: (stats) => {
+    const runs = stats.filter((x) => x.kind === 'run');
+    const val = (x) => (x === '' || x == null ? null : +x);
+    const mean = (xs) => { const v = xs.filter((x) => x !== null); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null; };
+    const round = (x, d) => (x === null ? null : Math.round(x * 10 ** d) / 10 ** d);
+    // measure, column, decimals, whether more is better (null: neither)
+    const measures = [['Points per hour', 'points_per_hour', 0, true], ['Exp per hour', 'exp_per_hour', 0, true], ['Orens per hour (gross)', 'orens_per_hour', 0, true],
+      ['Rent per hour', 'rent_per_hour', 0, false], ['Planned items done %', 'planned_pct', 0, true], ['Exp gained', 'exp_gained', 0, true],
+      ['Minutes of play', 'minutes', 0, null], ['Game days', 'game_days', 0, true], ['Jobs done', 'jobs', 1, true],
+      ['Skills learned', 'skills_learned', 1, true], ['Goal milestones', 'goal_steps', 1, true],
+      ['Game errors', 'errors', 1, false], ['Errors per hour', 'errors_per_hour', 2, false],
+      ['Deaths', 'deaths', 1, false], ['Near deaths', 'near_deaths', 1, false], ['Tool files changed', 'tool_files', 0, null]];
+    return measures.map(([metric, f, digits, better]) => {
+      const before = round(mean(runs.filter((x) => +x.point < 13).map((x) => val(x[f]))), digits);
+      const after = round(mean(runs.filter((x) => +x.point >= 13).map((x) => val(x[f]))), digits);
+      const change = before && after !== null ? Math.round(((after - before) / before) * 100) / 100 : null;
+      return { metric, before, after, change, digits, better };
+    });
+  },
+});
+</script>
+
+<script>
+const N = (x) => (x === undefined || x === null || x === '' ? null : (Number.isFinite(+x) ? +x : null));
+const SECTIONS = [
+  { id: 'score', title: 'Score', charts: [
+    { f: ['points_per_hour'], t: 'Points per hour', n: 'The run score (tools/score.py, from run 26 on; earlier runs scored the same way): a goal 300, a milestone 25, a nefia 60, an exp 1, gold in days of rent (orens ÷ the month’s bill ÷ 30 × 13), a game day −13, a death −1,000; ÷ real hours. Blank where the income is unknown.', kind: 'line', fmt: ',.0f' },
+    { f: ['points'], t: 'Points a run', n: 'The run’s total: what it earned, less its game days of rent and its deaths.', kind: 'bar', fmt: ',.0f' },
+    { f: ['points_per_game_day'], t: 'Points per game day', n: 'The same total ÷ the game days the run covered.', kind: 'line', fmt: ',.1f' },
+  ] },
+  { id: 'progress', title: 'Progress', charts: [
+    { f: ['level'], t: 'Level', n: 'Character level at the end of each run.', kind: 'line', fmt: ',.0f' },
+    { f: ['exp_gained'], t: 'Exp gained', n: 'Character exp earned in the run (ExpToNext is 50 + 30 × level). Blank where an end wasn\'t read.', kind: 'bar', fmt: ',.0f' },
+    { f: ['exp_per_hour'], t: 'Exp per hour', n: 'Exp gained ÷ real hours of play.', kind: 'line', fmt: ',.0f' },
+    { f: ['gold'], t: 'Gold carried', n: 'Orens in hand at the end; gold bars at home are not counted.', kind: 'line', fmt: ',.0f' },
+  ] },
+  { id: 'growth', title: 'Growth per play hour', charts: [
+    { f: ['orens_per_hour', 'rent_per_hour'], t: 'Orens per hour: gross income against rent', n: 'Gross income (jobs, chests, shipping, Treasure Hunt, salaries, sales) ÷ real hours, against the rent accrued ÷ real hours (~70 orens a game day). From runs/runstats.csv and the run logs (the 2026-10-23 review); blank where the log gave no income.', kind: 'bar', fmt: ',.0f', names: ['Gross orens/hour', 'Rent/hour'], colors: [0, '--cds-chart-muted'] },
+    { f: ['net_gold'], t: 'Net gold a run', n: 'Orens in hand at the end minus the start (power.csv): what was left after the bills and the shopping.', kind: 'bar', fmt: ',.0f' },
+    { f: ['wealth'], t: 'Wealth', n: 'Orens + 175 × gold bars + 50 × platinum at the end of the run, where the log gave the bars and platinum.', kind: 'line', fmt: ',.0f' },
+    { f: ['planned_pct'], t: 'Planned items done', n: 'The share of the last summary\'s Next-session items the run did (partial credit counts half).', kind: 'line', fmt: ',.0f', unit: '%' },
+    { f: ['game_days_per_hour'], t: 'Game days per real hour', n: 'How fast the calendar ran: every game day costs ~70 orens of rent, so a fast hour (a training loop) is an expensive one.', kind: 'line', fmt: ',.1f' },
+  ] },
+  { id: 'survival', title: 'Survival', charts: [
+    { f: ['deaths', 'near_deaths'], t: 'Deaths and near deaths', n: 'Near death: HP under a quarter of max.', kind: 'bar', fmt: ',.0f', names: ['Deaths', 'Near deaths'], colors: ['--cds-chart-status-critical', 1] },
+    { f: ['lowest_hp_pct'], t: 'Lowest HP', n: 'The run\'s lowest HP as a share of max, floored at 0: once dead, how far below 0 doesn\'t matter. A red dot at 0 is a run with a death.', kind: 'line', fmt: ',.0f', unit: '%', floor: 0, deathDot: 'deaths' },
+  ] },
+  { id: 'output', title: 'Getting things done', charts: [
+    { f: ['jobs'], t: 'Jobs done', n: 'Board jobs, story quests and residents\' jobs completed.', kind: 'bar', fmt: ',.0f' },
+    { f: ['skills_learned'], t: 'Skills learned', n: 'New game skills, spells and feats in the run.', kind: 'bar', fmt: ',.0f' },
+    { f: ['goal_steps'], t: 'Goal milestones', n: 'Goal milestones reached in the run (the register began in run 04).', kind: 'bar', fmt: ',.0f' },
+    { f: ['goals_done_total'], t: 'Goals done', n: 'Goals completed so far (knowledge/goals-done.md).', kind: 'line', fmt: ',.0f' },
+    { f: ['game_days'], t: 'Game days played', n: 'Days on the game calendar the run covered.', kind: 'bar', fmt: ',.0f' },
+  ] },
+  { id: 'errors', title: 'Mistakes', charts: [
+    { f: ['errors'], t: 'Game errors', n: 'Outcomes the game can\'t undo, deaths apart (runs/errors.csv from run 12).', kind: 'bar', fmt: ',.0f' },
+    { f: ['errors_per_hour'], t: 'Errors per hour', n: 'Game errors ÷ real hours of play.', kind: 'line', fmt: ',.2f' },
+  ] },
+  { id: 'power', title: 'Power', charts: [
+    { f: ['max_hp'], t: 'Max HP', n: 'From the power card at the end of the run.', kind: 'line', fmt: ',.0f' },
+    { f: ['pv'], t: 'PV', n: 'Protection value: armour against each hit.', kind: 'line', fmt: ',.0f' },
+    { f: ['speed'], t: 'Speed', n: 'From the run summaries (run 08 on).', kind: 'line', fmt: ',.0f' },
+    { f: ['my_melee'], t: 'My melee damage a turn', n: 'My best weapon\'s expected damage a turn against a same-level foe, after its armour (power.csv my_melee; until run 37 only the cards taken with no ally along, since the old column summed the party). The fall from run 21: a second weapon, then from run 30 a shield, in the off hand switched off the two-hand style.', kind: 'line', fmt: ',.1f' },
+  ] },
+  { id: 'system', title: 'Effort and the system', charts: [
+    { f: ['minutes'], t: 'Minutes of play', n: 'Real minutes from the first move to the quit.', kind: 'bar', fmt: ',.0f' },
+    { f: ['tool_files'], t: 'Tool files changed', n: 'Scripts and bridge files changed in git; the grey bar is the review.', kind: 'bar', fmt: ',.0f' },
+    { f: ['facts_total'], t: 'Facts in the graph', n: 'Observed facts recorded so far (knowledge/facts.jsonl).', kind: 'line', fmt: ',.0f' },
+    { f: ['index_entries'], t: 'Semantic index size', n: 'Entries in the semantic index at each close-out.', kind: 'line', fmt: ',.0f' },
+    { f: ['query_ms'], t: 'Semantic index speed', n: 'Median ms to embed and search one question (kb.py bench), from run 14.', kind: 'line', fmt: ',.1f', unit: ' ms' },
+  ] },
+];
+
+const host = document.getElementById('sections');
+for (const s of SECTIONS) {
+  const sec = document.createElement('section');
+  sec.className = 'rt-sec'; sec.id = s.id;
+  const h = document.createElement('h2'); h.textContent = s.title; sec.appendChild(h);
+  const grid = document.createElement('div'); grid.className = 'rt-grid'; sec.appendChild(grid);
+  for (const c of s.charts) {
+    const card = document.createElement('div'); card.className = 'rt-card'; card.id = 'c-' + c.f[0];
+    const t = document.createElement('h3'); t.textContent = c.t; card.appendChild(t);
+    const n = document.createElement('div'); n.className = 'n'; n.textContent = c.n; card.appendChild(n);
+    const box = document.createElement('div'); box.className = 'rt-chart dash-skeleton'; box.setAttribute('data-source', 'stats');
+    card.appendChild(box); grid.appendChild(card); c.box = box;
+  }
+  host.appendChild(sec);
+}
+
+const colorOf = (spec) => (typeof spec === 'string' ? `var(${spec})` : dash.colors[spec || 0]);
+let animated = false;
+
+function message(box, text, bad) {
+  box.innerHTML = '';
+  const m = document.createElement('div'); m.className = 'rt-fail' + (bad ? ' bad' : ''); m.textContent = text; box.appendChild(m);
+}
+
+function draw(c, rows) {
+  const box = c.box;
+  box.innerHTML = '';
+  const W = Math.max(240, box.clientWidth || 300), H = 150;
+  const pts = rows.map((r) => r.point);
+  // floor: a value under it is drawn at it (the lowest HP of a death run is 0, the user's call after run 37)
+  const valOf = (r, f) => { const v = N(r[f]); return v !== null && c.floor !== undefined ? Math.max(c.floor, v) : v; };
+  const died = (r) => Boolean(c.deathDot) && N(r[c.deathDot]) > 0;
+  const series = c.f.map((f) => rows.map((r) => ({ p: r.point, v: valOf(r, f), r })));
+  const all = series.flat().filter((d) => d.v !== null);
+  if (!all.length) { message(box, 'Not recorded yet', false); return; }
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+  const fmt = d3.format(c.fmt);
+  const maxV = d3.max(all, (d) => d.v);
+  const y = d3.scaleLinear([0, maxV > 0 ? maxV : 1], [H - 22, 18]).nice(4);
+  const ticks = y.ticks(4);
+  // the left margin from the widest tick label as drawn
+  const probe = svg.append('g').attr('font-size', 11);
+  let ml = 0;
+  for (const t of ticks) ml = Math.max(ml, probe.append('text').text(fmt(t)).node().getComputedTextLength());
+  let mr = 6;
+  const lastPt = series[0].filter((d) => d.v !== null).slice(-1)[0];
+  if (c.kind === 'line' && lastPt) mr = probe.append('text').text(fmt(lastPt.v) + (c.unit || '')).node().getComputedTextLength() + 12;
+  probe.remove();
+  const x = d3.scaleBand(pts, [ml + 10, W - mr]).paddingInner(0.25).paddingOuter(0.1);
+  const cxOf = (p) => x(p) + x.bandwidth() / 2;
+  const g = svg.append('g');
+  g.selectAll('line.grid').data(ticks).join('line').attr('class', 'grid')
+    .attr('x1', ml + 10).attr('x2', W - mr).attr('y1', (t) => y(t)).attr('y2', (t) => y(t))
+    .attr('stroke', 'var(--cds-chart-grid)').attr('stroke-width', 1);
+  g.selectAll('text.yt').data(ticks).join('text').attr('class', 'yt')
+    .attr('x', ml + 4).attr('y', (t) => y(t)).attr('dy', '0.32em').attr('text-anchor', 'end')
+    .attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((t) => fmt(t));
+  g.append('line').attr('x1', ml + 10).attr('x2', W - mr).attr('y1', y(0)).attr('y2', y(0)).attr('stroke', 'var(--cds-chart-axis)');
+  // x ticks: every run, or every other one when narrow; the review slot carries its marker instead
+  const runPts = pts.filter((p) => /^\d+$/.test(p));
+  const step = x.bandwidth() < 14 ? 2 : 1;
+  g.selectAll('text.xt').data(runPts.filter((p, i) => i % step === 0 || i === runPts.length - 1)).join('text').attr('class', 'xt')
+    .attr('x', cxOf).attr('y', H - 6).attr('text-anchor', 'middle')
+    .attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((p) => p);
+  for (const ev of rows.filter((r) => r.kind !== 'run')) {
+    g.append('line').attr('x1', cxOf(ev.point)).attr('x2', cxOf(ev.point)).attr('y1', 12).attr('y2', H - 22)
+      .attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
+    g.append('text').attr('x', cxOf(ev.point)).attr('y', 7).attr('text-anchor', 'middle').attr('font-size', 10)
+      .attr('fill', 'var(--color-fg-muted)').text(ev.kind === 'review' ? 'refactor' : 'new metric');
+  }
+  const mk = g.append('g').attr('class', 'mk');
+  if (c.kind === 'bar') {
+    const k = series.length;
+    const bw = Math.min(32, x.bandwidth() / k);
+    series.forEach((s, i) => {
+      mk.selectAll(null).data(s.filter((d) => d.v !== null && d.v > 0)).join('rect')
+        .attr('x', (d) => cxOf(d.p) - (bw * k) / 2 + i * bw).attr('width', Math.max(1, bw - (k > 1 ? 1 : 0)))
+        .attr('y', (d) => y(d.v)).attr('height', (d) => Math.max(0, y(0) - y(d.v))).attr('rx', 3)
+        .attr('fill', (d) => (d.r.kind !== 'run' ? 'var(--cds-chart-muted)' : colorOf(c.colors ? c.colors[i] : i)));
+    });
+  } else {
+    const s = series[0].filter((d) => d.v !== null);
+    mk.append('path').datum(s).attr('d', d3.line().x((d) => cxOf(d.p)).y((d) => y(d.v)))
+      .attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2)
+      .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+    mk.selectAll('circle').data(s).join('circle').attr('cx', (d) => cxOf(d.p)).attr('cy', (d) => y(d.v))
+      .attr('r', (d, i) => (died(d.r) ? 4.5 : i === s.length - 1 ? 4 : 2.5))
+      .attr('fill', (d) => (died(d.r) ? 'var(--cds-chart-status-critical)' : dash.colors[0]));
+    mk.append('text').attr('x', cxOf(lastPt.p) + 7).attr('y', y(lastPt.v)).attr('dy', '0.32em')
+      .attr('font-size', 11).attr('fill', 'var(--color-fg)').text(fmt(lastPt.v) + (c.unit || ''));
+  }
+  box.classList.toggle('drawn', !animated);
+  const tip = document.createElement('div'); tip.className = 'rt-tip'; tip.hidden = true; box.appendChild(tip);
+  const hl = g.insert('rect', '.mk').attr('fill', 'var(--cds-chart-grid)').attr('opacity', 0).attr('y', 12)
+    .attr('height', H - 34).attr('pointer-events', 'none');
+  const left = (p) => x(p) - (x.step() - x.bandwidth()) / 2;
+  g.selectAll('rect.hit').data(rows).join('rect').attr('class', 'hit').attr('x', (r) => left(r.point))
+    .attr('width', x.step()).attr('y', 0).attr('height', H).attr('fill', 'transparent')
+    .on('mouseenter', (event, r) => {
+      hl.attr('x', left(r.point)).attr('width', x.step()).attr('opacity', 0.6);
+      tip.innerHTML = '';
+      const head = document.createElement('div'); head.className = 'h';
+      head.textContent = `${r.label} · ${r.date}${r.model ? ' · ' + r.model : ''}`;
+      tip.appendChild(head);
+      c.f.forEach((f, i) => {
+        const v = valOf(r, f);
+        const line = document.createElement('div');
+        line.textContent = `${c.names ? c.names[i] + ': ' : ''}${v === null ? 'not recorded' : fmt(v) + (c.unit || '')}${died(r) ? ' (died)' : ''}`;
+        tip.appendChild(line);
+      });
+      tip.hidden = false;
+      const scale = box.clientWidth / W;
+      const tw = tip.offsetWidth;
+      tip.style.left = Math.max(0, Math.min(box.clientWidth - tw, cxOf(r.point) * scale - tw / 2)) + 'px';
+      tip.style.top = (-tip.offsetHeight - 4) + 'px';
+    })
+    .on('mouseleave', () => { tip.hidden = true; hl.attr('opacity', 0); });
+}
+
+dash.onData(() => {
+  const st = dash.data('stats');
+  for (const s of SECTIONS) for (const c of s.charts) {
+    if (st.status === 'ok') { c.box.classList.remove('dash-skeleton'); draw(c, st.data); }
+    else if (st.status === 'loading') { c.box.innerHTML = ''; c.box.classList.add('dash-skeleton'); }
+    else { c.box.classList.remove('dash-skeleton'); message(c.box, 'Failed to load', true); }
+  }
+  if (st.status === 'ok') animated = true;
+});
+</script>
+
+<script>
+const tiles = document.getElementById('tiles');
+const tileFmt = new Proxy({ 'Errors per hour': ',.2f' }, { get: (o, k) => o[k] || ',.0f' });
+const lowerBetter = { 'Errors per hour': true, 'Deaths': true, 'Rent per hour': true };
+
+dash.onData(() => {
+  const L = dash.data('latest');
+  const take = document.getElementById('take');
+  tiles.innerHTML = '';
+  if (L.status !== 'ok') {
+    take.classList.add('dash-skeleton');
+    for (let i = 0; i < 8; i++) { const t = document.createElement('div'); t.className = 'rt-tile dash-skeleton'; tiles.appendChild(t); }
+    return;
+  }
+  take.classList.remove('dash-skeleton');
+  const rows = L.data;
+  const by = Object.fromEntries(rows.map((r) => [r.metric, r]));
+  const show = (m) => (by[m] && by[m].latest !== null ? d3.format(tileFmt[m])(by[m].latest) : 'not recorded');
+  const deaths = by['Deaths'] && by['Deaths'].latest;
+  take.textContent = `Run ${rows[0] ? rows[0].run : ''} scored ${show('Points per hour')} points an hour and ended at level ${show('Level')}, earning ${show('Exp per hour')} exp an hour with ` +
+    `${show('Errors per hour')} game errors an hour and ${deaths === 0 ? 'no deaths' : show('Deaths') + ' deaths'}.`;
+  for (const r of rows) {
+    const t = document.createElement('div'); t.className = 'rt-tile';
+    const k = document.createElement('div'); k.className = 'k'; k.textContent = `${r.metric} · run ${r.run}`;
+    const where = 'metric=' + encodeURIComponent(r.metric);
+    const v = document.createElement('div'); v.className = 'v';
+    v.setAttribute('data-source', 'latest'); v.setAttribute('data-field', 'latest'); v.setAttribute('data-where', where);
+    v.textContent = r.latest === null ? '—' : d3.format(tileFmt[r.metric])(r.latest);
+    const d = document.createElement('div'); d.className = 'd';
+    if (r.change === null) d.textContent = 'no value for the run before';
+    else {
+      const num = document.createElement('span');
+      num.setAttribute('data-source', 'latest'); num.setAttribute('data-field', 'change'); num.setAttribute('data-where', where);
+      num.textContent = (r.change > 0 ? '+' : r.change < 0 ? '−' : '±') + d3.format(tileFmt[r.metric])(Math.abs(r.change));
+      const good = lowerBetter[r.metric] ? r.change < 0 : r.change > 0;
+      num.style.color = r.change === 0 ? 'var(--color-fg-muted)' : (good ? 'var(--color-ok)' : 'var(--color-bad)');
+      d.append(num, document.createTextNode(' on run ' + (r.previous === null ? '' : String(+r.run - 1).padStart(2, '0'))));
+    }
+    t.append(k, v, d); tiles.appendChild(t);
+  }
+});
+</script>
+
+<script>
+const N = (x) => (x === undefined || x === null || x === '' ? null : (Number.isFinite(+x) ? +x : null));
+const cmp = document.querySelector('#cmp tbody');
+const tbl = document.getElementById('tbl');
+const COLS = [
+  ['point', 'Run', 'l'], ['date', 'Date', 'l'], ['model', 'Model', 'l'], ['character', 'Character', 'l'], ['minutes', 'Minutes'],
+  ['points', 'Points'], ['points_per_hour', 'Points/hour'],
+  ['game_days', 'Game days'], ['level', 'Level'], ['exp_gained', 'Exp gained'], ['exp_per_hour', 'Exp/hour'], ['gold', 'Gold'], ['orens_per_hour', 'Orens/hour'], ['rent_per_hour', 'Rent/hour'], ['wealth', 'Wealth'], ['planned_pct', 'Plan %'],
+  ['deaths', 'Deaths'], ['near_deaths', 'Near deaths'], ['lowest_hp_pct', 'Lowest HP %'], ['jobs', 'Jobs'],
+  ['skills_learned', 'Skills learned'], ['goal_steps', 'Goal milestones'], ['goals_done', 'Goals done'], ['errors', 'Errors'],
+  ['errors_per_hour', 'Errors/hour'], ['max_hp', 'Max HP'], ['pv', 'PV'], ['speed', 'Speed'], ['my_melee', 'My melee/turn'], ['melee_per_turn', 'Party melee/turn'],
+  ['karma', 'Karma'], ['tool_files', 'Tool files'], ['tool_files_new', 'New tools'], ['facts_added', 'Facts added'],
+  ['index_entries', 'Index entries'], ['query_ms', 'Query ms'],
+];
+const TEXT = new Set(['point', 'date', 'model', 'character']);
+
+dash.onData(() => {
+  const R = dash.data('refactor');
+  cmp.innerHTML = '';
+  if (R.status === 'ok') {
+    for (const r of R.data) {
+      const tr = document.createElement('tr');
+      const f = (x) => (x === null ? '' : d3.format(`,.${r.digits}f`)(x));
+      const ch = r.change === null ? '' : (r.change > 0 ? '+' : r.change < 0 ? '−' : '±') + d3.format('.0%')(Math.abs(r.change));
+      [r.metric, f(r.before), f(r.after), ch].forEach((v, i) => {
+        const td = document.createElement('td'); td.textContent = v;
+        if (i === 0) td.className = 'l';
+        if (i === 3 && r.change && r.better !== null) {
+          const good = r.better ? r.change > 0 : r.change < 0;
+          td.style.color = good ? 'var(--color-ok)' : 'var(--color-bad)';
+        }
+        tr.appendChild(td);
+      });
+      cmp.appendChild(tr);
+    }
+  }
+  const S = dash.data('stats');
+  const thead = tbl.querySelector('thead'), tbody = tbl.querySelector('tbody');
+  thead.innerHTML = ''; tbody.innerHTML = '';
+  const htr = document.createElement('tr');
+  for (const [f, label, cls] of COLS) {
+    const th = document.createElement('th'); th.textContent = label; th.setAttribute('data-field', f); if (cls) th.className = cls; htr.appendChild(th);
+  }
+  thead.appendChild(htr);
+  if (S.status !== 'ok') return;
+  for (const r of S.data) {
+    const tr = document.createElement('tr'); if (r.kind !== 'run') tr.className = 'ev';
+    for (const [f, , cls] of COLS) {
+      const td = document.createElement('td'); if (cls) td.className = cls;
+      const v = r[f];
+      td.textContent = v === undefined || v === null ? '' : (TEXT.has(f) || N(v) === null ? v : d3.format(',')(N(v)));
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+});
+</script>

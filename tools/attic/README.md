@@ -1,0 +1,1 @@
+Retired one-off tools, kept for reference (not run, not named by a skill): kickkarma.py (run 06, the Thieves' Guild karma test), steal.py (run 06, the same test: emptying NPC containers), ability.py (an ability by name; craft.py and firstcraft.py open Quick Craft themselves).
