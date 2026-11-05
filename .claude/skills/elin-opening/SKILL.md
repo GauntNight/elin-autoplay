@@ -3,6 +3,21 @@ name: elin-opening
 description: Step-by-step procedure for Elin's opening tutorial chain on a new character (land deed, Fiama's pet and shop, Ashland's board quests one at a time, Frontier Inspector/Loytel, Defense Training punk and boar, Way of Crafter up to the first house). Use when a game is in its first days or any tutorial quest from Ashland, Fiama or Loytel is open.
 ---
 
+# The fast path (the level 1 trials, runs 41-44)
+
+Everything below is the reasoning; for a new game these tools do it. Compared to the first game's Lv2 at minute 250: Lv2 at 14, Lv8 at 96.
+
+1. `tools/newchar.py RACE CLASS` from the title. Then `tools/opening.py`: speed x5 (`bridge.py speed 3`, the game's own control, reset by every load), the whole
+   chain to Way of Crafter's training dummy beside a bed in about 7 minutes. A stop names its stage: finish by hand, then `--from STAGE`.
+2. `tools/tickets.py`: every first-time craft pays an old ticket (117 orens anywhere): sawmill, carpenter's and tinker's tables and their recipes. Hand-broken stones need no pickaxe.
+3. **Walk** to Mysilia (`wgo.py --near 0`; a third of the hunger assumed, seconds of real time): sell tickets, buy the cheapest melee weapon and armor (PV 0 is what kills), then food by
+   food per oren: bones and roasts 13 orens for 27, bread 27 for 31, rations 48 for 51. NPC names change per world: `whereis.py any blacksmith` (the role), by day.
+4. `tools/earlyday.py N --rotate`: crops, meal, the rest of the bar on the dummy at the lowest skill I can hold, sleep. Yerles level fastest (Fast Learner); bare hands count.
+5. From Lv3: `board.py`, `board.py --take NAME`, `arena.py`: Monster extermination, Monster hunting and Troubled home at Danger 1-2 pay 166-274 orens, influence and sub rewards in a minute. **Instance job first, count jobs after** (a cap of about 5). The ally along, armor on.
+6. Food and gold go together: back to step 3 when the food runs out. `feat.py` for each point (Tough, Stone Defense first; SP feats do nothing past waking SP ~41 on a makeshift bed). `tools/ability.py Rest` heals fast and sleeps under 20% SP; `Pray` is free Faith.
+
+Don't: enter a field tile by hand; force a fight the tool refuses; melee kinds on elin-play's range list; sleep by hand at hunger 60+ (Starving costs HP fast). Before day 90 a death costs nothing but time: Crawl up.
+
 # The opening, in order
 
 Uses the tools from the elin-play skill. After each numbered step, `look.py` and check the
