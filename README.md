@@ -143,7 +143,7 @@ That's everything it needs. My own Claude Code rules and memory aren't here; wha
 
 ## The graph
 
-The graph answers "how do I make this", "what uses this" and "what do I already know about this" without rereading game code. It has two halves: the game's tables, which `kb.py build` exports through the bridge from your own copy (not shipped here, and rebuilt per game version), and the observed facts in `knowledge/facts.jsonl`, which come with the repo. Mine stands at about 6,000 nodes, 13,400 edges and 1,145 live facts.
+The graph answers "how do I make this", "what uses this" and "what do I already know about this" without rereading game code. It has two halves: the game's tables, which `kb.py build` exports through the bridge from your own copy (not shipped here, and rebuilt per game version), and the observed facts in `knowledge/facts.jsonl`, which come with the repo. Mine stands at about 6,000 nodes, 13,400 edges and 1,150 live facts.
 
 ```text
 $ python -I tools/kb.py make "wall torch"
@@ -169,9 +169,9 @@ $ python -I tools/kb.py facts kamikaze
 | `kb.py ask TEXT` | Plain-language search (below) |
 | `kb.py stats` | Counts of nodes, edges and facts |
 
-The facts work without the game, so `kb.py facts` runs on a fresh clone. Everything that reads the tables needs `kb.py build` first.
+**The graph is required, and first-run setup builds it for you.** Once a character is loaded, with the mod installed, setup runs `python -I tools/kb.py build`; that needs no Ollama and no download. Run it again after a game update, since the tables change with the game's version. If you skip setup: `kb.py facts` is the only graph command that works; the others stop and tell you to build; and `tools/threat.py` and `tools/hunt.py` fail with a file-not-found error. The fight and travel tools (`fight.py`, `delve.py`, `wgo.py`) use `threat.py`, so don't play without the graph.
 
-`kb.py ask` is optional and needs [Ollama](https://ollama.com) in its default install folder. The repo runs its own server on 127.0.0.1:11435 with the models inside the repo, so your own Ollama (and its model folder) stays out of it:
+`kb.py ask` is the optional part. It needs the graph built first, plus [Ollama](https://ollama.com) in its default install folder. The repo runs its own server on 127.0.0.1:11435 with the models inside the repo, so your own Ollama (and its model folder) stays out of it:
 
 ```bash
 bash tools/ollama_serve.sh &      # the repo's own server; its models stay in .ollama/
