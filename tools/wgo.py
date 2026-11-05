@@ -172,7 +172,7 @@ def handle_ambush(_retry=False):
         print(f"  ambush: fought {target['name']} Lv{target.get('lv')}: {last(out)[:80]}")
     else:
         return f"{MAX_AMBUSH_FIGHTS} fights on one ambush map: look.py"
-    # run 41: a new game's materials are its valuables (elin-setup): take everything, and never purge: this purge threw away
+    # Start Run 1: a new game's materials are its valuables (elin-setup): take everything, and never purge: this purge threw away
     # the only axe, the potions and the pebbles of a level 2 character with 23 stacks in the pack
     new_game = not base_ready()
     out = run("loot.py", "20", *(["--all"] if new_game else []), timeout=300)
@@ -268,7 +268,7 @@ def main():
         i = sys.argv.index("--danger-ok")
         if i + 1 < len(sys.argv) and sys.argv[i + 1].isdigit():
             danger_cap = int(sys.argv.pop(i + 1))
-    # run 41: a floating eye at my level followed at exactly 4 cells and stopped every step; --near 3 walks on until it comes closer
+    # Start Run 1: a floating eye at my level followed at exactly 4 cells and stopped every step; --near 3 walks on until it comes closer
     near = int(sys.argv[sys.argv.index("--near") + 1]) if "--near" in sys.argv else 4
     if "--near" in sys.argv:
         del sys.argv[sys.argv.index("--near"):sys.argv.index("--near") + 2]

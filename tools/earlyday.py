@@ -1,17 +1,17 @@
-"""A new character's exp loop at home, from the first minutes (run 41, the Lv1 trials). Character exp is skill level-ups only, a
+"""A new character's exp loop at home, from the first minutes (Start Run 1, the Lv1 trials). Character exp is skill level-ups only, a
 level-1 skill levels fast, and at the game's speed x5 a full bar of SP on the dummy takes 5 real seconds and a sleep 4, so real time
 stops binding and food takes over: a sleep costs 20 hunger. Weeds close the loop: they pay Gathering and give grass, 5 grass and 3 SP
 make a weed stew (11 food, the bonfire burns a log from the pack).
 
 A cycle from waking: ripe crops (+100 skill exp a SP, three times the dummy, and food), a meal from the pack if there is one (bread, jerky,
-rations: run 41 found 1.15 food an oren at the general store) or else stews, the rest of the SP on the dummy, then sleep.
+rations: Start Run 1 found 1.15 food an oren at the general store) or else stews, the rest of the SP on the dummy, then sleep.
 
-The eat step was tested by hand on these stews (run 41: 79 -> 68 -> 57), as every loop's must be (run 18 starved in a loop).
+The eat step was tested by hand on these stews (Start Run 1: 79 -> 68 -> 57), as every loop's must be (run 18 starved in a loop).
 Stops (exit 3) on common.ready's reasons: a hostile in view, HP under 80%, a window it can't read, a bad condition; Hungry with no way
-to cook; a meal that didn't lower hunger; a sleep that didn't restore SP. It sleeps up to hunger 60 (LOOP_SLEEP), above the general 50: run 41's
+to cook; a meal that didn't lower hunger; a sleep that didn't restore SP. It sleeps up to hunger 60 (LOOP_SLEEP), above the general 50: Start Run 1's
 first batch deadlocked at SP 3 and hunger 50, too tired to gather and too hungry to sleep, and this loop wakes beside its food. Never at 60+.
 
-usage: python -I tools/earlyday.py [CYCLES=5] [--rotate] [--throw "a boomerang"]
+usage: python -I tools/earlyday.py [CYCLES=5] [--rotate] [--throw "a boomerang"] [--no-reserve]
   --rotate  train the lowest skill among the melee weapons in the pack and bare hands
 The base is runs/earlybase.json: {"stand": [X, Z], "bed": [X, Z], "fire": [X, Z]}, stand being one cell next to the dummy and the bonfire.
 """
@@ -30,8 +30,9 @@ STEW_FOOD, STEW_SP, STEW_GRASS = 11, 3, 5
 HUNGER_AFTER_MEAL = 38  # a sleep adds 20: wake under Hungry (70) with room to work
 SP_FLOOR = 4  # the bridge's guard cancels work at 3
 LOOP_SLEEP = 60  # the loop's own limit: see the docstring
+RESERVE_MEALS = 2
 WEED_RADIUS = 60
-MEALS = (("watermelon", 11), ("apple", 13), ("jerk", 19), ("orange", 22), ("on the bone", 27), ("roast", 34), ("stew", 11), ("soup", 18), ("skewer", 15), ("ramen", 22), ("salad", 20), ("pizza", 51), ("breadstick", 40), ("pile of bread", 31), ("piles of bread", 31), ("cheese bread", 31), ("ration", 51))  # a word of the name, food: smallest first (run 41: breads have several ids)
+MEALS = (("watermelon", 11), ("apple", 13), ("jerk", 19), ("orange", 22), ("on the bone", 27), ("roast", 34), ("stew", 11), ("soup", 18), ("skewer", 15), ("ramen", 22), ("salad", 20), ("pizza", 51), ("breadstick", 40), ("pile of bread", 31), ("piles of bread", 31), ("cheese bread", 31), ("ration", 51))  # a word of the name, food: smallest first (Start Run 1: breads have several ids)
 CROPS = (("berry", "berry"), ("crim", "crim"))
 
 
@@ -40,7 +41,7 @@ def count(item_id):
 
 
 def clear_windows():
-    """A tip, a dream, a report: read it through. Anything left is the caller's stop. A death prompt is never closed (run 43: that left the game stuck): crawl up and stop."""
+    """A tip, a dream, a report: read it through. Anything left is the caller's stop. A death prompt is never closed (Start Run 3: that left the game stuck): crawl up and stop."""
     if pc()["hp"] <= 0:
         ok = crawl_up()
         stop(f"I died: {'crawled up' if ok else 'no Crawl up offered: look.py'}: read the log before going on")
@@ -49,7 +50,7 @@ def clear_windows():
         if not (s.get("drama") or (s.get("layers") or {}).get("top")):
             return
         run("talk.py", "8", timeout=60)
-        # run 42: a resident's "Can I have some mushrooms? Yes. No." held the loop 5 minutes: talk.py never guesses, so a question gets No or Bye here
+        # Start Run 2: a resident's "Can I have some mushrooms? Yes. No." held the loop 5 minutes: talk.py never guesses, so a question gets No or Bye here
         no = [b for b in call("buttons")["data"]["buttons"] if (b.get("text") or "").startswith(("No.", "Bye", "b | No"))]
         if no:
             call("click", i=no[0]["i"])
@@ -64,17 +65,17 @@ def empty_hands():
     time.sleep(0.15)
 
 
-JUNK = ("rotten", "garbage", "empty can", "empty bottle", "junk stone", "rubble", "corpse", "offal", "heart", "fang", "seed", "bark", "resin",
+JUNK = ("rotten", "garbage", "empty can", "empty bottle", "junk stone", "rubble", "offal", "heart", "fang", "seed", "bark", "resin",
         "tuft", "leaf", "leaves", "shit", "letter", "skull")
-JUNK_FULL = ("branch", "recipe", "wooden box", "scrap", "potion of blindness", "potions of blindness", "potion of confusion", "potions of confusion", "fishing rod", "figure of", "card of")
+JUNK_FULL = ("recipe", "wooden box", "scrap", "potion of blindness", "potions of blindness", "potion of confusion", "potions of confusion", "fishing rod", "figure of", "card of")
 
 
 def tidy():
-    """Drop junk when the pack nears its 35 cards (run 42: three times a full grid made meals fall to the floor uneaten)."""
+    """Drop junk when the pack nears its 35 cards (Start Run 2: three times a full grid made meals fall to the floor uneaten)."""
     items = [i for i in data("inv")["items"] if not i.get("equipped")]
     if len(items) < 28:
         return
-    kinds = JUNK + JUNK_FULL if len(items) >= 33 else JUNK  # run 44: at 35 with JUNK gone, meals still fell to the ground three times
+    kinds = JUNK + JUNK_FULL if len(items) >= 33 else JUNK  # Start Run 4: at 35 with JUNK gone, meals still fell to the ground three times
     junk = [i for i in items if any(w in i["name"].lower() for w in kinds) and "bone nail" not in i["name"]]
     if not junk:
         return
@@ -94,15 +95,16 @@ def clear_hostiles():
             return
         f = foes[0]
         above = (f.get("lv") or 0) - s["pc"]["lv"]
-        if above > 0 and (above > 4 or not named("boomerang")):  # run 44: a boomerang at Throwing 1 killed a Lv6 squirrel at Lv2
-            stop(f"a hostile above my level: {f['name']} Lv{f.get('lv')} at {f.get('dist')}")
-        if above > 0:
+        if above > 7:  # Start Run 4: a boomerang killed a Lv6 at Lv2; Start Run 5: fists and the ally killed a Lv8 dog at Lv1 for 4 HP: at home this far above me is a fight, and fight.py's floor still holds
+            stop(f"a hostile far above my level: {f['name']} Lv{f.get('lv')} at {f.get('dist')}")
+        if above > 0 and named("boomerang"):
             tries += 1
-        # run 42: an evasive flyer kept away for eight fights in a row: after a miss in melee, throw (a boomerang comes back)
-        out = run("throw.py" if tries else "fight.py", f["name"].split()[-1], *(["a boomerang", 6, 35] if tries else [THRESHOLDS["walk_hp"]]), timeout=120)
+        # Start Run 2: an evasive flyer kept away for eight fights in a row: after a miss in melee, throw (a boomerang comes back)
+        throwing = tries and named("boomerang")
+        out = run("throw.py" if throwing else "fight.py", f["name"].split()[-1], *(["a boomerang", 6, 35] if throwing else [THRESHOLDS["walk_hp"]] + (["--force"] if above > 2 else [])), timeout=120)
         tries += 1
         print(f"  fought {f['name']} Lv{f.get('lv')}: {last(out)[:70] if out.strip() else ''}", flush=True)
-        run("loot.py", "8", timeout=120)  # only what's worth a card: --all filled the grid three times in run 42
+        run("loot.py", "8", timeout=120)  # only what's worth a card: --all filled the grid three times in Start Run 2
         clear_windows()
         if out.rc == 3:
             stop("fight: " + last(out)[:120])
@@ -111,11 +113,11 @@ def clear_hostiles():
 
 WEAPONS = (("club", "weaponBlunt"), ("mace", "weaponBlunt"), ("staff", "weaponStaff"), ("scythe", "weaponScythe"), ("kusarigama", "weaponScythe"),
            ("long sword", "weaponSword"), ("short sword", "weaponDagger"), ("dagger", "weaponDagger"), ("spear", "weaponPolearm"), ("trident", "weaponPolearm"),
-           ("lance", "weaponPolearm"), ("hand axe", "weaponAxe"), ("battle axe", "weaponAxe"), ("katana", "weaponSword"), ("machine axe", "weaponAxe"), ("scimitar", "weaponDagger"), ("wakizashi", "weaponDagger"), ("cane", "weaponStaff"), ("naginata", "weaponPolearm"))  # run 44: a woodcutter's axe and a bow punch the dummy
+           ("lance", "weaponPolearm"), ("hand axe", "weaponAxe"), ("battle axe", "weaponAxe"), ("war sickle", "weaponScythe"), ("katana", "weaponSword"), ("claymore", "weaponSword"), ("machine axe", "weaponAxe"), ("scimitar", "weaponDagger"), ("wakizashi", "weaponDagger"), ("cane", "weaponStaff"), ("naginata", "weaponPolearm"))  # Start Run 4: a woodcutter's axe and a bow punch the dummy
 
 
 def rotate():
-    """The dummy pays clamp((20 - skill) / 2, 1, 10) to the weapon's skill (run 42: nothing above about 18): train the lowest skill I can hold, fists included.
+    """The dummy pays clamp((20 - skill) / 2, 1, 10) to the weapon's skill (Start Run 2: nothing above about 18): train the lowest skill I can hold, fists included.
     Returns the skill picked."""
     txt = run("bridge.py", "skills", timeout=15)
     level = {m.group(1): int(m.group(2)) for m in (re.match(r"\s*(\w+)\s+(\d+) \(base", ln) for ln in txt.splitlines()) if m}
@@ -128,7 +130,7 @@ def rotate():
                 options.append((i["name"], sk, i))
                 break
     best = min(options, key=lambda o: level.get(o[1], 1))
-    # run 44: Throwing 1 paid 10 skill exp a SP against melee's 2 at skill 10; a thrown boomerang comes back, whatever is in the hands
+    # Start Run 4: Throwing 1 paid 10 skill exp a SP against melee's 2 at skill 10; a thrown boomerang comes back, whatever is in the hands
     if named("boomerang") and level.get("throwing", 1) <= level.get(best[1], 1):
         return "throwing"
     if (best[2] and best[2].get("equipped")) or (best[1] == "martial" and not held):
@@ -142,6 +144,24 @@ def rotate():
     run("close.py", timeout=10)
     print(f"  now training {best[1]} (level {level.get(best[1], 1)}) with {best[0] or 'bare hands'}", flush=True)
     return best[1]
+
+
+def battle_ready():
+    """Start Run 6: the dummy's rotation left a 2d3 sickle or bare hands in the hand for the road and the arena: 6 a turn where the pack held 3d3+2. The hardest hitter in the pack goes in the hand."""
+    best, score = None, -1
+    for i in data("inv")["items"]:
+        m = re.search(r"\((\d+)d(\d+)([+-]\d+)?", i["name"])
+        if m and any(w in i["name"] for w, _ in WEAPONS):
+            v = int(m.group(1)) * (int(m.group(2)) + 1) / 2 + int(m.group(3) or 0)
+            if v > score:
+                best, score = i, v
+    if not best or best.get("equipped"):
+        return
+    for h in [i for i in data("inv")["items"] if i.get("equipped") and any(w in i["name"] for w, _ in WEAPONS)]:
+        run("item.py", h["name"], "Unequip", timeout=15)
+    run("item.py", best["name"], "Equip", timeout=15)
+    run("close.py", timeout=10)
+    print(f"  in hand: {best['name'][:40]}", flush=True)
 
 
 def heal():
@@ -193,7 +213,7 @@ def cook(n, dx, dz):
 
 
 def named(word):
-    return [i["name"] for i in data("inv")["items"] if re.search(r"\b" + re.escape(word), i["name"]) and "rotten" not in i["name"] and not i.get("equipped")]  # run 42: berries rot in days; run 44: "e" from a foods.txt row matched the axe
+    return [i["name"] for i in data("inv")["items"] if re.search(r"\b" + re.escape(word), i["name"]) and "rotten" not in i["name"] and not i.get("equipped")]  # Start Run 2: berries rot in days; Start Run 4: "e" from a foods.txt row matched the axe
 
 
 def eat_named(word, food):
@@ -202,13 +222,21 @@ def eat_named(word, food):
     if not names:
         return False
     before = pc()["hunger"]
-    run("item.py", names[0], "Eat", timeout=30)
-    wait_idle(timeout=6000)
-    clear_windows()
-    after = pc()["hunger"]
-    if after >= before:
-        stop(f"{names[0]} didn't lower hunger ({before})")
-    return True
+    held = lambda: sum((i.get("num") or 1) for i in data("inv")["items"] if re.search(r"\b" + re.escape(word), i["name"]) and "rotten" not in i["name"])  # noqa: E731
+    stock = held()
+    for _ in range(2):
+        run("item.py", names[0], "Eat", timeout=30)
+        wait_idle(timeout=6000)
+        clear_windows()
+        for _ in range(12):  # Start Run 6: the hunger figure lags the meal, and eating again on that lag threw away two stews of three
+            time.sleep(0.2)
+            if pc()["hunger"] < before:
+                return True
+        if held() < stock:
+            break  # eaten, and it fed nothing to speak of: not a second one
+        names = named(word) or names  # never started (a bump, a full pack): once more
+    print(f"  {names[0]} didn't lower hunger ({before})", flush=True)  # Start Run 5: a blueberry held the whole loop: the next meal may work, and the hunger stops still stand
+    return False
 
 
 def meals():
@@ -216,18 +244,34 @@ def meals():
     known = list(MEALS)
     f = BASE.parent / "foods.txt"
     if f.exists():
-        known += [(w, 20) for w in f.read_text(encoding="utf-8").splitlines() if w and w not in ("berry", "bone", "plant")]  # run 44: buyfood writes the last word of a name; a raw bone isn't food (MEALS has "on the bone")
+        known += [(w, 20) for w in f.read_text(encoding="utf-8").splitlines() if w and w not in ("berry", "bone", "plant")]  # Start Run 4: buyfood writes the last word of a name; a raw bone isn't food (MEALS has "on the bone")
     return known
+
+
+def cook_corpses(fire, stand):
+    """Start Run 5: no vendor at the camp sells food and the road to Mysilia killed three times: what wanders in and dies is meals. "Meat on the bone" at the bonfire, about 27 food a corpse;
+    tidy used to throw them away."""
+    n = sum((i.get("num") or 1) for i in data("inv")["items"] if "corpse of" in i["name"] and "rotten" not in i["name"])
+    if not n or pc()["sp"] <= SP_FLOOR + 2:
+        return
+    walk(*stand, r=0, weak_ok=True)
+    empty_hands()
+    out = run("craft.py", fire[0] - stand[0], fire[1] - stand[1], "Meat on the bone", n, "--force", timeout=60)
+    clear_windows()
+    empty_hands()
+    print(f"  cooked {n} corpses: {last(out)[:60]}", flush=True)
 
 
 def eat_from_pack():
     """Down under 45: crops first (they rot), then the smallest meal in the pack. True when a meal remains, so stews aren't needed."""
     for word, food in (("blueberr", 8), ("crim", 7)):
         while pc()["hunger"] >= THRESHOLDS["eat_at"] - food and named(word):
-            eat_named(word, food)
+            if not eat_named(word, food):
+                break
     for word, food in meals():
         while pc()["hunger"] >= THRESHOLDS["eat_at"] and named(word):
-            eat_named(word, food)
+            if not eat_named(word, food):
+                break
     return any(named(w) for w, _ in meals())
 
 
@@ -235,7 +279,7 @@ def main():
     setup()
     if not BASE.exists():
         stop("no runs/earlybase.json: see the usage")
-    if "startSite" not in str((state().get("zone") or {}).get("full")):  # run 44: run in Mysilia it walked to the home's stand cell and trained nothing
+    if "startSite" not in str((state().get("zone") or {}).get("full")):  # Start Run 4: run in Mysilia it walked to the home's stand cell and trained nothing
         stop("not at home")
     base = json.loads(BASE.read_text(encoding="utf-8"))
     stand, bed, fire = base["stand"], base["bed"], base["fire"]
@@ -247,6 +291,11 @@ def main():
     for c in range(cycles):
         gate()
         p = pc()
+        # Start Runs 5 and 6: the dummy ate every meal, then the walk for more starved (hunger 90 by the road, twice). A loop stops with a leg's worth in hand: it costs about 20 and an ambush more.
+        reserve = sum(((i.get("num") or 1) for w, _ in meals() for i in data("inv")["items"] if re.search(r"\b" + re.escape(w), i["name"]) and "rotten" not in i["name"]))
+        if reserve < RESERVE_MEALS and p["hunger"] >= 30 and "--no-reserve" not in sys.argv:
+            print(f"stop: {reserve} meals left at hunger {p['hunger']}: time for food or a job, while the road is still walkable")
+            return 3
         day = p["date"].split()[0]
         if day != prayed:  # a free 80-100 Faith exp once a day (research of 2026-11-04)
             run("ability.py", "Pray", timeout=30)
@@ -265,7 +314,8 @@ def main():
                     else:
                         stop("crops: " + last(o)[:120])
 
-        # Food for tonight: meals from the pack, crops, then stews
+        # Food for tonight: corpses cooked, meals from the pack, crops, then stews
+        cook_corpses(fire, stand)
         fed = eat_from_pack()
         p = pc()
         hunger = p["hunger"]
@@ -299,7 +349,7 @@ def main():
         empty_hands()
         skill = rotate() if "--rotate" in sys.argv and "--throw" not in sys.argv else None
         if pc()["sp"] > SP_FLOOR + 1:
-            extra = ["--throw", sys.argv[sys.argv.index("--throw") + 1]] if "--throw" in sys.argv else ["--throw", "a boomerang"] if skill == "throwing" else []  # run 41: a boomerang comes back
+            extra = ["--throw", sys.argv[sys.argv.index("--throw") + 1]] if "--throw" in sys.argv else ["--throw", "a boomerang"] if skill == "throwing" else []  # Start Run 1: a boomerang comes back
             out = run("train.py", SP_FLOOR, 4, *extra, timeout=300)
             clear_windows()
             if out.rc == 3:
@@ -311,12 +361,13 @@ def main():
         # Sleep: a last meal if training left me over the line
         while pc()["hunger"] >= LOOP_SLEEP - 8 and any(named(w) for w, _ in meals()):
             word = next(w for w, _ in meals() if named(w))
-            eat_named(word, 0)
+            if not eat_named(word, 0):
+                break
         p = pc()
         if p["hunger"] >= LOOP_SLEEP:
             stop(f"hunger {p['hunger']}: no food left to sleep on, SP {p['sp']}")
         wait_idle(timeout=6000)
-        if max(abs(bed[0] - p["x"]), abs(bed[1] - p["z"])) > 1:  # run 44: a fight had drawn me 11 cells away
+        if max(abs(bed[0] - p["x"]), abs(bed[1] - p["z"])) > 1:  # Start Run 4: a fight had drawn me 11 cells away
             walk(*stand, r=0, weak_ok=True)
             p = pc()
         out = run("act.py", bed[0] - p["x"], bed[1] - p["z"], "Sleep", timeout=30)
@@ -333,7 +384,7 @@ def main():
         q = pc()
         print(f"{c + 1}: Lv{q['lv']} {start_exp}->{q['exp']}/{q['expNext']} (Lv{start_lv} at start)  SP {q['sp']}/{q.get('maxSp')}  hunger {q['hunger']}  "
               f"stews {count('zassouni')} grass {count('grass')}  {q['date']}  {time.time() - tc:.0f}s", flush=True)
-        if q["sp"] <= p["sp"] and p["sp"] <= SP_FLOOR + 3:  # run 44: a fight ended the training at SP 28, too fresh to sleep: that's just another round on the dummy
+        if q["sp"] <= p["sp"] and p["sp"] <= SP_FLOOR + 3:  # Start Run 4: a fight ended the training at SP 28, too fresh to sleep: that's just another round on the dummy
             stop(f"the sleep didn't restore SP ({p['sp']} -> {q['sp']})")
     print(f"done: {cycles} cycles in {time.time() - t0:.0f}s")
     return 0

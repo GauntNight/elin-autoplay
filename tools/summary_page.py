@@ -187,7 +187,7 @@ def render(md, source_name):
     for b in blocks(md):
         if b[0] == "h" and b[1] == 1:
             text = b[2]
-            m = re.match(r"(Run \d+)\s*(?:summary)?:?\s*(.*)", text, re.I)
+            m = re.match(r"(Start Runs? [\d-]+|Run \d+)\s*(?:summary)?:?\s*(.*)", text, re.I)
             h1, rest = (m.group(1), m.group(2)) if m else (text, "")
             title, eyebrow = f"Elin {h1}", "Elin · " + rest if rest else "Elin"
             continue

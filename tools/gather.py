@@ -134,7 +134,7 @@ def main():
         # run 17: on a wild field a kamikaze yeek walked up during a harvest and blew (-30 HP);
         # nothing here looked for hostiles. common.ready: a hostile in view (threat order belongs
         # to delve/fight), a window, a task still running, HP, Hungry, Overweight
-        # run 41: gathering weeds is how a new character fixes hunger, so its food run goes on whatever the hunger: stopping it starves her
+        # Start Run 1: gathering weeds is how a new character fixes hunger, so its food run goes on whatever the hunger: stopping it starves her
         why = ready(idle=True, hostiles=not WEAK_OK, hunger=None if "--food-run" in sys.argv else 70)
         if not why and WEAK_OK:
             why = weak_check()

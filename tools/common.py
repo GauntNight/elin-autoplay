@@ -111,7 +111,7 @@ def top():
 
 
 def crawl_up(word="Onward"):
-    """Answer the death prompt: the last word, then Crawl up (never Buried). Run 43: a loop's clear_windows closed the prompt instead, which left the game with HP under 0,
+    """Answer the death prompt: the last word, then Crawl up (never Buried). Start Run 3: a loop's clear_windows closed the prompt instead, which left the game with HP under 0,
     no dialog and no way on. True when the choice was clicked."""
     if top() == "Dialog":
         call("input", text=word)

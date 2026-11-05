@@ -3,7 +3,7 @@
 Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the hard rules); what each tool's domain taught us is in
 `knowledge/tool-notes.md`. Every tool: exit 0 done, 1 refused, 2 the bridge, 3 stopped for a decision.
 
-- **`ability.py`**: Use an ability by its name from the ability window (run 41): Rest, Pray. Opens the window, right-clicks the button with that name in the same step as listing it, and closes the window, so nothing else can shift the list in between.
+- **`ability.py`**: Use an ability by its name from the ability window (Start Run 1): Rest, Pray. Opens the window, right-clicks the button with that name in the same step as listing it, and closes the window, so nothing else can shift the list in between.
     usage: python -I tools/ability.py NAME        e.g. python -I tools/ability.py Rest
     Exit 0 used, 1 refused (no such ability), 2 the bridge.
 - **`act.py`**: Perform the act at a cell whose text starts with TEXT (case-insensitive), never by index: a creature standing on the cell puts its own acts (Talk, Attack...) first (run 03: `do 0` meant to read a letter opened Kaberg's dialog instead).
@@ -13,7 +13,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     mode: all (default) | left | key | right
 - **`activity.py`**: Mark the start and end of a timed activity for the run tracker (the review of 2026-10-23: the owner's measure is growth per real hour, and no log said what each activity earned). Each mark is one row in runs/activity.csv: the real clock, the game date, the tag, the phase, exp, level, gold, gold bars, the zone. stats.py pairs a start with its end and derives exp and orens per real hour per tag; the loops call it themselves, so the numbers need no hand work at the close-out.
     usage: python -I tools/activity.py TAG start|end [NOTE]
-- **`arena.py`**: Clear a job's arena instance ("Monster's Den": Monster extermination, Monster hunting, Troubled home) to "You have wiped out the nearby monsters!" (run 42: hunt.py stops at 70% HP and walks toward the edge, where "Leave Monster's Den?" would forfeit the job). Loop: fight the nearest foe, Rest when nothing is in view and HP is under 70%, else walk the map's corners and middle. Ends at the wipe, then loots, leaves and picks up the reward.
+- **`arena.py`**: Clear a job's arena instance ("Monster's Den": Monster extermination, Monster hunting, Troubled home) to "You have wiped out the nearby monsters!" (Start Run 2: hunt.py stops at 70% HP and walks toward the edge, where "Leave Monster's Den?" would forfeit the job). Loop: fight the nearest foe, Rest when nothing is in view and HP is under 70%, else walk the map's corners and middle. Ends at the wipe, then loots, leaves and picks up the reward.
     usage: python -I tools/arena.py [--no-leave] [--any] [--wiped]   --wiped: already wiped, only loot, leave and pick the reward
     Exit 0 wiped (and left), 1 refused (not in an arena), 3 stopped.
 - **`arrive.py`**: Arrive home (run 19, the user's rule after run 18): the scripted part of elin-home section 1, in order, with the Dishes box shared first. leave.py made it private on the way out (dishes.py).
@@ -27,7 +27,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       no ITEM lists what the bag holds
     Exit: 0 every item moved, 1 any item not moved (run 38: a full pack exited 0).
     item.py finds items inside an open bag too (run 04: `item.py "piles of bread" Eat` ate from the Cooler Box); --take raised a NullReference in the game on the world map.
-- **`board.py`**: List a town's jobs from its nearest quest board in one step (run 41: town jobs were a new character's best income: 247 orens and +1 influence in 3 real minutes). Walks next to the nearest ordinary board, opens it and prints each job with its reward, danger and time. The board stays open, so a job is `bridge.py click N expect=NAME` from the list. All boards in a town show the same jobs.
+- **`board.py`**: List a town's jobs from its nearest quest board in one step (Start Run 1: town jobs were a new character's best income: 247 orens and +1 influence in 3 real minutes). Walks next to the nearest ordinary board, opens it and prints each job with its reward, danger and time. The board stays open, so a job is `bridge.py click N expect=NAME` from the list. All boards in a town show the same jobs.
     usage: python -I tools/board.py [--close]
            python -I tools/board.py --take NAME [NAME ...]   accept these jobs in order, each by its name on the board (an instance job moves
                                                              me into it as its dialog ends, so it goes last); under Lv15 it refuses an instance
@@ -124,7 +124,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     open ("window open: LayerX"); read it with talk.py, or read.py then close.py.
 - **`butcher.py`**: Butcher every corpse in the pack and the Cooler Box with the butcher's tool (run 13, G6).
     usage: python -I tools/butcher.py [--dry] [NAME ...]   (NAME: only corpses matching these words)
-- **`buyfood.py`**: Turn gold into food at an open or named shop in one step (run 43: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from its tooltip, and buy by food per oren until the budget is gone. Meals earlyday.py doesn't know yet go in runs/foods.txt, one word a line, for it to eat.
+- **`buyfood.py`**: Turn gold into food at an open or named shop in one step (Start Run 3: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from its tooltip, and buy by food per oren until the budget is gone. Meals earlyday.py doesn't know yet go in runs/foods.txt, one word a line, for it to eat.
     usage: python -I tools/buyfood.py [--keep N] [--shop ROLE_ID]   stand by the shopkeeper (default merchant_inn); N orens are kept
     Exit 0 done, 1 refused (no shopkeeper near).
 - **`cast.py`**: Cast an attack spell at a hostile from range (bridge 0.33.0 `cast`: the game's own ButtonAbility.TryUse path, pc.UseAbility then EndTurn, with every rule of the game kept: range, line of sight, the spell stock, cooldowns). Run 27's 『Kobold』 (23% a round in melee, PV-heavy) had no ranged answer, and the stocked attack spells were barely cast (the user's tip after run 27). Each cast trains Casting by twice the MP spent (Chara.UseAbility: elements.ModExp(304, MP x 2)), and only a Casting level-up pays character exp: a weak exp engine at 69 MP, a free ranged attack all the same.
@@ -209,8 +209,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       from the game (Thing.IsSharedContainer, through boxcfg) and close the window.
     Exit: 0 done (the box is as asked), 1 refused (not at home, bad argument), 2 the bridge,
     3 stopped (the box couldn't be opened or the lock didn't change).
-- **`earlyday.py`**: A new character's exp loop at home, from the first minutes (run 41, the Lv1 trials). Character exp is skill level-ups only, a level-1 skill levels fast, and at the game's speed x5 a full bar of SP on the dummy takes 5 real seconds and a sleep 4, so real time stops binding and food takes over: a sleep costs 20 hunger. Weeds close the loop: they pay Gathering and give grass, 5 grass and 3 SP make a weed stew (11 food, the bonfire burns a log from the pack).
-    usage: python -I tools/earlyday.py [CYCLES=5] [--rotate] [--throw "a boomerang"]
+- **`earlyday.py`**: A new character's exp loop at home, from the first minutes (Start Run 1, the Lv1 trials). Character exp is skill level-ups only, a level-1 skill levels fast, and at the game's speed x5 a full bar of SP on the dummy takes 5 real seconds and a sleep 4, so real time stops binding and food takes over: a sleep costs 20 hunger. Weeds close the loop: they pay Gathering and give grass, 5 grass and 3 SP make a weed stew (11 food, the bonfire burns a log from the pack).
+    usage: python -I tools/earlyday.py [CYCLES=5] [--rotate] [--throw "a boomerang"] [--no-reserve]
       --rotate  train the lowest skill among the melee weapons in the pack and bare hands
     The base is runs/earlybase.json: {"stand": [X, Z], "bed": [X, Z], "fire": [X, Z]}, stand being one cell next to the dummy and the bonfire.
 - **`elin_eye.py`**: Capture the Elin window's own pixels to a PNG. Read-only.
@@ -234,7 +234,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/fasttravel.py NAME       travel to NAME (whole-word match; refuses two candidates,
                                                     a cost over the rations carried, or a non-world-map zone)
     Exit 0 travelled (or listed), 1 refused, 2 bridge error, 3 stopped (the list did not open).
-- **`feat.py`**: Spend a feat point by name (run 41: every level gives one, and clicking through the sheet by hand costs real minutes in a Lv1 run). Opens the sheet through the exp bar (fact #223), clicks the feat, answers Yes, closes.
+- **`feat.py`**: Spend a feat point by name (Start Run 1: every level gives one, and clicking through the sheet by hand costs real minutes in a Lv1 run). Opens the sheet through the exp bar (fact #223), clicks the feat, answers Yes, closes.
     usage: python -I tools/feat.py                 list what's on offer
            python -I tools/feat.py NAME [NAME ...]  buy the first one on offer, per point, in that order
     Exit 0 done (or listed), 1 refused (no point or none of them on offer), 2 the bridge.
@@ -411,7 +411,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     After moving a station or a box, update tools/home.py (and the skills' tables) in the same session.
 - **`needles.py`**: Collect needles from cacti on a beach map (the user's idea, run 08: G6's loom needs 6 needles; a cactus gives a bone needle when collected by hand, ripe or not: GrowSystemCactus.OnMineObj). Harvests every cactus on the explored map (right-click "Collect", wait, pick up the needle), then explores to reveal more. Fights hostiles 3+ levels below me; stops (exit 3) for anything stronger, HP under 70%, SP under the floor, or a window.
     usage: python -I tools/needles.py [WANT=12] [MIN_SP=10] [ROUNDS=30]
-- **`newchar.py`**: Make a new character from the title screen and start the game (run 41: the steps of elin-setup section 4 as one tool, each picked by name).
+- **`newchar.py`**: Make a new character from the title screen and start the game (Start Run 1: the steps of elin-setup section 4 as one tool, each picked by name).
     usage: python -I tools/newchar.py RACE CLASS [--name NAME]    e.g. Yerles Warrior
            python -I tools/newchar.py random random               a real random pick from the two lists
     Leaves the game creating the world, about 80 seconds, on the Novice Adventurer law and no oaths: never Permadeath. A new game is always a new
@@ -428,7 +428,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/ollama_stop.py [--check]
       --check  say what would be ended and end nothing
     exit codes: 0 stopped, or nothing to stop; 1 refused (the listener isn't what it should be); 2 still running afterwards.
-- **`opening.py`**: The opening as one tool (run 41: done by hand it took 15 real minutes, nearly all of it turns between steps; the elin-opening skill is the reasoning, this is its fast path). From a new game's first dialog to a claimed home, Aliby-style pet, boards, Loytel, the Defense Training kit and Way of Crafter's training dummy placed beside a bed. Each stage checks its result and stops (exit 3) naming the stage, so a stop is finished by hand and the rest picked up with --from STAGE. Sets the game's speed to x5 at once (fights set x1 themselves).
+- **`opening.py`**: The opening as one tool (Start Run 1: done by hand it took 15 real minutes, nearly all of it turns between steps; the elin-opening skill is the reasoning, this is its fast path). From a new game's first dialog to a claimed home, Aliby-style pet, boards, Loytel, the Defense Training kit and Way of Crafter's training dummy placed beside a bed. Each stage checks its result and stops (exit 3) naming the stage, so a stop is finished by hand and the rest picked up with --from STAGE. Sets the game's speed to x5 at once (fights set x1 themselves).
     usage: python -I tools/opening.py [--from STAGE] [--to STAGE]
     stages: intro deed rewards pet box inspector punk boar logs workbench torch house dummy
     Writes runs/earlybase.json (the stand, the bed and the bonfire) for earlyday.py and marks each stage on the trial clock when one runs.
@@ -522,9 +522,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       WALL     the wall item to place (e.g. "plank walls"); doors are skipped (a door cell is left as it is)
     Stops (exit 3) on a cell it couldn't mine or place, with the cells done so far; HP, a hostile or a window stop it too
     (common.ready). Exit 0 when every cell holds the new wall at its old facing.
-- **`roam.py`**: Walk for character exp (run 43): the game pays 1 exp per 3 miles walked on arrival at a local map ("You have walked around 19 miles and have gained experience": +6), at no stamina and a third of a hunger a game hour, about 18 exp a real minute at speed x5. It beat the dummy once skills passed about 10. Shuttles between two places, entering each to bank the miles. Ambushes: its own field() below, a new character's rules, not wgo.py --ambush's.
-    usage: python -I tools/roam.py PLACE_A PLACE_B [--legs N] [--danger-ok N]   from the world map or inside either place
+- **`roam.py`**: Walk for character exp (Start Run 3): the game pays 1 exp per 3 miles walked on arrival at a local map ("You have walked around 19 miles and have gained experience": +6), at no stamina and a third of a hunger a game hour, about 18 exp a real minute at speed x5. It beat the dummy once skills passed about 10. Shuttles between two places, entering each to bank the miles. Ambushes: its own field() below, a new character's rules, not wgo.py --ambush's.
+    usage: python -I tools/roam.py PLACE_A PLACE_B [--legs N] [--danger-ok N] [--long-ok]   from the world map or inside either place
     At home with a bed (runs/earlybase.json) and Sleepy or worse: one earlyday.py cycle (pray, crops, dummy, sleep).
+    A long trip wants PV 10 and food for the road (the user's rule): home and the camp are always allowed.
     Stops (exit 3): an ambush the rules refuse, no food left at hunger 60+, HP under the loop floor. Exit 0 when the legs are done.
 - **`rotate.py`**: Set walls to a facing, using the game's own "Rotate block" (hold any wall item and right-click an existing wall; each rotation steps blockDir 0 -> 1 -> 2 -> 0).
     usage: python -I tools/rotate.py DIR X,Z [X,Z ...]
@@ -593,6 +594,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/stairs.py down|up
     Exit 0 (the zone changed, printed before -> after), 1 refused (no such stairway known), 3 stopped (a
     hostile within 4, HP under 70%, a window, or the zone didn't change).
+- **`startloop.py`**: The money-and-food circle of a Start Run, once there is armor and an ally (Start Runs 5-6, by hand each time, and each dropped stitch cost a death): Mysilia's inn and board, the camp's board, home's dummy. Every leg passes two or three game days, so the boards refill as I go. Takes each instance job, buys food with what it earns, spends the stamina at home.
+    usage: python -I tools/startloop.py MINUTES [--cycles N]   N dummy cycles on each home visit (default 3)
+    Stops (exit 3): a refused ambush, no food and no money with the road too far, a death (crawled up: read the log), the time.
 - **`stats.py`**: The run tracker's table: one row per run (and per event between runs, such as the 2026-10-19 review) with every number the user tracks across sessions (2026-10-20): minutes, game days, level and exp, exp an hour, gold, damage, HP/PV/speed, deaths and near deaths, jobs, skills, goals, game errors and errors an hour, tool changes, facts and the semantic index; and, since the review of 2026-10-23 (the owner's measure is growth per play hour, and no CSV held a money flow), income, bills, rent an hour, wealth, the plan's completion and the rates per activity.
     usage: python -I tools/stats.py          write runs/stats.csv and runs/activity_rates.csv, print both
     The dashboard (Elin Run Tracker) reads runs/stats.csv; elin-closeout says how to refresh it.
@@ -638,7 +642,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
             17: "cure major wound" took a cursed potion and hurt the escort)
     Without the Putit it throws granite pebbles. Exit 0 when the target dies or the item runs out; 1 when
     there was nothing to throw at all (the caller melees); exit 3 under the HP floor or when a window opens.
-- **`tickets.py`**: The first-time craft chain as one tool (run 42: every new recipe pays an old ticket, 117 orens anywhere, and trains Crafting and Carpentry from level 1; done by hand it took 25 real minutes). From a home with a workbench: logs, stones by hand, vines and bones, then sawmill -> carpenter's table -> tinker's table and every cheap recipe on them. Eats and sleeps itself. A recipe that fails is skipped and reported; nothing here stops for a missing material.
+- **`tickets.py`**: The first-time craft chain as one tool (Start Run 2: every new recipe pays an old ticket, 117 orens anywhere, and trains Crafting and Carpentry from level 1; done by hand it took 25 real minutes). From a home with a workbench: logs, stones by hand, vines and bones, then sawmill -> carpenter's table -> tinker's table and every cheap recipe on them. Eats and sleeps itself. A recipe that fails is skipped and reported; nothing here stops for a missing material.
     usage: python -I tools/tickets.py [--target N]     stop once N tickets are in the pack (default: all of the list)
     Needs runs/earlybase.json (the bed) and the axe. Exit 0 done, 3 stopped (a hostile above my level, no food and too hungry to sleep).
 - **`town.py`**: G12's done-when, read from the game's own rooms (bridge 0.27.0 `rooms`): the town checks.
@@ -670,15 +674,15 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/trash.py              sweep radius 80, then dump
            python -I tools/trash.py dump         only dump the pack's junk
            python -I tools/trash.py dump "leaf dish"   also dump stacks matching these names
-- **`trial.py`**: Trials: a series of new level 1 characters that put the rules through their paces while the player's own game stays safe (the user, 2026-11-05: four 2-hour runs from level 1, "Make sure we keep Rolord"). A game's records live in runs/ and knowledge/, and the tools read them there, so the kept game's records are parked in archive/NAME/ with a checksum of every file, and the trials get blank ones. Its save is never loaded: new characters take the game's next free world_N. The trial's floor gate and route limit go in runs/thresholds.json (gitignored, read by common.py), so no tracked file changes and the numbers leave with the records.
+- **`trial.py`**: Start Runs: a series of new level 1 characters that put the rules through their paces while the player's own game stays safe (the user, 2026-11-05: 2-hour runs from level 1, "Make sure we keep Rolord"). They have their own count, S1, S2 and on, and never join the kept game's run numbers, metrics or tracker (the user, same day). A game's records live in runs/ and knowledge/, and the tools read them there, so the kept game's records are parked in archive/NAME/ with a checksum of every file, and the trials get blank ones. Its save is never loaded: new characters take the game's next free world_N. The trial's floor gate and route limit go in runs/thresholds.json (gitignored, read by common.py), so no tracked file changes and the numbers leave with the records.
     usage: python -I tools/trial.py park [--yes]          show or do the parking (a second park is refused)
-           python -I tools/trial.py start RUN "CHARACTER" WORLD   start a trial's clock: minutes count from here
+           python -I tools/trial.py start S8 "CHARACTER" WORLD    start a trial's clock: minutes count from here
            python -I tools/trial.py mark "LABEL" [--note TEXT]    a milestone at the current minute, in runs/milestones.csv
            python -I tools/trial.py sample [--every 20] [--max 125]  log the state every N seconds until the window or the game ends;
                                                                      a level-up marks itself. Run it in the background
            python -I tools/trial.py table                 minutes to each level and the totals, per trial, against the baselines
            python -I tools/trial.py status                what is parked and which trial is running
-           python -I tools/trial.py restore [--yes]       the trials' records to archive/trials-DATE/, the kept game's back, every
+           python -I tools/trial.py restore [--yes]       the trials' records to archive/start-runs-DATE/, the kept game's back, every
                                                           checksum verified (exit 1 and nothing more removed if one differs)
     Exit: 0 done (or shown), 1 refused, 2 the bridge.
 - **`unpack.py`**: Open the mail: every package (delivery box) on the map, one at a time, with its contents listed. Deliveries, quest rewards and the tax bill arrive in packages by the hearth or the mail post, and they pile up unopened (run 04 found four, holding a tool, a can, a bottle).

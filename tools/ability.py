@@ -1,4 +1,4 @@
-"""Use an ability by its name from the ability window (run 41): Rest, Pray. Opens the window, right-clicks the button with that
+"""Use an ability by its name from the ability window (Start Run 1): Rest, Pray. Opens the window, right-clicks the button with that
 name in the same step as listing it, and closes the window, so nothing else can shift the list in between.
 
 Rest at SP under about 20% falls asleep where you stand, with no bed (fact #1197); above that it only meditates and heals.
@@ -27,6 +27,20 @@ def use(name):
             hits = listed()
             if hits:
                 break
+    if not hits:
+        # run 15, Start Run 5: at times the injected Menu keys do nothing (all four at once, after a death); the hotbar's own "Ability" button opens the list
+        for b in call("buttons", all=True)["data"]["buttons"]:
+            if b.get("hot") == "HotItemLayer":
+                tip = (call("hover", i=b["i"]).get("data") or {}).get("texts") or [""]
+                if tip[0] == "Ability":
+                    call("buttons", all=True)
+                    call("click", i=b["i"])
+                    for _ in range(10):
+                        time.sleep(0.2)
+                        hits = listed()
+                        if hits:
+                            break
+                    break
     if not hits:
         return False
     rep = call("rclick", i=hits[0]["i"])

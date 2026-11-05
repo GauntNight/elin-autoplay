@@ -126,5 +126,5 @@ What the first test of this skill cost (a Lich Pianist with 10 HP and 25 stamina
 - **One step, then read the result.** Chaining commands put down the gold bars and shared the toolbelt. Use `act.py` by name:
   an index read a moment ago can become Attack when a pet steps onto the cell (the bridge now refuses that).
 - **Death is cheap at first:** "the blessing of Elin" means nothing is lost early on (until 485-08-12 in the first game, unless the
-  player took the oath against it). The game asks for a last word, then **Crawl up, never Buried**: `common.crawl_up` answers both; closing that prompt hangs the game (run 43).
+  player took the oath against it). The game asks for a last word, then **Crawl up, never Buried**: `common.crawl_up` answers both; closing that prompt hangs the game (Start Run 3).
   Log the cause in `runs/errors.csv`, and fix what let it happen.

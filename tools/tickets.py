@@ -1,4 +1,4 @@
-"""The first-time craft chain as one tool (run 42: every new recipe pays an old ticket, 117 orens anywhere, and trains Crafting and Carpentry from level 1;
+"""The first-time craft chain as one tool (Start Run 2: every new recipe pays an old ticket, 117 orens anywhere, and trains Crafting and Carpentry from level 1;
 done by hand it took 25 real minutes). From a home with a workbench: logs, stones by hand, vines and bones, then sawmill -> carpenter's table -> tinker's
 table and every cheap recipe on them. Eats and sleeps itself. A recipe that fails is skipped and reported; nothing here stops for a missing material.
 
@@ -76,7 +76,7 @@ def sleep_if_low(need=9):
 
 
 def crops():
-    """Food first (run 43 ran dry mid-chain): a new map's crops are ripe and nearly free."""
+    """Food first (Start Run 3 ran dry mid-chain): a new map's crops are ripe and nearly free."""
     for obj, item, n in (("berry", "berry", 12), ("crim", "crim", 8)):
         run("gather.py", obj, item, n, 2, 45, "--food-run", timeout=120)
         clear_windows()
@@ -140,7 +140,7 @@ def near(station):
 
 
 def craft(station, name, use=None, n=1):
-    """One recipe by name. True when a new item came of it. Run 44: a second run of this tool re-crafted paid recipes (rods, desks): about 30 SP for nothing: paid ones are written down and skipped."""
+    """One recipe by name. True when a new item came of it. Start Run 4: a second run of this tool re-crafted paid recipes (rods, desks): about 30 SP for nothing: paid ones are written down and skipped."""
     if name in paid():
         return False
     sleep_if_low()
@@ -196,7 +196,7 @@ def paid():
 
 def strings(n):
     for _ in range(n):
-        if have("vine") < 2 or have("string") >= n:  # run 44: five more strings on every run of the tool, 2 SP each
+        if have("vine") < 2 or have("string") >= n:  # Start Run 4: five more strings on every run of the tool, 2 SP each
             return
         craft("workbench", "String")
 
@@ -218,7 +218,7 @@ def stones_by_hand(n):
 
 
 def tinker():
-    """The tinker's table and its tools (run 43: a table recipe isn't always known at the start: a desk counts as Table, fact to check; the first chair and a table or desk, 2 bones)."""
+    """The tinker's table and its tools (Start Run 3: a table recipe isn't always known at the start: a desk counts as Table, fact to check; the first chair and a table or desk, 2 bones)."""
     t0 = time.time()
     if not built("tinker's table"):
         if have(" log") < 6:

@@ -1,4 +1,4 @@
-"""Turn gold into food at an open or named shop in one step (run 43: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from
+"""Turn gold into food at an open or named shop in one step (Start Run 3: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from
 its tooltip, and buy by food per oren until the budget is gone. Meals earlyday.py doesn't know yet go in runs/foods.txt, one word a line, for it to eat.
 
 usage: python -I tools/buyfood.py [--keep N] [--shop ROLE_ID]   stand by the shopkeeper (default merchant_inn); N orens are kept
@@ -67,7 +67,7 @@ def main():
     for b in grid():
         n = nutrition(b)
         card = b["card"]
-        if not n or "rotten" in card:
+        if not n or "rotten" in card or "bundle of" in card:  # Start Run 7: a raw crop tops the list at 2 food an oren, 8 a bundle by hand, but the loops' meals() leave "plant" uneaten: the money sat in the pack
             continue
         p, _ = price(b)
         if p:
@@ -89,7 +89,7 @@ def main():
             before = gold()
             call("invdo", i=k)
             time.sleep(0.1)
-            if gold() >= before:  # run 43: a full pack refuses silently and this loop spun: stop, say so
+            if gold() >= before:  # Start Run 3: a full pack refuses silently and this loop spun: stop, say so
                 print(f"a purchase of {base} changed nothing: the pack is probably full ({len([i for i in data('inv')['items'] if not i.get('equipped')])} cards)")
                 run("close.py", timeout=10)
                 return 0

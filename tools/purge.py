@@ -106,7 +106,7 @@ def drop_in_open(name):
 
 def main():
     setup()
-    # runs 41 and 43: the list is a late character's: in a new game it threw away the only axe, twice, through wgo and through ladder
+    # Start Runs 1 and 3: the list is a late character's: in a new game it threw away the only axe, twice, through wgo and through ladder
     if not base_ready():
         print("no purge in a new game: its materials and tools are what it's short of")
         return 0

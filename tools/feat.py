@@ -1,4 +1,4 @@
-"""Spend a feat point by name (run 41: every level gives one, and clicking through the sheet by hand costs real minutes in a Lv1 run).
+"""Spend a feat point by name (Start Run 1: every level gives one, and clicking through the sheet by hand costs real minutes in a Lv1 run).
 Opens the sheet through the exp bar (fact #223), clicks the feat, answers Yes, closes.
 
 usage: python -I tools/feat.py                 list what's on offer

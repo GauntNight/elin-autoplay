@@ -1,5 +1,5 @@
 """Clear a job's arena instance ("Monster's Den": Monster extermination, Monster hunting, Troubled home) to "You have wiped out the nearby monsters!"
-(run 42: hunt.py stops at 70% HP and walks toward the edge, where "Leave Monster's Den?" would forfeit the job). Loop: fight the nearest foe, Rest when
+(Start Run 2: hunt.py stops at 70% HP and walks toward the edge, where "Leave Monster's Den?" would forfeit the job). Loop: fight the nearest foe, Rest when
 nothing is in view and HP is under 70%, else walk the map's corners and middle. Ends at the wipe, then loots, leaves and picks up the reward.
 
 Survival: a foe more than 3 levels above me, or HP under 25% with foes around, stops (exit 3) for a decision: nothing here flees by itself.
@@ -22,7 +22,7 @@ def texts():
 
 
 def wipe_line():
-    """The wipe line's position in the visible log, -1 when it isn't there. Run 43: the log still held the last job's line, so a second arena in a row counted as
+    """The wipe line's position in the visible log, -1 when it isn't there. Start Run 3: the log still held the last job's line, so a second arena in a row counted as
     wiped at once; and the window is short, so counting lines failed too (the old one scrolled off as the new one came): a line further down than any seen is new."""
     return max((i for i, t in enumerate(texts()) if "wiped out the nearby monsters" in t), default=-1)
 
@@ -55,9 +55,11 @@ def main():
     if "arena" not in (z.get("full") or "") and "--any" not in sys.argv:  # --any: the same loop on a nefia floor, no wipe to wait for
         print(f"refused: not in an arena: {z.get('full')}")
         return 1
-    if "--any" in sys.argv and s["pc"]["lv"] < 10 and "--weak-ok" not in sys.argv:  # run 43: Puppy's Cave at Lv7, HP 59 -> -8: a floor's crowd, and little exp for it
+    if "--any" in sys.argv and s["pc"]["lv"] < 10 and "--weak-ok" not in sys.argv:  # Start Run 3: Puppy's Cave at Lv7, HP 59 -> -8: a floor's crowd, and little exp for it
         print(f"refused: a nefia floor at Lv{s['pc']['lv']}: level 10, or --weak-ok")
         return 1
+    from earlyday import battle_ready
+    battle_ready()
     i = 0
     t0 = time.time()
     high = wipe_line()
@@ -78,13 +80,13 @@ def main():
                 stop(f"HP {p['hp']}/{p['maxHp']} with {len(foes)} foes in view")
             out = run("fight.py", f["name"].split()[-1], FLOOR, timeout=90)
             print(f"  {f['name']} Lv{f.get('lv')}: HP {pc()['hp']}  {last(out)[:50]}", flush=True)
-            if out.rc == 1:  # run 43: the fight tool refuses an avoid kind and this loop asked again for 3 minutes
+            if out.rc == 1:  # Start Run 3: the fight tool refuses an avoid kind and this loop asked again for 3 minutes
                 stop(f"fight.py refused {f['name']}: {last(out)[:80]}")
             continue
         if p["hp"] * 100 < 70 * p["maxHp"]:
             rest()
             continue
-        # run 42: walkto refuses unexplored cells and the loop spun for 7 minutes; hunt.py's legs missed the last one: explore.py found it at once
+        # Start Run 2: walkto refuses unexplored cells and the loop spun for 7 minutes; hunt.py's legs missed the last one: explore.py found it at once
         i += 1
         run("explore.py", timeout=60)
         answer_no()
@@ -99,7 +101,9 @@ def main():
     print("wiped out")
     if "--no-leave" in sys.argv:
         return 0
-    run("loot.py", 30, "--all", timeout=120)
+    run("loot.py", 30, timeout=120)  # Start Run 5: --all filled the pack with junk and the reward on the ground couldn't be picked up
+    from earlyday import tidy
+    tidy()
     out = run("leave.py", "--force", timeout=120)
     print(last(out)[:70])
     b = [x for x in call("buttons")["data"]["buttons"] if (x.get("text") or "").endswith("Yes.")]

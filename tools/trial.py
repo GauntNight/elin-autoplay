@@ -1,17 +1,18 @@
-"""Trials: a series of new level 1 characters that put the rules through their paces while the player's own game stays safe
-(the user, 2026-11-05: four 2-hour runs from level 1, "Make sure we keep Rolord"). A game's records live in runs/ and knowledge/,
+"""Start Runs: a series of new level 1 characters that put the rules through their paces while the player's own game stays safe
+(the user, 2026-11-05: 2-hour runs from level 1, "Make sure we keep Rolord"). They have their own count, S1, S2 and on, and never
+join the kept game's run numbers, metrics or tracker (the user, same day). A game's records live in runs/ and knowledge/,
 and the tools read them there, so the kept game's records are parked in archive/NAME/ with a checksum of every file, and the trials
 get blank ones. Its save is never loaded: new characters take the game's next free world_N. The trial's floor gate and route limit
 go in runs/thresholds.json (gitignored, read by common.py), so no tracked file changes and the numbers leave with the records.
 
 usage: python -I tools/trial.py park [--yes]          show or do the parking (a second park is refused)
-       python -I tools/trial.py start RUN "CHARACTER" WORLD   start a trial's clock: minutes count from here
+       python -I tools/trial.py start S8 "CHARACTER" WORLD    start a trial's clock: minutes count from here
        python -I tools/trial.py mark "LABEL" [--note TEXT]    a milestone at the current minute, in runs/milestones.csv
        python -I tools/trial.py sample [--every 20] [--max 125]  log the state every N seconds until the window or the game ends;
                                                                  a level-up marks itself. Run it in the background
        python -I tools/trial.py table                 minutes to each level and the totals, per trial, against the baselines
        python -I tools/trial.py status                what is parked and which trial is running
-       python -I tools/trial.py restore [--yes]       the trials' records to archive/trials-DATE/, the kept game's back, every
+       python -I tools/trial.py restore [--yes]       the trials' records to archive/start-runs-DATE/, the kept game's back, every
                                                       checksum verified (exit 1 and nothing more removed if one differs)
 Exit: 0 done (or shown), 1 refused, 2 the bridge.
 """
@@ -40,6 +41,12 @@ START_NUMBERS = dict(newgame.START)
 BASELINES = [  # minutes of play to each level: where the comparison starts
     ("Rolord (runs 03-08, Juere warrior)", {2: 250, 3: 610, 5: 740, 6: 1027, 7: 1332, 8: 1982, 9: 2277, 10: 2642}),
     ("Lefess (the 2026-11-04 test, Lich Pianist)", {}),  # level 1 at 60 minutes, one death at 30
+    ("Start Run 2 (Yerles Warrior, 1,116 exp, 0 deaths)", {2: 14, 3: 18, 4: 21, 5: 30, 6: 47, 7: 69, 8: 96}),
+    ("Start Run 3 (Yerles Warrior, 953 exp, 5 deaths)", {2: 19, 3: 22, 4: 29, 5: 31, 6: 43, 7: 64, 8: 106}),
+    ("Start Run 4 (Juere Warmage, 870 exp, 3 deaths)", {2: 35, 3: 57, 4: 68, 5: 80, 6: 92}),
+    ("Start Run 5 (Yerles Warrior, 989 exp, 5 deaths)", {2: 30, 3: 44, 4: 49, 5: 67, 6: 86, 7: 96, 8: 111}),
+    ("Start Run 6 (Hillfolk Thief, 661 exp, 5 deaths)", {2: 23, 3: 27, 4: 44, 5: 62}),
+    ("Start Run 7 (Juere Gunner, 875 exp, 0 deaths)", {2: 24, 3: 36, 4: 62, 5: 93, 6: 107}),
 ]
 
 
@@ -112,10 +119,10 @@ def restore(apply):
         return 1
     src = ARCHIVE / name
     lines = [ln.split("  ", 1) for ln in (src / "MANIFEST.sha256").read_text(encoding="utf-8").splitlines() if ln.strip()]
-    dest = ARCHIVE / f"trials-{now():%Y-%m-%d}"
+    dest = ARCHIVE / f"start-runs-{now():%Y-%m-%d}"
     n = 2
     while dest.exists():
-        dest = ARCHIVE / f"trials-{now():%Y-%m-%d}-{n}"
+        dest = ARCHIVE / f"start-runs-{now():%Y-%m-%d}-{n}"
         n += 1
     print(f"the trials' records -> {dest.relative_to(ROOT)}/; {name}'s {len(lines)} files back in place")
     if not apply:
@@ -168,6 +175,8 @@ def start(args):
         return 1
     TRIAL.write_text(json.dumps({"run": args[0], "character": args[1], "world": args[2], "start": now().isoformat()}) + "\n",
                      encoding="utf-8", newline="\n")
+    for stale in ("tickets_paid.txt", "foods.txt", "earlybase.json"):  # one character's: Start Run 6's first crafts were skipped as paid by Start Run 5's list
+        (RUNS / stale).unlink(missing_ok=True)
     print(f"trial {args[0]}: {args[1]} in {args[2]}, the clock runs from {now():%H:%M:%S}")
     return 0
 
@@ -244,13 +253,13 @@ def table():
         for r in rr:
             first.setdefault(int(r["lv"]), float(r["minutes"]))
         end, m = rr[-1], float(rr[-1]["minutes"])
-        # run 44: exp_total prices every level at the undiscounted 50 + 30 x LV, so a Fast Learner's ran 20% high: this sums each sample's own level cost
+        # Start Run 4: exp_total prices every level at the undiscounted 50 + 30 x LV, so a Fast Learner's ran 20% high: this sums each sample's own level cost
         earned = 0
         for a, b in zip(rr, rr[1:]):
             earned += int(b["exp"]) - int(a["exp"]) if a["lv"] == b["lv"] else int(a["exp_next"]) - int(a["exp"]) + int(b["exp"])
         rate = earned / m * 60 if m else 0
         low = min((int(r["hp"]) * 100 // max(int(r["max_hp"]), 1)) for r in rr if r["hp"] and r["max_hp"])
-        print(f"run {run}: " + ", ".join(f"Lv{k} {v:.0f}" for k, v in sorted(first.items()) if k > 1)
+        print(f"{run}: " + ", ".join(f"Lv{k} {v:.0f}" for k, v in sorted(first.items()) if k > 1)
               + f" | end +{m:.0f} min Lv{end['lv']}, exp earned {earned} ({rate:.0f} an hour), {end['gold']} orens, lowest HP {low}%")
     return 0
 

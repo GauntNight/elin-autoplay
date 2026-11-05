@@ -1,4 +1,4 @@
-"""Make a new character from the title screen and start the game (run 41: the steps of elin-setup section 4 as one tool, each picked by name).
+"""Make a new character from the title screen and start the game (Start Run 1: the steps of elin-setup section 4 as one tool, each picked by name).
 
 usage: python -I tools/newchar.py RACE CLASS [--name NAME]    e.g. Yerles Warrior
        python -I tools/newchar.py random random               a real random pick from the two lists
@@ -63,7 +63,7 @@ def main():
         print(__doc__)
         return 1
     before = {p.name for p in SAVE.glob("world_*")}
-    for _ in range(40):  # the news pop-up comes first; one Cancel only: a second closes the title menu itself (run 41)
+    for _ in range(40):  # the news pop-up comes first; one Cancel only: a second closes the title menu itself (Start Run 1)
         tops = [b.get("text") or "" for b in buttons()]
         if any("Create an adventurer" in t for t in tops) or (call("state")["data"].get("layers") or {}).get("top") == "LayerEditBio":
             break

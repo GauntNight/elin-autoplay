@@ -222,7 +222,7 @@ def main():
         # (explored cells only: where it refuses, the steps below still run)
         tx = x0 + 1 if sx < 0 else x1 - 1 if sx > 0 else p["x"]
         tz = z0 + 1 if sz < 0 else z1 - 1 if sz > 0 else p["z"]
-        # run 41: --force means fleeing, and r=2, hp=60 cancelled the walk at once beside any foe or under 60% HP, exactly when it is needed:
+        # Start Run 1: --force means fleeing, and r=2, hp=60 cancelled the walk at once beside any foe or under 60% HP, exactly when it is needed:
         # "could not find an exit" stood in two of three deaths at the map's middle. A fleeing walk goes on until the edge.
         force = "--force" in sys.argv
         w = walk(tx, tz, r=0 if force else 2, hp=1 if force else 60, timeout=60000)
@@ -258,7 +258,7 @@ def main():
         s = call("state")["data"]
         if any(c["hostile"] and c["dist"] <= 1 for c in s.get("nearby") or []) and "--force" not in sys.argv:
             stop("a hostile is adjacent: deal with it first")
-        # run 43, two deaths: 56 -> -4 and 43 -> -4 HP on a flee that moved one cell in 30-40 turns (steps into a foe's cell are attacks, walks that go nowhere
+        # Start Run 3, two deaths: 56 -> -4 and 43 -> -4 HP on a flee that moved one cell in 30-40 turns (steps into a foe's cell are attacks, walks that go nowhere
         # still pass turns). A flee that isn't moving hands back at once: fight, or use an item.
         q = s["pc"]
         moved = abs(q["x"] - p["x"]) + abs(q["z"] - p["z"])

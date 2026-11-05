@@ -130,7 +130,7 @@ def after_round(hp0, max_hp, min_hp, who):
             print(f"a hit of {drop:.0f}% in one round ({hp0} -> {hp2}/{max_hp}, {who}), but {foes[0]['name']} is alone "
                   f"at {foes[0].get('hpPct')}%: one more round")
             return s2
-        # run 43: with no teleport in the pack this stop's advice is empty, and at 59 max HP one 16-point bite from a Lv4 is over 25%: two deaths came from walking away
+        # Start Run 3: with no teleport in the pack this stop's advice is empty, and at 59 max HP one 16-point bite from a Lv4 is over 25%: two deaths came from walking away
         # instead. While every foe is at or below my level and I hold 40%, the fight goes on.
         if hp_after >= 40 and all((c.get("lv") or 0) <= p2["lv"] for c in foes):
             names = [i["name"] for i in call("inv")["data"]["items"]]
@@ -381,7 +381,7 @@ def _fight(trk):
 
 
 def fight_speed():
-    """Fights run at the game's speed x1 (run 41): a loop may run at x5 (bridge `speed`), and this tool's checks between polls then span several
+    """Fights run at the game's speed x1 (Start Run 1): a loop may run at x5 (bridge `speed`), and this tool's checks between polls then span several
     game rounds: four deaths in that run read "a hit of 49-66% in one round". The speed before it comes back when the tool exits."""
     import atexit
     rep = call("speed")

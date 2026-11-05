@@ -1,4 +1,4 @@
-"""The opening as one tool (run 41: done by hand it took 15 real minutes, nearly all of it turns between steps; the elin-opening skill is the
+"""The opening as one tool (Start Run 1: done by hand it took 15 real minutes, nearly all of it turns between steps; the elin-opening skill is the
 reasoning, this is its fast path). From a new game's first dialog to a claimed home, Aliby-style pet, boards, Loytel, the Defense Training kit and
 Way of Crafter's training dummy placed beside a bed. Each stage checks its result and stops (exit 3) naming the stage, so a stop is finished by
 hand and the rest picked up with --from STAGE. Sets the game's speed to x5 at once (fights set x1 themselves).
@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
 from common import data, pc, run, state, stop, top, wait_idle, walk, walk_beside  # noqa: E402
 
-STAGES = "intro deed rewards pet box inspector punk boar logs workbench torch house dummy".split()
+STAGES = "intro deed rewards pet box inspector punk boar logs workbench torch house dummy books".split()
 BASE = Path(__file__).resolve().parent.parent / "runs" / "earlybase.json"
 
 
@@ -57,14 +57,17 @@ def bye():
 
 
 def talkto(name):
-    for _ in range(3):
+    """Start Runs 5 and 6: Ashland wanders out of view and three tries at one spot stopped the opening: sweep the home for him, a few rounds of it."""
+    spots = [(55, 49), (58, 46), (60, 52), (50, 52), (48, 56), (62, 46), (52, 44), (66, 50), (44, 48), (56, 58), (64, 56)]
+    for k in range(len(spots) * 3):
         settle()
         out = run("talkto.py", name, timeout=60)
         if "not in view" in out or "could not get" in out:
+            walk(*spots[k % len(spots)], r=1, hp=1, timeout=8000)
             hits = [c for c in state().get("nearby") or [] if name.lower() in (c.get("name") or "").lower()]
-            walk(55, 49, r=0, hp=1, timeout=15000)
-            if hits:
-                walk_beside(hits[0]["x"] if "x" in hits[0] else 55, hits[0]["z"] if "z" in hits[0] else 49)
+            if hits and hits[0].get("dist", 9) > 1:
+                p = pc()
+                walk_beside(p["x"] + hits[0]["dx"], p["z"] + hits[0]["dz"])
             continue
         return out
     stop(f"can't reach {name}")
@@ -110,7 +113,7 @@ def board_job(name, choice=None, optional=False):
     call("do", i=view[0]["i"])
     time.sleep(0.5)
     rows = [r for r in call("buttons")["data"]["buttons"] if "item quest" in r.get("name", "") and name in r.get("text", "")]
-    if not rows and optional:  # run 44: --from logs asked for a job already held and stopped there
+    if not rows and optional:  # Start Run 4: --from logs asked for a job already held and stopped there
         call("closetop")
         return
     if not rows:
@@ -129,13 +132,21 @@ def have(item_id):
 
 
 def gather(obj, item, n, min_sp=3, r=30):
-    out = run("gather.py", obj, item, n, min_sp, r, timeout=240)
-    settle()
+    """Start Run 4: a putit in view ended this with 3 logs on the ground and the whole opening stopped: what wanders in gets killed and the gathering goes on."""
+    for _ in range(4):
+        out = run("gather.py", obj, item, n, min_sp, r, timeout=240)
+        settle()
+        if "hostile" not in out:
+            return out
+        from earlyday import clear_hostiles
+        clear_hostiles()
+        run("loot.py", 3, "--all", timeout=40)
+        settle()
     return out
 
 
 def rest_if_low(need=7):
-    """SP is what runs out in the opening (run 42 stopped twice): a low bar sleeps where I stand: no bed needed under 20%, fact #1197."""
+    """SP is what runs out in the opening (Start Run 2 stopped twice): a low bar sleeps where I stand: no bed needed under 20%, fact #1197."""
     p = pc()
     if p["sp"] >= need:
         return
@@ -242,7 +253,7 @@ def st_pet():
 
 
 def st_box():
-    # run 43: "a royal sturdy box": a random quality word, so the name is matched by its last words; a resumed stage has the job already
+    # Start Run 3: "a royal sturdy box": a random quality word, so the name is matched by its last words; a resumed stage has the job already
     if not call("find", name="sturdy box", r=4, n=1)["data"]["hits"]:
         board_job("Essential Equipment")
     hit = call("find", name="sturdy box", r=4, n=1)["data"]["hits"]
@@ -351,7 +362,7 @@ def st_torch():
     rest_if_low(6)
     if have("resin") < 2:
         gather("cedar tree", "resin", 2, 2, 40)
-    if have("branch") < 1:  # run 44: the resin came without one and "no torch worn" was the first sign
+    if have("branch") < 1:  # Start Run 4: the resin came without one and "no torch worn" was the first sign
         gather("tree", "branch", 1, 2, 40)
     craft(*bench(), "String")
     craft(*bench(), "Torch")
@@ -364,7 +375,7 @@ def st_torch():
 
 
 def ring(x, z):
-    """A 3x3 ring round x,z with the door on its west side: 8 walls: a 1x1 room passes the house check (run 41)."""
+    """A 3x3 ring round x,z with the door on its west side: 8 walls: a 1x1 room passes the house check (Start Run 1)."""
     cells = [(x - 1, z - 1), (x, z - 1), (x + 1, z - 1), (x + 1, z), (x + 1, z + 1), (x, z + 1), (x - 1, z + 1), (x - 1, z)]
     return [f"{a},{b}" for a, b in cells], f"{x - 1},{z}"
 
@@ -388,7 +399,7 @@ def st_house():
     talkto("Ashland")
     settle()
     if not here("Pick all"):
-        walk(58, 47, r=0, hp=1, timeout=4000)  # run 41: the rewards landed two cells off
+        walk(58, 47, r=0, hp=1, timeout=4000)  # Start Run 1: the rewards landed two cells off
         here("Pick all")
     settle()
     if not have("432"):
@@ -406,10 +417,11 @@ def st_dummy():
     fire = call("find", name="bonfire", r=25, n=1)["data"]["hits"]
     fx, fz = (fire[0]["x"], fire[0]["z"]) if fire else (56, 47)
     dummy, stand, bed = (fx + 1, fz - 1), (fx + 1, fz), (fx + 2, fz - 1)
-    out = run("place.py", "training dummy", f"{dummy[0]},{dummy[1]}", timeout=20)
+    # Start Run 6: someone stood on the dummy's cell and "no Place offered" stopped the opening: the other cells beside the stand do as well
+    out = run("place.py", "training dummy", f"{dummy[0]},{dummy[1]}", f"{fx + 2},{fz}", f"{fx + 1},{fz + 1}", f"{fx + 2},{fz + 1}", timeout=30)
     if "placed" not in out:
         stop("the dummy: " + out[-120:])
-    if have("leaf") < 4 or have("grass") < 2:  # run 44: short of leaves the bed was skipped in silence, and earlyday stopped at "no Sleep" 15 minutes later
+    if have("leaf") < 4 or have("grass") < 2:  # Start Run 4: short of leaves the bed was skipped in silence, and earlyday stopped at "no Sleep" 15 minutes later
         gather("weed", "leaf", 4, 2, 40)
         gather("weed", "grass", 2, 2, 40)
     if have("leaf") >= 4 and have("grass") >= 2:
@@ -418,8 +430,25 @@ def st_dummy():
         if "placed" not in out:
             stop("the bed: " + out[-120:])
     BASE.write_text(json.dumps({"stand": list(stand), "bed": list(bed), "fire": [fx, fz]}) + "\n", encoding="utf-8", newline="\n")
+    for board, x, z in (("home board", fx - 2, fz + 3), ("resident board", fx - 4, fz + 3)):  # Start Run 4: 31 weight in the pack put a weak character at Burden phase 3 with a load of logs
+        if have(board.replace(" ", "_")) or any(board in i["name"] for i in data("inv")["items"]):
+            run("place.py", board, f"{x},{z}", f"{x},{z + 1}", f"{x - 1},{z}", timeout=20)
+            settle()
     walk(*stand, r=0, hp=1, timeout=8000)
     say(f"  base: stand {stand}, bed {bed}, bonfire {(fx, fz)}")
+
+
+def st_books():
+    """Start Run 4: a class's starter spellbooks read down: about 7 reads, no SP, a Literacy level and every spell in them. Other books stay shut."""
+    for _ in range(16):
+        books = [i["name"] for i in data("inv")["items"] if "tome" in i["name"] or "spellbook" in i["name"] or "ancient book" in i["name"]]
+        if not books:
+            return
+        run("item.py", books[_ % len(books)], "Read", timeout=20)
+        wait_idle(timeout=6000)
+        settle()
+        if any(c.get("hostile") and c.get("dist", 9) <= 3 for c in state().get("nearby") or []):
+            return
 
 
 def main():

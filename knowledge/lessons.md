@@ -16,10 +16,11 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 
 
-- Measure where the exp comes from before planning the next hour: run 44 spent minutes 6-66 on shops, jobs and roads at 4 exp a minute with the 30-a-minute dummy beside its bed; the 20-second samples showed it at once, afterwards. (44)
-- A rate measured at one level is that level's rate: the dummy's 39 a minute at skill 3 is 3 at skill 10, and "walking beats the dummy" (run 43, at skill 10+) read as a general rule until run 44 measured both at low skill. Say at what state a rate holds. (44)
+- Measure where the exp comes from before planning the next hour: Start Run 4 spent minutes 6-66 on shops, jobs and roads at 4 exp a minute with the 30-a-minute dummy beside its bed; the 20-second samples showed it at once, afterwards. (Start Run 4) (review 2026-11-05)
+- A rate measured at one level is that level's rate: the dummy's 39 a minute at skill 3 is 3 at skill 10, and "walking beats the dummy" (Start Run 3, at skill 10+) read as a general rule until Start Run 4 measured both at low skill. Say at what state a rate holds. (Start Run 4) (review 2026-11-05)
 - The largest gains of a run can sit unread in the home's boxes: tally them by kind (stock) at every session start. Run 40's ancient books, skill books and enchant armor scrolls had waited for runs. (40)
-- A file cut to its last line hides what a check showed: a tool's output that decides something gets read whole; the two guns were recorded as read when they weren't. (40)
+- A refusal I want past gets changed with its reason written, or obeyed: never overridden in the moment. `--danger-ok`, `--food-trip` and `--weak-ok` each cost deaths in the Start Runs, all under time pressure; the PV 15 change at Lv3 cost both scrolls and the ally, and the one that went well (a food trip at hunger 71) proves nothing. (Start Run 7) (review 2026-11-05)
+- A file cut to its last line hides what a check showed: a tool's output that decides something gets read whole; the two guns were recorded as read when they weren't, and in Start Run 7 `cut -c1-90` turned ConWet into "cond C", which I read as poison and blamed on rice. (40) (review 2026-11-05)
 - A claim about what I compared stands only if I compared it: "none are better" was written over 14 pieces whose lines I never read. (40)
 - Trip food for a long night is bought or cooked dishes, not raw crops: the Cooler Box slows rot, it doesn't stop it
   (fact #1169). (39)
@@ -38,7 +39,8 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 ## Promoted (where the older lessons live now)
 
-- the level 1 trials (runs 41-44): armor before arenas and no caves under Lv10 -> board.py --take and arena.py --any refuse, elin-opening's fast path; a flee that doesn't move -> leave.py; a death prompt -> common.crawl_up and close.py; a demand paid unread -> roam.py KEEP; full pack -> earlyday.tidy JUNK_FULL; paid recipes re-crafted -> tickets.py
+- Start Runs 5-7: long trips before food and armor (the user) -> roam.road_ready; starving on the way to food -> earlyday RESERVE_MEALS; a scroll unread at 0 HP -> roam.escape; a demand paid unread -> roam.KEEP; jobs under Lv4 -> board.py's PV 15 and 2 scrolls; stale per-character lists -> trial.py start
+- the level 1 trials (Start Runs 1-4): armor before arenas and no caves under Lv10 -> board.py --take and arena.py --any refuse, elin-opening's fast path; a flee that doesn't move -> leave.py; a death prompt -> common.crawl_up and close.py; a demand paid unread -> roam.py KEEP; full pack -> earlyday.tidy JUNK_FULL; paid recipes re-crafted -> tickets.py
 - run 40 triage: a neutral master that steals (37) -> a fact, and The Fighting Bull ring protects from thieves
 - run 39 triage (the run-36 lessons): the named exploder by the down stairway -> fact #1174; grassland nefias run long
   -> fact #1175 (run 39 again: 40-70 real minutes each); Return needs a local map -> recall.py refuses on the world map

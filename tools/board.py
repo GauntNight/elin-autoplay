@@ -1,4 +1,4 @@
-"""List a town's jobs from its nearest quest board in one step (run 41: town jobs were a new character's best income: 247 orens and +1
+"""List a town's jobs from its nearest quest board in one step (Start Run 1: town jobs were a new character's best income: 247 orens and +1
 influence in 3 real minutes). Walks next to the nearest ordinary board, opens it and prints each job with its reward, danger and time.
 The board stays open, so a job is `bridge.py click N expect=NAME` from the list. All boards in a town show the same jobs.
 
@@ -8,13 +8,14 @@ usage: python -I tools/board.py [--close]
                                                          job below Lv4 or without the ally beside me at 70%+ (--weak-ok)
 Exit 0 listed, 1 refused (no board known on this map), 2 the bridge.
 """
+import re
 import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import act, pc, setup, walk_beside  # noqa: E402
+from common import act, pc, run, setup, walk_beside  # noqa: E402
 
 
 INSTANCE = ("Monster hunting", "Monster extermination", "Troubled home")
@@ -55,13 +56,18 @@ def main():
     setup()
     if "--take" in sys.argv:
         names = [a for a in sys.argv[sys.argv.index("--take") + 1:] if a != "--weak-ok"]
-        # runs 41, 43, 44: five of the twelve deaths were job arenas taken too weak or without the ally: nine or ten foes at once, whatever the Danger number says.
+        # Start Runs 1, 3, 4: five of the twelve deaths were job arenas taken too weak or without the ally: nine or ten foes at once, whatever the Danger number says.
         # Under level 15 an instance job wants level 4 and the ally beside me at 70%+, unless --weak-ok.
         s = call("state")["data"]
         p, party = s["pc"], s.get("party") or []
         ally_ok = any(a.get("here") and a.get("dist", 99) <= 5 and a.get("hp", 0) * 10 >= a.get("maxHp", 1) * 7 for a in party)
-        if p["lv"] < 15 and "--weak-ok" not in sys.argv and any(w in n for n in names for w in INSTANCE) and (p["lv"] < 4 or not ally_ok):
-            print(f"refused: an instance job at Lv{p['lv']} with {'the ally ready' if ally_ok else 'no ally beside me at 70%+'}: level 4 and the ally, or --weak-ok")
+        # Start Run 7: at Lv3 PV 16 (a stone breastplate, 208 orens at the camp) took a Danger 1 job, but HP 22 -> 4 three times, both scrolls read, the ally dead:
+        # it paid 156 orens, 2 platinum and 40 exp and started that run's economy, so PV 15 stands in for the level only with 2 scrolls of teleport to spend.
+        m = re.search(r"PV (-?\d+)", str(run("power.py", timeout=20)))
+        scrolls = sum(i.get("num") or 1 for i in call("inv")["data"]["items"] if "scroll" in i["name"] and "of teleport" in i["name"])
+        armored = bool(m) and int(m.group(1)) >= 15 and scrolls >= 2
+        if p["lv"] < 15 and "--weak-ok" not in sys.argv and any(w in n for n in names for w in INSTANCE) and ((p["lv"] < 4 and not armored) or not ally_ok):
+            print(f"refused: an instance job at Lv{p['lv']} with {'the ally ready' if ally_ok else 'no ally beside me at 70%+'}: level 4 (or PV 15 and 2 teleport scrolls) and the ally, or --weak-ok")
             return 1
         ok = [take(n) for n in names]
         return 0 if all(ok) else 1
