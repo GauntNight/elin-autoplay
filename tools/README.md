@@ -3,6 +3,9 @@
 Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the hard rules); what each tool's domain taught us is in
 `knowledge/tool-notes.md`. Every tool: exit 0 done, 1 refused, 2 the bridge, 3 stopped for a decision.
 
+- **`ability.py`**: Use an ability by its name from the ability window (run 41): Rest, Pray. Opens the window, right-clicks the button with that name in the same step as listing it, and closes the window, so nothing else can shift the list in between.
+    usage: python -I tools/ability.py NAME        e.g. python -I tools/ability.py Rest
+    Exit 0 used, 1 refused (no such ability), 2 the bridge.
 - **`act.py`**: Perform the act at a cell whose text starts with TEXT (case-insensitive), never by index: a creature standing on the cell puts its own acts (Talk, Attack...) first (run 03: `do 0` meant to read a letter opened Kaberg's dialog instead).
     usage: python -I tools/act.py DX DZ TEXT [mode]     e.g. act.py -1 0 Read
            python -I tools/act.py find NAME TEXT [mode]  the nearest thing/object NAME, e.g.
@@ -21,6 +24,11 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       no ITEM lists what the bag holds
     Exit: 0 every item moved, 1 any item not moved (run 38: a full pack exited 0).
     item.py finds items inside an open bag too (run 04: `item.py "piles of bread" Eat` ate from the Cooler Box); --take raised a NullReference in the game on the world map.
+- **`board.py`**: List a town's jobs from its nearest quest board in one step (run 41: town jobs were a new character's best income: 247 orens and +1 influence in 3 real minutes). Walks next to the nearest ordinary board, opens it and prints each job with its reward, danger and time. The board stays open, so a job is `bridge.py click N expect=NAME` from the list. All boards in a town show the same jobs.
+    usage: python -I tools/board.py [--close]
+           python -I tools/board.py --take NAME [NAME ...]   accept these jobs in order, each by its name on the board (an instance job moves
+                                                             me into it as its dialog ends, so it goes last)
+    Exit 0 listed, 1 refused (no board known on this map), 2 the bridge.
 - **`box.py`**: Open a container, move named items into it (or out of it with --take), close it. With no items, list what it holds. One process and one bridge connection: calling item.py from a script that holds the bridge blocks it (the bridge serves one client at a time; run 04).
     usage: python -I tools/box.py WHERE [--take] [ITEM ...]
       WHERE  X,Z of the container, or its name ("shipping chest", "shared sturdy box")
@@ -49,6 +57,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       shiftclick N              the game's quick move of inventory slot N into the open container
       drag I J [N]              drag slot I onto slot J (a hotbar slot, a picker's ing1, a crafter)
       altitude [D]              the placement height for the next Place (wall-mounted items)
+      speed [1|2|3]             the game's own speed control (a hotbar's changeSpeed shortcut): x1, x2, x5; no index reads it (0.38.0)
       places [R]                world map: known places within R with distance and danger
       power                     my attacks, defense and resists as the game computes them
       actions                   every EAction name the input layer knows
@@ -193,6 +202,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       from the game (Thing.IsSharedContainer, through boxcfg) and close the window.
     Exit: 0 done (the box is as asked), 1 refused (not at home, bad argument), 2 the bridge,
     3 stopped (the box couldn't be opened or the lock didn't change).
+- **`earlyday.py`**: A new character's exp loop at home, from the first minutes (run 41, the Lv1 trials). Character exp is skill level-ups only, a level-1 skill levels fast, and at the game's speed x5 a full bar of SP on the dummy takes 5 real seconds and a sleep 4, so real time stops binding and food takes over: a sleep costs 20 hunger. Weeds close the loop: they pay Gathering and give grass, 5 grass and 3 SP make a weed stew (11 food, the bonfire burns a log from the pack).
+    usage: python -I tools/earlyday.py [CYCLES=5] [--throw "a boomerang"]
+    The base is runs/earlybase.json: {"stand": [X, Z], "bed": [X, Z], "fire": [X, Z]}, stand being one cell next to the dummy and the bonfire.
 - **`elin_eye.py`**: Capture the Elin window's own pixels to a PNG. Read-only.
     usage: python -I tools/elin_eye.py [out.png] [--width N]
       --width N  downscale to N px wide (default 1600; 0 = full size)
@@ -214,6 +226,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/fasttravel.py NAME       travel to NAME (whole-word match; refuses two candidates,
                                                     a cost over the rations carried, or a non-world-map zone)
     Exit 0 travelled (or listed), 1 refused, 2 bridge error, 3 stopped (the list did not open).
+- **`feat.py`**: Spend a feat point by name (run 41: every level gives one, and clicking through the sheet by hand costs real minutes in a Lv1 run). Opens the sheet through the exp bar (fact #223), clicks the feat, answers Yes, closes.
+    usage: python -I tools/feat.py                 list what's on offer
+           python -I tools/feat.py NAME [NAME ...]  buy the first one on offer, per point, in that order
+    Exit 0 done (or listed), 1 refused (no point or none of them on offer), 2 the bridge.
 - **`fence.py`**: Sell the stolen goods at a black market (run 33: done by hand at Minwer and Siyun with a scratch loop). steal.py appends every stolen item's name to runs/stolen.txt; this opens the fence's wares (shop.py --keep-open), sells each listed stack with its "Sell N" act, closes the shop (the Thieves Guild books the contribution when the window closes: elin-play) and prints the guild line from the journal. Only Derphy (Siyun), Port Kapul (Minwer) and my own land buy stolen goods below rank 4 (G27's notes).
     usage: python -I tools/fence.py SHOPKEEPER [--dry]
     Exit 0, 1 refused (nothing listed, the shopkeeper not in view), 3 stopped (a window).
@@ -246,7 +262,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/flyer.py [GIFTS=10]
     Stops when the flyers run out, nobody new is in range, a window opens or a hostile shows up.
 - **`gather.py`**: Gather until the pack holds enough of an item: find the nearest object of a kind, harvest it with the held tool (holding the axe first if nothing is held), pick up the drops, repeat. Skips cells that offer no harvest (map edge, no path). Exit 0 at the target, on low SP, or when nothing is left in range; exit 3 (stop) on common.ready's reasons before each harvest (a hostile in view, a window, a task running, HP under 60%, Hungry, Overweight) and on a full pack; exit 1 without the tool.
-    usage: python -I tools/gather.py OBJECT ITEM COUNT [min_sp] [radius] [--weak-ok]
+    usage: python -I tools/gather.py OBJECT ITEM COUNT [min_sp] [radius] [--weak-ok] [--food-run]
+      --food-run  gathering food while hungry: no hunger stop at all (the food is the fix)
       --weak-ok  (run 31) keep going past hostiles 10+ levels under me unless within 2 cells or an exploder
       e.g. python -I tools/gather.py weed leaf 14
 - **`gearcheck.py`**: Put every identified ☆ piece in the bags beside what I wear in that slot, before anything ships (run 40, the user: "how often do you look at current equipment versus new?"). The answer was: by hand, by name, and not every batch: 14 pieces shipped on the names alone that day, and the copper ring's Lightning weakness was last weighed in run 29. elin-pack has said "equip what beats worn gear" since run 08; nothing made it happen.
@@ -627,6 +644,17 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/trash.py              sweep radius 80, then dump
            python -I tools/trash.py dump         only dump the pack's junk
            python -I tools/trash.py dump "leaf dish"   also dump stacks matching these names
+- **`trial.py`**: Trials: a series of new level 1 characters that put the rules through their paces while the player's own game stays safe (the user, 2026-11-05: four 2-hour runs from level 1, "Make sure we keep Rolord"). A game's records live in runs/ and knowledge/, and the tools read them there, so the kept game's records are parked in archive/NAME/ with a checksum of every file, and the trials get blank ones. Its save is never loaded: new characters take the game's next free world_N. The trial's floor gate and route limit go in runs/thresholds.json (gitignored, read by common.py), so no tracked file changes and the numbers leave with the records.
+    usage: python -I tools/trial.py park [--yes]          show or do the parking (a second park is refused)
+           python -I tools/trial.py start RUN "CHARACTER" WORLD   start a trial's clock: minutes count from here
+           python -I tools/trial.py mark "LABEL" [--note TEXT]    a milestone at the current minute, in runs/milestones.csv
+           python -I tools/trial.py sample [--every 20] [--max 125]  log the state every N seconds until the window or the game ends;
+                                                                     a level-up marks itself. Run it in the background
+           python -I tools/trial.py table                 minutes to each level and the totals, per trial, against the baselines
+           python -I tools/trial.py status                what is parked and which trial is running
+           python -I tools/trial.py restore [--yes]       the trials' records to archive/trials-DATE/, the kept game's back, every
+                                                          checksum verified (exit 1 and nothing more removed if one differs)
+    Exit: 0 done (or shown), 1 refused, 2 the bridge.
 - **`unpack.py`**: Open the mail: every package (delivery box) on the map, one at a time, with its contents listed. Deliveries, quest rewards and the tax bill arrive in packages by the hearth or the mail post, and they pile up unopened (run 04 found four, holding a tool, a can, a bottle).
     usage: python -I tools/unpack.py [--take] [--pickup] [radius]
     Then triage what came out (elin-play: use now / bring / store / sell or ship).
@@ -672,6 +700,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`wgo.py`**: World-map travel with the game's own pathing (the user's tip, run 08: clicking a place walks there around cliffs). Sends AI_Goto to the named place's cell, polls until I arrive, land on a local map (an ambush), see a hostile within 4, or HP drops under 60%; then cancels the walk so it doesn't resume after an ambush (run 08: a leftover goto walked me 14 game hours further).
     usage: python -I tools/wgo.py NAME [--weak-ok] [--ambush]   a place from `bridge.py places` (name or id)
            python -I tools/wgo.py X Z [--weak-ok] [--ambush]    an absolute world-map cell
+      --near N   stop for a hostile within N cells (default 4)
       --weak-ok  keep walking past hostiles 3+ levels below me (a lone crab kept stopping the walk;
                  if one ambushes, the fight is easy); anything stronger still stops it
       --ambush   handle an ambush map instead of handing back (the review of 2026-10-23: travel was the

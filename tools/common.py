@@ -239,6 +239,13 @@ THRESHOLDS = {
     "escape_heals": 3,
     "burden_stop": 3,       # Overweight: no loop goes on; 4 is Squashed (the game refuses to move)
 }
+# A game's own numbers (2026-11-05, tools/trial.py): runs/thresholds.json is gitignored and leaves with that game's records, so
+# level 1 trials get a level 1 floor gate and route limit without touching this table; elin-play's table is checked against TRACKED.
+TRACKED_THRESHOLDS = dict(THRESHOLDS)
+_LOCAL_NUMBERS = Path(__file__).resolve().parent.parent / "runs" / "thresholds.json"
+if _LOCAL_NUMBERS.exists():
+    import json as _json
+    THRESHOLDS.update(_json.loads(_LOCAL_NUMBERS.read_text(encoding="utf-8")))
 
 # Conditions under which no action can be trusted (blind: no targeting; paralysed, asleep,
 # fainted: nothing happens; confused: steps go astray; suffocating: get out first).

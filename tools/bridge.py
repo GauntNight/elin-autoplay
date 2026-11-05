@@ -10,6 +10,7 @@ usage: python -I tools/bridge.py <op> [args]
   shiftclick N              the game's quick move of inventory slot N into the open container
   drag I J [N]              drag slot I onto slot J (a hotbar slot, a picker's ing1, a crafter)
   altitude [D]              the placement height for the next Place (wall-mounted items)
+  speed [1|2|3]             the game's own speed control (a hotbar's changeSpeed shortcut): x1, x2, x5; no index reads it (0.38.0)
   places [R]                world map: known places within R with distance and danger
   power                     my attacks, defense and resists as the game computes them
   actions                   every EAction name the input layer knows
@@ -216,6 +217,9 @@ def main(argv):
         kw["i"] = int(rest[0])
     elif op == "altitude":
         kw["d"] = int(rest[0]) if rest else 0
+    elif op == "speed":
+        if rest:
+            kw["i"] = int(rest[0])
     elif op == "boxcfg":  # boxcfg [priority=N] [allow=food,drink|all] [norotten=1|0] ["name=X"] (open box)
         keyed(("priority", "allow", "norotten", "name", "bag"), ints=("priority",), bools=("norotten",))
         if "norotten" in kw:

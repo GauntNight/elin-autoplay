@@ -5,6 +5,7 @@ doesn't resume after an ambush (run 08: a leftover goto walked me 14 game hours 
 
 usage: python -I tools/wgo.py NAME [--weak-ok] [--ambush]   a place from `bridge.py places` (name or id)
        python -I tools/wgo.py X Z [--weak-ok] [--ambush]    an absolute world-map cell
+  --near N   stop for a hostile within N cells (default 4)
   --weak-ok  keep walking past hostiles 3+ levels below me (a lone crab kept stopping the walk;
              if one ambushes, the fight is easy); anything stronger still stops it
   --ambush   handle an ambush map instead of handing back (the review of 2026-10-23: travel was the
@@ -28,7 +29,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import THRESHOLDS, last, ready, refuse, run, stop, wait_until, walk  # noqa: E402
+from common import THRESHOLDS, base_ready, last, ready, refuse, run, stop, wait_until, walk  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TRAVEL_CSV = ROOT / "knowledge" / "travel.csv"
@@ -171,12 +172,16 @@ def handle_ambush(_retry=False):
         print(f"  ambush: fought {target['name']} Lv{target.get('lv')}: {last(out)[:80]}")
     else:
         return f"{MAX_AMBUSH_FIGHTS} fights on one ambush map: look.py"
-    out = run("loot.py", "20", timeout=300)
+    # run 41: a new game's materials are its valuables (elin-setup): take everything, and never purge: this purge threw away
+    # the only axe, the potions and the pebbles of a level 2 character with 23 stacks in the pack
+    new_game = not base_ready()
+    out = run("loot.py", "20", *(["--all"] if new_game else []), timeout=300)
     print(f"  ambush: loot: {last(out)[:100]}")
     # run 35: two ambushes' loot filled the grid on the way to Ruined Ruin; the ladder refused at the door (-1 free
     # cards), and its own purge stopped on a kamikaze yeek standing beside me: free the cards here, where it's quiet
-    out = run("purge.py", "--free", "3", timeout=600)
-    print(f"  ambush: purge: {last(out)[:100]}")
+    if not new_game:
+        out = run("purge.py", "--free", "3", timeout=600)
+        print(f"  ambush: purge: {last(out)[:100]}")
     out = run("leave.py", timeout=300)
     if out.rc != 0 and "hostile" in last(out) and not _retry:
         # run 21: twice a late arrival (a snow putit, a giant fish) came up while leave.py walked
@@ -263,6 +268,10 @@ def main():
         i = sys.argv.index("--danger-ok")
         if i + 1 < len(sys.argv) and sys.argv[i + 1].isdigit():
             danger_cap = int(sys.argv.pop(i + 1))
+    # run 41: a floating eye at my level followed at exactly 4 cells and stopped every step; --near 3 walks on until it comes closer
+    near = int(sys.argv[sys.argv.index("--near") + 1]) if "--near" in sys.argv else 4
+    if "--near" in sys.argv:
+        del sys.argv[sys.argv.index("--near"):sys.argv.index("--near") + 2]
     a = [x for x in sys.argv[1:] if x not in ("--weak-ok", "--breathe", "--ambush", "--danger-ok", "--enter")]
     s0 = call("state")["data"]
     z = s0.get("zone") or {}
@@ -324,7 +333,7 @@ def main():
         # run 21: even 20 s legs ran 7-27 steps and up to 79 game hours (hunger 45 -> 91, twice
         # Starving); waypoints a few tiles ahead are refused (unexplored tiles). A world-map step
         # takes ~0.75 real seconds: a 2.5 s leg is 2-3 steps, then the meal and sleep checks run
-        w = walk(tx, tz, r=4, hp=60, timeout=LEG_MS, weak_ok=weak_ok)
+        w = walk(tx, tz, r=near, hp=60, timeout=LEG_MS, weak_ok=weak_ok)
         pos = (w.get("x", last_pos[0]), w.get("z", last_pos[1]))
         why = w.get("why")
         if why == "zone":

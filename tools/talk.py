@@ -32,7 +32,7 @@ def main():
     steps = int(sys.argv[1]) if len(sys.argv) > 1 else 25
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     last = None
-    z0 = call("state")["data"]["zone"]
+    z0 = call("state")["data"].get("zone")  # run 41: a new game's intro plays before there's a map, so no zone yet
     zone0 = z0["full"] if isinstance(z0, dict) else z0
     for _ in range(steps):
         dr, top = drama()
@@ -55,7 +55,7 @@ def main():
             continue
         if not dr:
             time.sleep(1.0)  # a quest dialog can move you to another map as it ends
-            z = call("state")["data"]["zone"]
+            z = call("state")["data"].get("zone")
             zone = z["full"] if isinstance(z, dict) else z
             print(f"[dialog closed; top layer: {top}; zone: {zone}]")
             if zone != zone0:

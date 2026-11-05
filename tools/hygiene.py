@@ -249,8 +249,9 @@ def thresholds_check(findings):
             return
         findings.append(f"{rel}: no thresholds-table row for {what} (THRESHOLDS say {want})")
 
+    from common import TRACKED_THRESHOLDS as TT  # the table states the tracked numbers: a trial's runs/thresholds.json is that game's
     row_number("the floor gate", r"floor gate|MAX_DANGER",
-               [r"\*\*(\d+) at Lv", r"MAX_DANGER`?\D{0,16}?(\d+)", r"gate\D{0,20}?(\d+)"], T["max_danger"])
+               [r"\*\*(\d+) at Lv", r"MAX_DANGER`?\D{0,16}?(\d+)", r"gate\D{0,20}?(\d+)"], TT["max_danger"])
     row_number("Hungry", r"^\| Status", [r"Hungry \((\d+)\+?\)", r"Hungry\D{0,8}?(\d+)"], T["hungry"])
     row_number("the kamikaze distance", r"Suicide attackers|kamikaze",
                [r"from \*{0,2}(\d+)\+ cells", r"(\d+)\+? cells"], T["kamikaze_dist"])

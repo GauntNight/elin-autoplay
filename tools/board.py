@@ -1,0 +1,79 @@
+"""List a town's jobs from its nearest quest board in one step (run 41: town jobs were a new character's best income: 247 orens and +1
+influence in 3 real minutes). Walks next to the nearest ordinary board, opens it and prints each job with its reward, danger and time.
+The board stays open, so a job is `bridge.py click N expect=NAME` from the list. All boards in a town show the same jobs.
+
+usage: python -I tools/board.py [--close]
+       python -I tools/board.py --take NAME [NAME ...]   accept these jobs in order, each by its name on the board (an instance job moves
+                                                         me into it as its dialog ends, so it goes last)
+Exit 0 listed, 1 refused (no board known on this map), 2 the bridge.
+"""
+import sys
+import time
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from bridge import call  # noqa: E402
+from common import act, pc, setup, walk_beside  # noqa: E402
+
+
+def rows():
+    return [x for x in call("buttons")["data"]["buttons"] if "item quest" in x.get("name", "")]
+
+
+def take(name):
+    """Open the board if needed and accept the first job with this name. True when accepted."""
+    from common import run
+    if not rows():
+        hits = [h for h in call("find", name="quest board", r=4, n=4)["data"]["hits"]]
+        if not hits:
+            print(f"no board within 4 for {name}")
+            return False
+        act(hits[0]["x"], hits[0]["z"], "View Works")
+        time.sleep(0.6)
+    hit = [r for r in rows() if r["text"].startswith(name)]
+    if not hit:
+        print(f"no {name} on the board")
+        return False
+    call("click", i=hit[0]["i"], expect=name)
+    time.sleep(0.5)
+    run("talk.py", "3")
+    yes = [b for b in call("buttons")["data"]["buttons"] if (b.get("text") or "").startswith("I accept")]
+    if not yes:
+        print(f"{name}: no accept button")
+        return False
+    call("click", i=yes[0]["i"])
+    time.sleep(0.4)
+    print(f"took {name}: " + run("talk.py", "4").strip()[-70:])
+    return True
+
+
+def main():
+    setup()
+    if "--take" in sys.argv:
+        ok = [take(n) for n in sys.argv[sys.argv.index("--take") + 1:]]
+        return 0 if all(ok) else 1
+    hits = [h for h in call("find", name="quest board", r=150, n=20)["data"]["hits"] if h.get("installed", True)]
+    plain = [h for h in hits if "maniac" not in h["name"]] or hits
+    if not plain:
+        print("refused: no quest board known on this map")
+        return 1
+    b = plain[0]
+    walk_beside(b["x"], b["z"])
+    p = pc()
+    call("acts", dx=b["x"] - p["x"], dz=b["z"] - p["z"], mode="all")
+    act(b["x"], b["z"], "View Works")
+    time.sleep(0.6)
+    rows = [x for x in call("buttons")["data"]["buttons"] if "item quest" in x.get("name", "")]
+    texts = call("texts")["data"]["texts"]
+    infl = [x["text"] for x in call("buttons")["data"]["buttons"] if "Influence" in (x.get("tip") or x.get("text") or "")]
+    print(f"at {b['name']} {b['x']},{b['z']}; {infl[:1]}")
+    for r in rows:
+        print(f"  {r['i']}: {r['text'][:110]}")
+    print("  details: " + " | ".join(t for t in texts if any(w in t for w in ("orens", "Danger", "Days", "Hours", "Reward")))[:600])
+    if "--close" in sys.argv:
+        call("closetop")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

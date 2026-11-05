@@ -26,7 +26,7 @@ namespace ElinAutoplay
     [BepInPlugin("elin.autoplay.bridge", "ElinBridge", Version)]
     public class Bridge : BaseUnityPlugin
     {
-        public const string Version = "0.37.2";
+        public const string Version = "0.38.0";
         public const int Port = 47323;
 
         class Request
@@ -401,6 +401,22 @@ namespace ElinAutoplay
                     return Sneak((int?)cmd["r"]);
                 case "spguard":  // run 25: the stamina floor; floor=-1 turns it off
                     return SpGuard((int?)cmd["floor"]);
+                case "speed":  // 2026-11-05: the game's own speed control, what a hotbar's "changeSpeed N" shortcut does (HotItemSpeed.OnClick):
+                    {          // index 1, 2, 3 = x1, x2, x5, times the turbo of a running task. Not saved: every load starts at 1. Never 0 (a pause)
+                        if (cmd["i"] != null)
+                        {
+                            int a = (int)cmd["i"];
+                            if (a < 1 || a >= ActionMode.GameSpeeds.Length) return Err("speed index must be 1, 2 or 3");
+                            EClass.scene.actionMode.ChangeGameSpeed(a);
+                        }
+                        return Ok(new JObject
+                        {
+                            ["index"] = EClass.game.gameSpeedIndex,
+                            ["base"] = ActionMode.GameSpeeds[EClass.game.gameSpeedIndex],
+                            ["now"] = EClass.scene.actionMode.gameSpeed,
+                            ["defaultTurbo"] = EClass.setting.defaultTurbo,
+                        });
+                    }
                 case "input":  // the open text dialog (Dialog.InputName: Change name): set the field and press Enter
                     {          // (the DialogInput prefab has no OK button: Enter is its only confirm, Dialog.OnUpdateInput)
                         var dlg = TopLayer() as Dialog;

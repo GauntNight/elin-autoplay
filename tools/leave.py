@@ -222,7 +222,10 @@ def main():
         # (explored cells only: where it refuses, the steps below still run)
         tx = x0 + 1 if sx < 0 else x1 - 1 if sx > 0 else p["x"]
         tz = z0 + 1 if sz < 0 else z1 - 1 if sz > 0 else p["z"]
-        w = walk(tx, tz, r=2, timeout=60000)
+        # run 41: --force means fleeing, and r=2, hp=60 cancelled the walk at once beside any foe or under 60% HP, exactly when it is needed:
+        # "could not find an exit" stood in two of three deaths at the map's middle. A fleeing walk goes on until the edge.
+        force = "--force" in sys.argv
+        w = walk(tx, tz, r=0 if force else 2, hp=1 if force else 60, timeout=60000)
         if w.get("why") == "hostile":
             stop(f"a hostile came into view on the way to the edge: {w.get('hostile')} Lv{w.get('hostileLv')} at {w.get('hostileDist')}")
         if w.get("done") and try_enter(zone):
@@ -248,7 +251,7 @@ def main():
                 print(f"  stopped: in water (HP {pc['hp']}): stepping back")
                 call("step", dx=-sx, dz=-sz)
                 break
-            if ("ConWet" in (pc.get("conditions") or []) and not wet0) or pc["hp"] < hp0:
+            if ("ConWet" in (pc.get("conditions") or []) and not wet0) or (pc["hp"] < hp0 and not force):
                 print(f"  stopped: wet or hurt (HP {pc['hp']})")
                 call("step", dx=-sx, dz=-sz)
                 break

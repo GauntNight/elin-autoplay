@@ -5,7 +5,8 @@ on low SP, or when nothing is left in range; exit 3 (stop) on common.ready's rea
 each harvest (a hostile in view, a window, a task running, HP under 60%, Hungry, Overweight)
 and on a full pack; exit 1 without the tool.
 
-usage: python -I tools/gather.py OBJECT ITEM COUNT [min_sp] [radius] [--weak-ok]
+usage: python -I tools/gather.py OBJECT ITEM COUNT [min_sp] [radius] [--weak-ok] [--food-run]
+  --food-run  gathering food while hungry: no hunger stop at all (the food is the fix)
   --weak-ok  (run 31) keep going past hostiles 10+ levels under me unless within 2 cells or an exploder
   e.g. python -I tools/gather.py weed leaf 14
 """
@@ -133,7 +134,8 @@ def main():
         # run 17: on a wild field a kamikaze yeek walked up during a harvest and blew (-30 HP);
         # nothing here looked for hostiles. common.ready: a hostile in view (threat order belongs
         # to delve/fight), a window, a task still running, HP, Hungry, Overweight
-        why = ready(idle=True, hostiles=not WEAK_OK)
+        # run 41: gathering weeds is how a new character fixes hunger, so its food run goes on whatever the hunger: stopping it starves her
+        why = ready(idle=True, hostiles=not WEAK_OK, hunger=None if "--food-run" in sys.argv else 70)
         if not why and WEAK_OK:
             why = weak_check()
         if why:

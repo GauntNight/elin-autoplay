@@ -67,6 +67,34 @@ def set_number(text, key, value):
     return new
 
 
+def set_aside(archive):
+    """Move a game's records into archive (newgame and trial.py share this)."""
+    (archive / "runs").mkdir(parents=True, exist_ok=True)
+    if RUNS.is_dir():
+        for f in sorted(RUNS.iterdir()):
+            if f.name not in WORKING:
+                shutil.move(str(f), str(archive / "runs" / f.name))
+    for f in RECORDS:
+        if (KNOWLEDGE / f).exists():
+            shutil.move(str(KNOWLEDGE / f), str(archive / f))
+
+
+def make_blank():
+    """Blank records from templates/."""
+    for sub in WORKING:
+        (RUNS / sub).mkdir(parents=True, exist_ok=True)
+    for f in (TEMPLATES / "runs").iterdir():
+        shutil.copyfile(f, RUNS / f.name)
+    for f in (TEMPLATES / "knowledge").iterdir():
+        shutil.copyfile(f, KNOWLEDGE / f.name)
+
+
+def mark_no_base():
+    (RUNS / "no-base.txt").write_text(
+        "This game has no base yet: tools/home.py still holds the last game's coordinates, so the home routines refuse.\n"
+        "Once the boxes exist, put their cells in tools/home.py and delete this file.\n", encoding="utf-8", newline="\n")
+
+
 def main():
     apply = "--yes" in sys.argv[1:]
     name, next_run = last_game(), last_run() + 1
@@ -90,20 +118,8 @@ def main():
         return 0
 
     if archive:
-        (archive / "runs").mkdir(parents=True)
-        if RUNS.is_dir():
-            for f in sorted(RUNS.iterdir()):
-                if f.name not in WORKING:
-                    shutil.move(str(f), str(archive / "runs" / f.name))
-        for f in RECORDS:
-            if (KNOWLEDGE / f).exists():
-                shutil.move(str(KNOWLEDGE / f), str(archive / f))
-    for sub in WORKING:
-        (RUNS / sub).mkdir(parents=True, exist_ok=True)
-    for f in (TEMPLATES / "runs").iterdir():
-        shutil.copyfile(f, RUNS / f.name)
-    for f in (TEMPLATES / "knowledge").iterdir():
-        shutil.copyfile(f, KNOWLEDGE / f.name)
+        set_aside(archive)
+    make_blank()
 
     common = ROOT / "tools" / "common.py"
     text = common.read_bytes().decode("utf-8")
@@ -116,9 +132,7 @@ def main():
     if not n:
         print("elin-play: no floor-gate number found to set: hygiene.py will flag the table")
     skill.write_bytes(text.encode("utf-8"))
-    (RUNS / "no-base.txt").write_text(
-        "This game has no base yet: tools/home.py still holds the last game's coordinates, so the home routines refuse.\n"
-        "Once the boxes exist, put their cells in tools/home.py and delete this file.\n", encoding="utf-8", newline="\n")
+    mark_no_base()
     print(f"done. The next run is {next_run:02}. tools/common.py and elin-play's table changed: commit them.")
     if archive:
         print(f"Undo: move archive/{name}/ back, delete runs/no-base.txt, git checkout tools/common.py .claude/skills/elin-play/SKILL.md")

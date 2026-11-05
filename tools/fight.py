@@ -373,5 +373,17 @@ def _fight(trk):
     print("log:", " / ".join(log[-5:]))
 
 
+def fight_speed():
+    """Fights run at the game's speed x1 (run 41): a loop may run at x5 (bridge `speed`), and this tool's checks between polls then span several
+    game rounds: four deaths in that run read "a hit of 49-66% in one round". The speed before it comes back when the tool exits."""
+    import atexit
+    rep = call("speed")
+    prior = (rep.get("data") or {}).get("index", 1) if rep.get("ok") else 1
+    if prior > 1:
+        call("speed", i=1)
+        atexit.register(lambda: call("speed", i=prior))
+
+
 if __name__ == "__main__":
+    fight_speed()
     main()
