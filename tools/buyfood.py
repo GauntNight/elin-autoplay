@@ -94,7 +94,7 @@ def main():
                 run("close.py", timeout=10)
                 return 0
             bought += n
-        words.add(base.split()[-1].rstrip("s"))
+        words.add("on the bone" if "on the bone" in base else base.split()[-1].rstrip("s"))
     FOODS.write_text("\n".join(sorted(w for w in words if w)) + "\n", encoding="utf-8", newline="\n")
     run("close.py", timeout=10)
     print(f"bought {bought} food; {gold()} orens left; best: {[(round(r, 2), c[:22]) for r, _, _, c in offers[:4]]}")

@@ -55,6 +55,9 @@ def main():
     if "arena" not in (z.get("full") or "") and "--any" not in sys.argv:  # --any: the same loop on a nefia floor, no wipe to wait for
         print(f"refused: not in an arena: {z.get('full')}")
         return 1
+    if "--any" in sys.argv and s["pc"]["lv"] < 10 and "--weak-ok" not in sys.argv:  # run 43: Puppy's Cave at Lv7, HP 59 -> -8: a floor's crowd, and little exp for it
+        print(f"refused: a nefia floor at Lv{s['pc']['lv']}: level 10, or --weak-ok")
+        return 1
     i = 0
     t0 = time.time()
     high = wipe_line()

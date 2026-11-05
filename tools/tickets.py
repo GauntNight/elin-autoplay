@@ -18,6 +18,7 @@ from earlyday import clear_hostiles, clear_windows, named, tidy  # noqa: E402
 
 BASE = Path(__file__).resolve().parent.parent / "runs" / "earlybase.json"
 BED = json.loads(BASE.read_text(encoding="utf-8"))["bed"] if BASE.exists() else None
+PAID = BASE.parent / "tickets_paid.txt"  # recipes that have paid their ticket in this game: gitignored with the game's records
 FOODS = ("boar on the bone", "stew", "soup", "blueberr", "crim", "on the bone", "bread", "ration", "jerk")
 SPOTS = {"sawmill": (59, 48), "carpenter's table": (60, 49), "tinker's table": (61, 48)}
 TARGET = int(sys.argv[sys.argv.index("--target") + 1]) if "--target" in sys.argv else 99
@@ -139,7 +140,9 @@ def near(station):
 
 
 def craft(station, name, use=None, n=1):
-    """One recipe by name. True when a new item came of it."""
+    """One recipe by name. True when a new item came of it. Run 44: a second run of this tool re-crafted paid recipes (rods, desks): about 30 SP for nothing: paid ones are written down and skipped."""
+    if name in paid():
+        return False
     sleep_if_low()
     clear_hostiles()
     pos = near(station) if station != "quick" else None
@@ -159,6 +162,9 @@ def craft(station, name, use=None, n=1):
         call("do", i=put[0]["i"])
         time.sleep(0.1)
     ok = "You crafted" in out or "crafted" in last(out)
+    if tickets() > before:
+        with PAID.open("a", encoding="utf-8", newline="\n") as f:
+            f.write(name + "\n")
     print(f"  {name}: {'ok' if ok else last(out)[-70:]}  tickets {tickets()} (+{tickets() - before})  SP {pc()['sp']}", flush=True)
     tidy()
     return ok
@@ -184,9 +190,13 @@ def place(item, spot):
     return "placed" in out
 
 
+def paid():
+    return set(PAID.read_text(encoding="utf-8").splitlines()) if PAID.exists() else set()
+
+
 def strings(n):
     for _ in range(n):
-        if have("vine") < 2:
+        if have("vine") < 2 or have("string") >= n:  # run 44: five more strings on every run of the tool, 2 SP each
             return
         craft("workbench", "String")
 

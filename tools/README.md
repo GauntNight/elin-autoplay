@@ -14,7 +14,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`activity.py`**: Mark the start and end of a timed activity for the run tracker (the review of 2026-10-23: the owner's measure is growth per real hour, and no log said what each activity earned). Each mark is one row in runs/activity.csv: the real clock, the game date, the tag, the phase, exp, level, gold, gold bars, the zone. stats.py pairs a start with its end and derives exp and orens per real hour per tag; the loops call it themselves, so the numbers need no hand work at the close-out.
     usage: python -I tools/activity.py TAG start|end [NOTE]
 - **`arena.py`**: Clear a job's arena instance ("Monster's Den": Monster extermination, Monster hunting, Troubled home) to "You have wiped out the nearby monsters!" (run 42: hunt.py stops at 70% HP and walks toward the edge, where "Leave Monster's Den?" would forfeit the job). Loop: fight the nearest foe, Rest when nothing is in view and HP is under 70%, else walk the map's corners and middle. Ends at the wipe, then loots, leaves and picks up the reward.
-    usage: python -I tools/arena.py [--no-leave]
+    usage: python -I tools/arena.py [--no-leave] [--any] [--wiped]   --wiped: already wiped, only loot, leave and pick the reward
     Exit 0 wiped (and left), 1 refused (not in an arena), 3 stopped.
 - **`arrive.py`**: Arrive home (run 19, the user's rule after run 18): the scripted part of elin-home section 1, in order, with the Dishes box shared first. leave.py made it private on the way out (dishes.py).
     usage: python -I tools/arrive.py
@@ -30,7 +30,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`board.py`**: List a town's jobs from its nearest quest board in one step (run 41: town jobs were a new character's best income: 247 orens and +1 influence in 3 real minutes). Walks next to the nearest ordinary board, opens it and prints each job with its reward, danger and time. The board stays open, so a job is `bridge.py click N expect=NAME` from the list. All boards in a town show the same jobs.
     usage: python -I tools/board.py [--close]
            python -I tools/board.py --take NAME [NAME ...]   accept these jobs in order, each by its name on the board (an instance job moves
-                                                             me into it as its dialog ends, so it goes last)
+                                                             me into it as its dialog ends, so it goes last); under Lv15 it refuses an instance
+                                                             job below Lv4 or without the ally beside me at 70%+ (--weak-ok)
     Exit 0 listed, 1 refused (no board known on this map), 2 the bridge.
 - **`box.py`**: Open a container, move named items into it (or out of it with --take), close it. With no items, list what it holds. One process and one bridge connection: calling item.py from a script that holds the bridge blocks it (the bridge serves one client at a time; run 04).
     usage: python -I tools/box.py WHERE [--take] [ITEM ...]
@@ -123,6 +124,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     open ("window open: LayerX"); read it with talk.py, or read.py then close.py.
 - **`butcher.py`**: Butcher every corpse in the pack and the Cooler Box with the butcher's tool (run 13, G6).
     usage: python -I tools/butcher.py [--dry] [NAME ...]   (NAME: only corpses matching these words)
+- **`buyfood.py`**: Turn gold into food at an open or named shop in one step (run 43: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from its tooltip, and buy by food per oren until the budget is gone. Meals earlyday.py doesn't know yet go in runs/foods.txt, one word a line, for it to eat.
+    usage: python -I tools/buyfood.py [--keep N] [--shop ROLE_ID]   stand by the shopkeeper (default merchant_inn); N orens are kept
+    Exit 0 done, 1 refused (no shopkeeper near).
 - **`cast.py`**: Cast an attack spell at a hostile from range (bridge 0.33.0 `cast`: the game's own ButtonAbility.TryUse path, pc.UseAbility then EndTurn, with every rule of the game kept: range, line of sight, the spell stock, cooldowns). Run 27's 『Kobold』 (23% a round in melee, PV-heavy) had no ranged answer, and the stocked attack spells were barely cast (the user's tip after run 27). Each cast trains Casting by twice the MP spent (Chara.UseAbility: elements.ModExp(304, MP x 2)), and only a Casting level-up pays character exp: a weak exp engine at 69 MP, a free ranged attack all the same.
     usage: python -I tools/cast.py [SPELL=arrow_Cold] [NAME] [CASTS=10] [--mp-floor N] [--hp N] [--until PCT]
       --until PCT  (run 29, G20's monster ball) stop once the target is at or under PCT% HP (exit 0), or when the
@@ -518,6 +522,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       WALL     the wall item to place (e.g. "plank walls"); doors are skipped (a door cell is left as it is)
     Stops (exit 3) on a cell it couldn't mine or place, with the cells done so far; HP, a hostile or a window stop it too
     (common.ready). Exit 0 when every cell holds the new wall at its old facing.
+- **`roam.py`**: Walk for character exp (run 43): the game pays 1 exp per 3 miles walked on arrival at a local map ("You have walked around 19 miles and have gained experience": +6), at no stamina and a third of a hunger a game hour, about 18 exp a real minute at speed x5. It beat the dummy once skills passed about 10. Shuttles between two places, entering each to bank the miles. Ambushes: its own field() below, a new character's rules, not wgo.py --ambush's.
+    usage: python -I tools/roam.py PLACE_A PLACE_B [--legs N] [--danger-ok N]   from the world map or inside either place
+    At home with a bed (runs/earlybase.json) and Sleepy or worse: one earlyday.py cycle (pray, crops, dummy, sleep).
+    Stops (exit 3): an ambush the rules refuse, no food left at hunger 60+, HP under the loop floor. Exit 0 when the legs are done.
 - **`rotate.py`**: Set walls to a facing, using the game's own "Rotate block" (hold any wall item and right-click an existing wall; each rotation steps blockDir 0 -> 1 -> 2 -> 0).
     usage: python -I tools/rotate.py DIR X,Z [X,Z ...]
 - **`score.py`**: The run score (the user, 2026-10-26: "a rating system to create a score ... This may help make decisions"; tracked from run 26 on). Every outcome of a run is worth points; a run's rating is its points per real hour, with points per game day beside it.

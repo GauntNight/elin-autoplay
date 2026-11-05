@@ -46,6 +46,9 @@ HP floors stated in five places); the other skills point here. **In code they ar
 | Carried gold into a nefia | spend down first, or box it at home: carried orens are currency and can't be boxed (run 16), but picked-up coins are an item stack (`box.py 57,54 "685 orens"`, take it back with `--take` before the tax day: springday pays from carried gold) (a death past the beginner period drops 33-67% of it on the death tile, the code: Chara.ApplyDeathPenalty; no items or levels are lost; run 12 took 1,373 into danger 8-9) | the user, run 03; the review; run 15 |
 
 **Rules, one line each (the run that cost it)**
+- **A flee has to move** (run 43: 56 -> -4 and 43 -> -4 HP on one cell): `leave.py --force` hands back after an attempt that moved under 2 cells, and a teleport-less `fight.py` fights on while no foe is above my level and HP holds 40%: walking away from what I can kill is what killed. (43)
+- **A death prompt is answered, never closed** (run 43: closing it left the game at HP -1 with no dialog and no way on): `common.crawl_up`; `close.py` refuses at HP under 0, loops crawl up and stop. (43)
+- **A bandit's demand is read before it's paid** (run 44: an automatic surrender gave up all 8 gold bars): `roam.py` refuses demands for gold bars, platinum, tickets or the weapon. A surrender ends a lone bandit; a gang keeps hitting (run 43). (43, 44)
 - **One weapon, the other hand empty** (the user, after run 37: "our damage per hit has gone way down"): anything else in a
   hand, a shield or a second weapon, switches off the game's two-hand style (x1.5 damage, +25 to-hit): the axe alone 22.8
   a turn vs Lv33, 9.5 beside the Dreadbane Small Shield (fact #1137); worn from run 21 (a second weapon) and run 30 (the
@@ -154,6 +157,9 @@ rules and turn each outcome into a rule; I ask the user only about major goals. 
    cloud saves, including their own characters under the same ids.
 4. `python -I tools/look.py`: a compact state (HP/MP/SP, hunger, held item, AI, creatures,
    items, log, and a DANGER line when something threatens survival).
+   **Game speed** (trials, runs 41-44): `python -I tools/bridge.py speed 3` is the game's own x5 control, reset by every load: 31 SP on the dummy in about 5 s, a sleep in about 4 s, 60
+   world-map hours in about 2 s. Real time stops binding; food and money bind. `fight.py` drops to x1 for its rounds and puts it back. Home loops and the world map use it; delve and
+   ladder floors haven't been tested at x5 (their own rounds poll: a round at x5 cost 66% in run 41), so `speed 1` before a nefia until a run has tried it.
 5. `python -I tools/power.py --log RUN`: the power card, logged to `runs/power.csv` (again at
    the end of the session, so each run shows its change).
 6. At home, once there's a base (no `runs/no-base.txt`): `arrive.py` (the Dishes box shared, `packcheck.py --move`, the mail, trash,

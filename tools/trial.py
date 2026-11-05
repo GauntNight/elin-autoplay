@@ -244,10 +244,14 @@ def table():
         for r in rr:
             first.setdefault(int(r["lv"]), float(r["minutes"]))
         end, m = rr[-1], float(rr[-1]["minutes"])
-        rate = int(end["exp_total"]) / m * 60 if m else 0
+        # run 44: exp_total prices every level at the undiscounted 50 + 30 x LV, so a Fast Learner's ran 20% high: this sums each sample's own level cost
+        earned = 0
+        for a, b in zip(rr, rr[1:]):
+            earned += int(b["exp"]) - int(a["exp"]) if a["lv"] == b["lv"] else int(a["exp_next"]) - int(a["exp"]) + int(b["exp"])
+        rate = earned / m * 60 if m else 0
         low = min((int(r["hp"]) * 100 // max(int(r["max_hp"]), 1)) for r in rr if r["hp"] and r["max_hp"])
         print(f"run {run}: " + ", ".join(f"Lv{k} {v:.0f}" for k, v in sorted(first.items()) if k > 1)
-              + f" | end +{m:.0f} min Lv{end['lv']}, exp {end['exp_total']} ({rate:.0f} an hour), {end['gold']} orens, lowest HP {low}%")
+              + f" | end +{m:.0f} min Lv{end['lv']}, exp earned {earned} ({rate:.0f} an hour), {end['gold']} orens, lowest HP {low}%")
     return 0
 
 

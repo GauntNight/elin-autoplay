@@ -4,7 +4,8 @@ The board stays open, so a job is `bridge.py click N expect=NAME` from the list.
 
 usage: python -I tools/board.py [--close]
        python -I tools/board.py --take NAME [NAME ...]   accept these jobs in order, each by its name on the board (an instance job moves
-                                                         me into it as its dialog ends, so it goes last)
+                                                         me into it as its dialog ends, so it goes last); under Lv15 it refuses an instance
+                                                         job below Lv4 or without the ally beside me at 70%+ (--weak-ok)
 Exit 0 listed, 1 refused (no board known on this map), 2 the bridge.
 """
 import sys
@@ -14,6 +15,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
 from common import act, pc, setup, walk_beside  # noqa: E402
+
+
+INSTANCE = ("Monster hunting", "Monster extermination", "Troubled home")
 
 
 def rows():
@@ -50,7 +54,16 @@ def take(name):
 def main():
     setup()
     if "--take" in sys.argv:
-        ok = [take(n) for n in sys.argv[sys.argv.index("--take") + 1:]]
+        names = [a for a in sys.argv[sys.argv.index("--take") + 1:] if a != "--weak-ok"]
+        # runs 41, 43, 44: five of the twelve deaths were job arenas taken too weak or without the ally: nine or ten foes at once, whatever the Danger number says.
+        # Under level 15 an instance job wants level 4 and the ally beside me at 70%+, unless --weak-ok.
+        s = call("state")["data"]
+        p, party = s["pc"], s.get("party") or []
+        ally_ok = any(a.get("here") and a.get("dist", 99) <= 5 and a.get("hp", 0) * 10 >= a.get("maxHp", 1) * 7 for a in party)
+        if p["lv"] < 15 and "--weak-ok" not in sys.argv and any(w in n for n in names for w in INSTANCE) and (p["lv"] < 4 or not ally_ok):
+            print(f"refused: an instance job at Lv{p['lv']} with {'the ally ready' if ally_ok else 'no ally beside me at 70%+'}: level 4 and the ally, or --weak-ok")
+            return 1
+        ok = [take(n) for n in names]
         return 0 if all(ok) else 1
     hits = [h for h in call("find", name="quest board", r=150, n=20)["data"]["hits"] if h.get("installed", True)]
     plain = [h for h in hits if "maniac" not in h["name"]] or hits

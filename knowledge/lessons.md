@@ -16,6 +16,8 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 
 
+- Measure where the exp comes from before planning the next hour: run 44 spent minutes 6-66 on shops, jobs and roads at 4 exp a minute with the 30-a-minute dummy beside its bed; the 20-second samples showed it at once, afterwards. (44)
+- A rate measured at one level is that level's rate: the dummy's 39 a minute at skill 3 is 3 at skill 10, and "walking beats the dummy" (run 43, at skill 10+) read as a general rule until run 44 measured both at low skill. Say at what state a rate holds. (44)
 - The largest gains of a run can sit unread in the home's boxes: tally them by kind (stock) at every session start. Run 40's ancient books, skill books and enchant armor scrolls had waited for runs. (40)
 - A file cut to its last line hides what a check showed: a tool's output that decides something gets read whole; the two guns were recorded as read when they weren't. (40)
 - A claim about what I compared stands only if I compared it: "none are better" was written over 14 pieces whose lines I never read. (40)
@@ -36,6 +38,7 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 ## Promoted (where the older lessons live now)
 
+- the level 1 trials (runs 41-44): armor before arenas and no caves under Lv10 -> board.py --take and arena.py --any refuse, elin-opening's fast path; a flee that doesn't move -> leave.py; a death prompt -> common.crawl_up and close.py; a demand paid unread -> roam.py KEEP; full pack -> earlyday.tidy JUNK_FULL; paid recipes re-crafted -> tickets.py
 - run 40 triage: a neutral master that steals (37) -> a fact, and The Fighting Bull ring protects from thieves
 - run 39 triage (the run-36 lessons): the named exploder by the down stairway -> fact #1174; grassland nefias run long
   -> fact #1175 (run 39 again: 40-70 real minutes each); Return needs a local map -> recall.py refuses on the world map

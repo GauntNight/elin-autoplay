@@ -110,8 +110,9 @@ What the first test of this skill cost (a Lich Pianist with 10 HP and 25 stamina
 - **Read the character first.** `power.py`: HP and SP decide everything early. Rolord's numbers are not this character's.
 - **Stay home until about level 5.** A road ambush kills a 10 HP character outright, even a level 1 puppy, and walking away
   doesn't save her. `wgo.py` now caps a route's ambush level at the character's level + 1.
-- **Exp comes from skill level-ups** (10-14 each), not kills or the dummy: first-time crafts (`firstcraft.py STATION --craft`),
-  gathering, many low skills.
+- **Exp comes from skill level-ups** (10-14 each), not kills. Low skills are the fuel, and the **dummy is the best engine until they reach about 9**: a hit also trains Tactics and Strategy
+  (`earlyday.py N --rotate`; **elin-opening**'s fast path). First-time crafts (`firstcraft.py STATION --craft`) pay money and skill too. A weak character gets more from this, not less: a Warmage with 29 SP
+  ran 30-40 exp a real minute.
 - **Budget stamina before gathering.** It only comes back with sleep, and sleep needs SP under 20% (or being sleepy). **No bed is
   needed for that:** the Rest ability at low SP falls asleep where you stand (measured: SP 3 to 18 of 25 in 7 hours; a bed: 4 to 25).
   A log takes about 1 SP, a weed about 0.5 on average, a workbench 5, a bed 4. Below 0, each point of deficit is an HP of damage, so
@@ -125,5 +126,5 @@ What the first test of this skill cost (a Lich Pianist with 10 HP and 25 stamina
 - **One step, then read the result.** Chaining commands put down the gold bars and shared the toolbelt. Use `act.py` by name:
   an index read a moment ago can become Attack when a pet steps onto the cell (the bridge now refuses that).
 - **Death is cheap at first:** "the blessing of Elin" means nothing is lost early on (until 485-08-12 in the first game, unless the
-  player took the oath against it). The game asks for a last word (`bridge.py input "..."`), then **Crawl up, never Buried**.
+  player took the oath against it). The game asks for a last word, then **Crawl up, never Buried**: `common.crawl_up` answers both; closing that prompt hangs the game (run 43).
   Log the cause in `runs/errors.csv`, and fix what let it happen.

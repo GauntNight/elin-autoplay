@@ -93,7 +93,7 @@ def on_my_cell(text, r=2):
     return False
 
 
-def board_job(name, choice=None):
+def board_job(name, choice=None, optional=False):
     settle()
     hits = [h for h in call("find", name="quest board", r=30, n=2)["data"]["hits"]]
     if not hits:
@@ -110,6 +110,9 @@ def board_job(name, choice=None):
     call("do", i=view[0]["i"])
     time.sleep(0.5)
     rows = [r for r in call("buttons")["data"]["buttons"] if "item quest" in r.get("name", "") and name in r.get("text", "")]
+    if not rows and optional:  # run 44: --from logs asked for a job already held and stopped there
+        call("closetop")
+        return
     if not rows:
         stop(f"no {name} on the board")
     call("click", i=rows[0]["i"], expect=name)
@@ -313,7 +316,7 @@ def st_boar():
 
 
 def st_logs():
-    board_job("Way of Crafter")
+    board_job("Way of Crafter", optional=True)
     gather("cedar tree", "log", 8, 3, 30)
     if have("log") < 3:
         gather("tree", "log", 5, 3, 30)
@@ -346,8 +349,10 @@ def st_torch():
     if have("vine") < 2:
         gather("vine bush", "vine", 2, 0, 30)
     rest_if_low(6)
-    if have("resin") < 2 or have("branch") < 1:
+    if have("resin") < 2:
         gather("cedar tree", "resin", 2, 2, 40)
+    if have("branch") < 1:  # run 44: the resin came without one and "no torch worn" was the first sign
+        gather("tree", "branch", 1, 2, 40)
     craft(*bench(), "String")
     craft(*bench(), "Torch")
     run("item.py", "torch", "Equip", timeout=20)
@@ -404,6 +409,9 @@ def st_dummy():
     out = run("place.py", "training dummy", f"{dummy[0]},{dummy[1]}", timeout=20)
     if "placed" not in out:
         stop("the dummy: " + out[-120:])
+    if have("leaf") < 4 or have("grass") < 2:  # run 44: short of leaves the bed was skipped in silence, and earlyday stopped at "no Sleep" 15 minutes later
+        gather("weed", "leaf", 4, 2, 40)
+        gather("weed", "grass", 2, 2, 40)
     if have("leaf") >= 4 and have("grass") >= 2:
         craft(*bench(), "Makeshift bed", 1)
         out = run("place.py", "makeshift bed", f"{bed[0]},{bed[1]}", timeout=20)

@@ -5,18 +5,21 @@ description: Step-by-step procedure for Elin's opening tutorial chain on a new c
 
 # The fast path (the level 1 trials, runs 41-44)
 
-Everything below is the reasoning; for a new game these tools do it. Compared to the first game's Lv2 at minute 250: Lv2 at 14, Lv8 at 96.
+Everything below is the reasoning; for a new game these tools do it. The first game's Lv2 took 250 minutes and its Lv8 1,982; with this path Lv2 took 14 and Lv8 96. In their two hours three Yerles Warriors earned 843, 1,116 and 953 exp; a random Juere Warmage with under half the SP earned 870, for all that it did step 5 an hour late.
 
-1. `tools/newchar.py RACE CLASS` from the title. Then `tools/opening.py`: speed x5 (`bridge.py speed 3`, the game's own control, reset by every load), the whole
+1. `tools/newchar.py RACE CLASS` (or `random random`) from the title. Then `tools/opening.py`: speed x5 (`bridge.py speed 3`, the game's own control, reset by every load), the whole
    chain to Way of Crafter's training dummy beside a bed in about 7 minutes. A stop names its stage: finish by hand, then `--from STAGE`.
-2. `tools/tickets.py`: every first-time craft pays an old ticket (117 orens anywhere): sawmill, carpenter's and tinker's tables and their recipes. Hand-broken stones need no pickaxe.
-3. **Walk** to Mysilia (`wgo.py --near 0`; a third of the hunger assumed, seconds of real time): sell tickets, buy the cheapest melee weapon and armor (PV 0 is what kills), then food by
-   food per oren: bones and roasts 13 orens for 27, bread 27 for 31, rations 48 for 51. NPC names change per world: `whereis.py any blacksmith` (the role), by day.
-4. `tools/earlyday.py N --rotate`: crops, meal, the rest of the bar on the dummy at the lowest skill I can hold, sleep. Yerles level fastest (Fast Learner); bare hands count.
-5. From Lv3: `board.py`, `board.py --take NAME`, `arena.py`: Monster extermination, Monster hunting and Troubled home at Danger 1-2 pay 166-274 orens, influence and sub rewards in a minute. **Instance job first, count jobs after** (a cap of about 5). The ally along, armor on.
-6. Food and gold go together: back to step 3 when the food runs out. `feat.py` for each point (Tough, Stone Defense first; SP feats do nothing past waking SP ~41 on a makeshift bed). `tools/ability.py Rest` heals fast and sleeps under 20% SP; `Pray` is free Faith.
+2. **Read any starter books down**: a class's spellbooks take about 7 reads and no SP for three spells and a Literacy level. A Teleport spell saves lives even with one cast in three failing at Casting 4.
+3. `tools/tickets.py`: every first-time craft pays an old ticket (117 orens anywhere): sawmill, carpenter's and tinker's tables and their recipes. It skips what has paid. Hand-broken stones need no pickaxe. **Stop at about 10 tickets, minute 15**; `firstcraft.py STATION --craft` picks up the rest later. Make the **Boomerang** (4 planks, 2 strings): it returns and it kills.
+4. **The first trip, by minute 20:** Tinker's Camp is 5 miles from home and always allowed; Mysilia needs `--danger-ok 5` at low level. Sell tickets at any shop. **Armor first**: the second number is PV, and `[1, 7]` for 300 orens did more than any level. Then the cheapest melee weapon, then food: `buyfood.py` (bones 13 orens for 27; the inn sometimes has no wares, come back). NPC names change per world: `whereis.py any blacksmith`, then the role id.
+5. **`tools/earlyday.py N --rotate` until the melee skills reach about 9: nothing pays like it.** Crops, meal, the bar on the dummy at the lowest skill I can hold or throw, sleep, in cycles of 14 seconds: 30-40 exp a real minute at the start, because a hit also trains Tactics and Strategy from level 1. Run 44 did this from minute 66 (435 exp in 26 minutes against 240 in the 60 before); runs 42-43 from minute 20.
+6. **Jobs from level 4, with PV 15+ and the ally beside me at full HP** (`board.py --take` refuses less): `board.py`, `board.py --take NAME`, `arena.py`. Monster hunting, Monster extermination and Troubled home pay 155-295 orens, influence and sub rewards in a minute. A Danger number says nothing about the count: Danger 1 sent ten foes at once. Check both boards: Mysilia's and the camp's each go long without one. **Instance job first, count jobs after** (a cap of about 5).
+7. **Past skill 9-10 the dummy pays 2-5 exp a minute.** Then, by what's on hand: `tools/roam.py Meadow Mysilia --danger-ok 5` (1 exp per 3 miles on arrival, Travel, a daily Pray, its own ambush routine, about 5-12 exp a minute); Riding at the first 4-5 platinum (110 skill exp on a 5-mile mounted leg, no SP; the little girl is GoodRide); a cheap weapon of an untrained kind; Desks at the carpenter's (11 skill exp a SP at Carpentry 1-2, and they sell for 19).
+8. `feat.py` for each point (Tough, then Stone, Iron and Steel Defense: PV 1 -> 23 with step 4). `tools/ability.py Rest` heals fast, free on the world map (3 -> 28 HP in seconds), and sleeps under 20% SP; `Pray` is free Faith.
 
-Don't: enter a field tile by hand; force a fight the tool refuses; melee kinds on elin-play's range list; sleep by hand at hunger 60+ (Starving costs HP fast). Before day 90 a death costs nothing but time: Crawl up.
+Don't: enter a field tile by hand; force a fight the tool refuses; take caves or nefias under Lv10 (`arena.py --any` refuses); melee kinds on elin-play's range list; sleep by hand at hunger 60+ (Starving costs HP fast); carry over 33 cards (meals fall to the ground). Before day 90 a death costs nothing but time: Crawl up (`common.crawl_up`). Past Lv7 the road can still kill in one exchange: a danger 6 field took a 62 HP character down in seconds.
+
+**What this skill's fast path changed** (four 2-hour trials, 2026-11-04 and 05). Measure: minutes to Lv8. Baseline: 1,982 (Rolord). Latest: 96 (run 42), 106 (run 43). Deaths in the four: 4, 0, 5, 3; Lv10 was not reached in any.
 
 # The opening, in order
 
