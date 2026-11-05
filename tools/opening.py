@@ -239,9 +239,19 @@ def st_pet():
 
 
 def st_box():
-    board_job("Essential Equipment")
-    if not on_my_cell("Pick (a sturdy box", r=3):
+    # run 43: "a royal sturdy box": a random quality word, so the name is matched by its last words; a resumed stage has the job already
+    if not call("find", name="sturdy box", r=4, n=1)["data"]["hits"]:
+        board_job("Essential Equipment")
+    hit = call("find", name="sturdy box", r=4, n=1)["data"]["hits"]
+    if not hit:
         stop("no sturdy box")
+    walk(hit[0]["x"], hit[0]["z"], r=0, hp=1, timeout=4000)
+    acts = call("acts", dx=0, dz=0, mode="all")["data"]["acts"]
+    pick = [a for a in acts if a["text"].startswith("Pick") and "sturdy box" in a["text"]]
+    if not pick:
+        stop(f"no Pick for the box: {[a['text'] for a in acts]}")
+    call("do", i=pick[0]["i"])
+    wait_idle(timeout=3000)
     settle()
     run("item.py", "sturdy box", "Grab", timeout=20)
     p = pc()
@@ -250,6 +260,9 @@ def st_box():
         stop("couldn't place the box: " + out[-120:])
     b = call("find", name="sturdy box", r=4, n=1)["data"]["hits"][0]
     q = pc()
+    if max(abs(b["x"] - q["x"]), abs(b["z"] - q["z"])) > 1:
+        walk_beside(b["x"], b["z"])
+        q = pc()
     run("act.py", b["x"] - q["x"], b["z"] - q["z"], "Open", timeout=20)
     time.sleep(0.4)
     call("winbtn", name="buttonShared")
@@ -322,7 +335,7 @@ def st_workbench():
 
 def bench():
     p = pc()
-    b = call("find", name="workbench", r=12, n=1)["data"]["hits"][0]
+    b = call("find", name="workbench", r=60, n=1)["data"]["hits"][0]
     if max(abs(p["x"] - b["x"]), abs(p["z"] - b["z"])) > 1:
         walk_beside(b["x"], b["z"])
         p = pc()
@@ -384,6 +397,7 @@ def st_house():
 
 
 def st_dummy():
+    rest_if_low(6)
     fire = call("find", name="bonfire", r=25, n=1)["data"]["hits"]
     fx, fz = (fire[0]["x"], fire[0]["z"]) if fire else (56, 47)
     dummy, stand, bed = (fx + 1, fz - 1), (fx + 1, fz), (fx + 2, fz - 1)

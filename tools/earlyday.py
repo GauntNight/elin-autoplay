@@ -23,7 +23,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import THRESHOLDS, call, data, last, pc, ready, run, setup, state, stop, top, wait_idle, walk  # noqa: E402
+from common import crawl_up, THRESHOLDS, call, data, last, pc, ready, run, setup, state, stop, top, wait_idle, walk  # noqa: E402
 
 BASE = Path(__file__).resolve().parent.parent / "runs" / "earlybase.json"
 STEW_FOOD, STEW_SP, STEW_GRASS = 11, 3, 5
@@ -31,7 +31,7 @@ HUNGER_AFTER_MEAL = 38  # a sleep adds 20: wake under Hungry (70) with room to w
 SP_FLOOR = 4  # the bridge's guard cancels work at 3
 LOOP_SLEEP = 60  # the loop's own limit: see the docstring
 WEED_RADIUS = 60
-MEALS = (("watermelon", 11), ("apple", 13), ("jerk", 19), ("orange", 22), ("on the bone", 27), ("roast", 34), ("stew", 11), ("soup", 18), ("pile of bread", 31), ("piles of bread", 31), ("cheese bread", 31), ("ration", 51))  # a word of the name, food: smallest first (run 41: breads have several ids)
+MEALS = (("watermelon", 11), ("apple", 13), ("jerk", 19), ("orange", 22), ("on the bone", 27), ("roast", 34), ("stew", 11), ("soup", 18), ("skewer", 15), ("ramen", 22), ("salad", 20), ("pizza", 51), ("breadstick", 40), ("pile of bread", 31), ("piles of bread", 31), ("cheese bread", 31), ("ration", 51))  # a word of the name, food: smallest first (run 41: breads have several ids)
 CROPS = (("berry", "berry"), ("crim", "crim"))
 
 
@@ -40,7 +40,10 @@ def count(item_id):
 
 
 def clear_windows():
-    """A tip, a dream, a report: read it through. Anything left is the caller's stop."""
+    """A tip, a dream, a report: read it through. Anything left is the caller's stop. A death prompt is never closed (run 43: that left the game stuck): crawl up and stop."""
+    if pc()["hp"] <= 0:
+        ok = crawl_up()
+        stop(f"I died: {'crawled up' if ok else 'no Crawl up offered: look.py'}: read the log before going on")
     for _ in range(4):
         s = state()
         if not (s.get("drama") or (s.get("layers") or {}).get("top")):
@@ -62,7 +65,7 @@ def empty_hands():
 
 
 JUNK = ("rotten", "garbage", "empty can", "empty bottle", "junk stone", "rubble", "corpse", "offal", "heart", "fang", "seed", "bark", "resin",
-        "tuft", "leaf", "leaves", "shit", "letter", "skull", "bone")
+        "tuft", "leaf", "leaves", "shit", "letter", "skull")
 
 
 def tidy():
@@ -70,9 +73,11 @@ def tidy():
     items = [i for i in data("inv")["items"] if not i.get("equipped")]
     if len(items) < 28:
         return
-    for i in items:
-        if any(w in i["name"].lower() for w in JUNK) and "bone nail" not in i["name"]:
-            run("item.py", i["name"], "Drop", timeout=15)
+    junk = [i for i in items if any(w in i["name"].lower() for w in JUNK) and "bone nail" not in i["name"]]
+    if not junk:
+        return
+    for i in junk:
+        run("item.py", i["name"], "Drop", timeout=15)
     run("close.py", timeout=10)
     print(f"  tidied the pack: {len(items)} -> {len([i for i in data('inv')['items'] if not i.get('equipped')])} cards", flush=True)
 
@@ -99,7 +104,7 @@ def clear_hostiles():
     stop("eight fights in a row: look.py")
 
 
-WEAPONS = (("club", "weaponBlunt"), ("mace", "weaponBlunt"), ("staff", "weaponStaff"), ("scythe", "weaponScythe"),
+WEAPONS = (("club", "weaponBlunt"), ("mace", "weaponBlunt"), ("staff", "weaponStaff"), ("scythe", "weaponScythe"), ("kusarigama", "weaponScythe"),
            ("long sword", "weaponSword"), ("short sword", "weaponDagger"), ("dagger", "weaponDagger"), ("spear", "weaponPolearm"), ("trident", "weaponPolearm"),
            ("lance", "weaponPolearm"), ("hand axe", "weaponAxe"), ("battle axe", "weaponAxe"))
 
@@ -198,15 +203,24 @@ def eat_named(word, food):
     return True
 
 
+def meals():
+    """MEALS plus what buyfood.py wrote down for this game (runs/foods.txt)."""
+    known = list(MEALS)
+    f = BASE.parent / "foods.txt"
+    if f.exists():
+        known += [(w, 20) for w in f.read_text(encoding="utf-8").split() if w not in ("berry",)]
+    return known
+
+
 def eat_from_pack():
     """Down under 45: crops first (they rot), then the smallest meal in the pack. True when a meal remains, so stews aren't needed."""
     for word, food in (("blueberr", 8), ("crim", 7)):
         while pc()["hunger"] >= THRESHOLDS["eat_at"] - food and named(word):
             eat_named(word, food)
-    for word, food in MEALS:
+    for word, food in meals():
         while pc()["hunger"] >= THRESHOLDS["eat_at"] and named(word):
             eat_named(word, food)
-    return any(named(w) for w, _ in MEALS)
+    return any(named(w) for w, _ in meals())
 
 
 def main():
@@ -286,8 +300,8 @@ def main():
                     stop("train: " + last(out)[:140])
 
         # Sleep: a last meal if training left me over the line
-        while pc()["hunger"] >= LOOP_SLEEP - 8 and any(named(w) for w, _ in MEALS):
-            word = next(w for w, _ in MEALS if named(w))
+        while pc()["hunger"] >= LOOP_SLEEP - 8 and any(named(w) for w, _ in meals()):
+            word = next(w for w, _ in meals() if named(w))
             eat_named(word, 0)
         p = pc()
         if p["hunger"] >= LOOP_SLEEP:

@@ -258,6 +258,12 @@ def main():
         s = call("state")["data"]
         if any(c["hostile"] and c["dist"] <= 1 for c in s.get("nearby") or []) and "--force" not in sys.argv:
             stop("a hostile is adjacent: deal with it first")
+        # run 43, two deaths: 56 -> -4 and 43 -> -4 HP on a flee that moved one cell in 30-40 turns (steps into a foe's cell are attacks, walks that go nowhere
+        # still pass turns). A flee that isn't moving hands back at once: fight, or use an item.
+        q = s["pc"]
+        moved = abs(q["x"] - p["x"]) + abs(q["z"] - p["z"])
+        if force and moved < 2:
+            stop(f"the flee isn't moving ({moved} cells this attempt, HP {q['hp']}/{q['maxHp']}): fight or use an item")
     stop("could not find an exit")
 
 

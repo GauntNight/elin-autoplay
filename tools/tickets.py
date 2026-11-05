@@ -74,8 +74,19 @@ def sleep_if_low(need=9):
     clear_windows()
 
 
+def crops():
+    """Food first (run 43 ran dry mid-chain): a new map's crops are ripe and nearly free."""
+    for obj, item, n in (("berry", "berry", 12), ("crim", "crim", 8)):
+        run("gather.py", obj, item, n, 2, 45, "--food-run", timeout=120)
+        clear_windows()
+    call("act", action="EmptyHand")
+
+
 def gather_all():
     """Materials for the whole list: about 16 logs, 12 stones, 14 vines, 3 bones, 6 branches."""
+    crops()
+    if not gather_needed():
+        return
     for obj, item, n in (("vine bush", "vine", 14), ("tree", "log", 16)):
         sleep_if_low()
         out = run("gather.py", obj, item, n, 4, 45, "--food-run", timeout=240)
@@ -99,6 +110,14 @@ def gather_all():
         p = pc()
         run("harvest.py", h["x"] - p["x"], h["z"] - p["z"], 4, timeout=30)
         clear_windows()
+
+
+def gather_needed():
+    return have(" log") < 6 or have("vine") < 4
+
+
+def built(station):
+    return bool([x for x in call("find", name=station, r=30, n=1)["data"]["hits"] if x.get("installed", True)])
 
 
 def material(word, n):
@@ -172,18 +191,87 @@ def strings(n):
         craft("workbench", "String")
 
 
+def stones_by_hand(n):
+    tried = set()
+    while have("granite stone") < n:
+        sleep_if_low()
+        hits = [h for h in call("find", name="a stone", r=60, n=200)["data"]["hits"]
+                if h["kind"] == "obj" and not h.get("edge") and (h["x"], h["z"]) not in tried]
+        if not hits:
+            return
+        h = hits[0]
+        tried.add((h["x"], h["z"]))
+        walk_beside(h["x"], h["z"])
+        p = pc()
+        run("harvest.py", h["x"] - p["x"], h["z"] - p["z"], 4, timeout=30)
+        clear_windows()
+
+
+def tinker():
+    """The tinker's table and its tools (run 43: a table recipe isn't always known at the start: a desk counts as Table, fact to check; the first chair and a table or desk, 2 bones)."""
+    t0 = time.time()
+    if not built("tinker's table"):
+        if have(" log") < 6:
+            sleep_if_low()
+            run("gather.py", "tree", "log", 8, 3, 45, "--food-run", timeout=180)
+            clear_windows()
+            call("act", action="EmptyHand")
+        if have("bone") < 3:
+            run("gather.py", "bone", "bone", 4, 2, 45, "--food-run", timeout=120)
+            clear_windows()
+        if not (have("a table") or have("desk")):
+            if have("plank") < 4:
+                saw(" log", 2)
+            m = material("plank", 4)
+            if m:
+                craft("carpenter's table", "Desk", m)
+        if not have("chair"):
+            m = material("log", 2)
+            if m:
+                craft("carpenter's table", "Round chair", m)
+        craft("workbench", "Tinker's table")
+        place("tinker's table", SPOTS["tinker's table"])
+    if not built("tinker's table"):
+        print("no tinker's table: " + ", ".join(i["name"][:18] for i in data("inv")["items"] if any(w in i["name"] for w in ("chair", "table", "desk", "bone"))))
+        return
+    stones_by_hand(9)
+    if have("vine") < 8:
+        run("gather.py", "vine bush", "vine", 8, 2, 45, "--food-run", timeout=120)
+        clear_windows()
+    if have("stick") < 6:
+        saw("branch", 1)
+    if have("nail") < 1 and have("bone"):
+        craft("tinker's table", "Nail")
+    strings(4)
+    for n, cost in (("Pickaxe", 2), ("Shovel", 2), ("Woodcutter's axe", 1), ("Hammer", 2), ("Sickle", 2)):
+        st, sk, sg = material("stone", cost), material("stick", 1), material("string", 1)
+        if st and sk and sg:
+            craft("tinker's table", n, f"{st},{sk},{sg}")
+    st, sk = material("stone", 1), material("stick", 1)
+    if st and sk and have("nail"):
+        craft("tinker's table", "Hoe", f"{st},{sk},bone")
+    print(f"tinker done: {tickets()} tickets, SP {pc()['sp']}, hunger {pc()['hunger']}, {time.time() - t0:.0f}s")
+
+
 def main():
     setup()
     t0 = time.time()
+    if "--tinker" in sys.argv:
+        tinker()
+        return 0
     gather_all()
     print(f"gathered: logs {have(' log')}, stones {have('granite stone')}, vines {have('vine')}, bones {have('bone')}, branches {have('branch')}; SP {pc()['sp']}  {time.time() - t0:.0f}s", flush=True)
     logs = lambda n=2: material("log", n)  # noqa: E731
-    craft("workbench", "Sawmill", f"{logs(3)},{material('stone', 3)}")
-    place("sawmill", SPOTS["sawmill"])
-    saw(" log", 3)  # planks
-    saw("branch", 2)  # sticks
-    craft("workbench", "Carpenter's table", f"{material('plank', 4)},{material('stone', 2)}")
-    place("carpenter's table", SPOTS["carpenter's table"])
+    if not built("sawmill"):
+        craft("workbench", "Sawmill", f"{logs(3)},{material('stone', 3)}")
+        place("sawmill", SPOTS["sawmill"])
+    if not have("plank"):
+        saw(" log", 3)  # planks
+    if not have("stick"):
+        saw("branch", 2)  # sticks
+    if not built("carpenter's table"):
+        craft("workbench", "Carpenter's table", f"{material('plank', 4)},{material('stone', 2)}")
+        place("carpenter's table", SPOTS["carpenter's table"])
     strings(5)
     saw("branch", 2)
     craft("carpenter's table", "Wooden weapon", f"{logs(2)},{material('string', 1)},{material('stick', 2)}")
@@ -193,7 +281,10 @@ def main():
     saw(" log", 2)
     craft("carpenter's table", "Desk", material("plank", 4))
     craft("carpenter's table", "Boomerang", f"{material('plank', 4)},{material('string', 2)}")
-    if have("bone") >= 2 and have("round chair") and have("a table"):
+    if have("bone") < 3:
+        run("gather.py", "bone", "bone", 4, 2, 45, "--food-run", timeout=120)
+        clear_windows()
+    if not built("tinker's table") and have("bone") >= 2 and have("round chair") and have("a table"):
         craft("workbench", "Tinker's table")
         place("tinker's table", SPOTS["tinker's table"])
     if near("tinker's table"):

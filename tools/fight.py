@@ -130,6 +130,13 @@ def after_round(hp0, max_hp, min_hp, who):
             print(f"a hit of {drop:.0f}% in one round ({hp0} -> {hp2}/{max_hp}, {who}), but {foes[0]['name']} is alone "
                   f"at {foes[0].get('hpPct')}%: one more round")
             return s2
+        # run 43: with no teleport in the pack this stop's advice is empty, and at 59 max HP one 16-point bite from a Lv4 is over 25%: two deaths came from walking away
+        # instead. While every foe is at or below my level and I hold 40%, the fight goes on.
+        if hp_after >= 40 and all((c.get("lv") or 0) <= p2["lv"] for c in foes):
+            names = [i["name"] for i in call("inv")["data"]["items"]]
+            if not any("teleport" in n for n in names):
+                print(f"a hit of {drop:.0f}% in one round ({hp0} -> {hp2}/{max_hp}, {who}); no teleport in the pack and no foe above my level: fighting on")
+                return s2
         stop(f"a hit of {drop:.0f}% in one round ({hp0} -> {hp2}/{max_hp}, {who}): teleport")
     if hp2 * 100 < min_hp * max_hp:
         stop(f"HP {hp2}/{max_hp} is below {min_hp}%")

@@ -110,6 +110,21 @@ def top():
     return (state().get("layers") or {}).get("top")
 
 
+def crawl_up(word="Onward"):
+    """Answer the death prompt: the last word, then Crawl up (never Buried). Run 43: a loop's clear_windows closed the prompt instead, which left the game with HP under 0,
+    no dialog and no way on. True when the choice was clicked."""
+    if top() == "Dialog":
+        call("input", text=word)
+    for _ in range(25):
+        time.sleep(0.2)
+        hit = [b for b in call("buttons")["data"]["buttons"] if (b.get("text") or "").endswith("Crawl up")]
+        if hit:
+            call("click", i=hit[0]["i"])
+            time.sleep(1.5)
+            return True
+    return False
+
+
 def wait_until(until="idle", n=1, timeout=15000, **kw):
     """The bridge's deferred wait. Returns the reply data (done, why, x, z, hp, zone, top, ai)."""
     reply = call("wait", until=until, n=n, timeout=timeout, **kw)

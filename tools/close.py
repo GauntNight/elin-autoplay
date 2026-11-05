@@ -25,7 +25,10 @@ def system_menu():
 
 
 def close_all(say=print):
-    """Close windows until none is open; the System menu is dismissed through Help."""
+    """Close windows until none is open; the System menu is dismissed through Help. Never the death prompt (run 43): common.crawl_up answers that."""
+    if call("state")["data"]["pc"]["hp"] <= 0:
+        say("refused: HP under 0: a death prompt is answered by common.crawl_up, never closed")
+        return False
     for i in range(6):
         sm = system_menu()
         if sm:

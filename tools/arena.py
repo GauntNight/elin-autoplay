@@ -3,7 +3,7 @@
 nothing is in view and HP is under 70%, else walk the map's corners and middle. Ends at the wipe, then loots, leaves and picks up the reward.
 
 Survival: a foe more than 3 levels above me, or HP under 25% with foes around, stops (exit 3) for a decision: nothing here flees by itself.
-usage: python -I tools/arena.py [--no-leave]
+usage: python -I tools/arena.py [--no-leave] [--any] [--wiped]   --wiped: already wiped, only loot, leave and pick the reward
 Exit 0 wiped (and left), 1 refused (not in an arena), 3 stopped.
 """
 import sys
@@ -21,8 +21,10 @@ def texts():
     return call("texts", all=True)["data"]["texts"]
 
 
-def wiped():
-    return any("wiped out the nearby monsters" in t for t in texts())
+def wipe_line():
+    """The wipe line's position in the visible log, -1 when it isn't there. Run 43: the log still held the last job's line, so a second arena in a row counted as
+    wiped at once; and the window is short, so counting lines failed too (the old one scrolled off as the new one came): a line further down than any seen is new."""
+    return max((i for i, t in enumerate(texts()) if "wiped out the nearby monsters" in t), default=-1)
 
 
 def answer_no():
@@ -50,15 +52,18 @@ def main():
     setup()
     s = state()
     z = s.get("zone") or {}
-    if "arena" not in (z.get("full") or ""):
+    if "arena" not in (z.get("full") or "") and "--any" not in sys.argv:  # --any: the same loop on a nefia floor, no wipe to wait for
         print(f"refused: not in an arena: {z.get('full')}")
         return 1
     i = 0
     t0 = time.time()
-    while time.time() - t0 < 180:
+    high = wipe_line()
+    while time.time() - t0 < 180 and "--wiped" not in sys.argv:
         answer_no()
-        if wiped():
+        now = wipe_line()
+        if now > high:
             break
+        high = now if now >= 0 else high  # the old line scrolls up: follow it down to where a new one would show
         s = state()
         p = s["pc"]
         foes = sorted((c for c in s.get("nearby") or [] if c.get("hostile")), key=lambda c: c.get("dist", 99))
@@ -70,6 +75,8 @@ def main():
                 stop(f"HP {p['hp']}/{p['maxHp']} with {len(foes)} foes in view")
             out = run("fight.py", f["name"].split()[-1], FLOOR, timeout=90)
             print(f"  {f['name']} Lv{f.get('lv')}: HP {pc()['hp']}  {last(out)[:50]}", flush=True)
+            if out.rc == 1:  # run 43: the fight tool refuses an avoid kind and this loop asked again for 3 minutes
+                stop(f"fight.py refused {f['name']}: {last(out)[:80]}")
             continue
         if p["hp"] * 100 < 70 * p["maxHp"]:
             rest()
@@ -79,9 +86,13 @@ def main():
         run("explore.py", timeout=60)
         answer_no()
         if i > 8:
+            if "--any" in sys.argv:
+                print("explored eight times: floor done")
+                return 0
             stop("explored eight times and none left in view: look.py")
     else:
-        stop("3 minutes in the arena: look.py")
+        if "--wiped" not in sys.argv:
+            stop("3 minutes in the arena: look.py")
     print("wiped out")
     if "--no-leave" in sys.argv:
         return 0

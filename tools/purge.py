@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, ready, refuse, run, setup, stop  # noqa: E402
+from common import base_ready, call, data, ready, refuse, run, setup, stop  # noqa: E402
 
 BAGS = ("a backpack", "a loot bag", "a spoils bag")
 MATERIALS = r"(paper|grass|straw|wooden|stone|bone|sand|mica|hide|copper|silk|jelly|oak|cotton|plastic|iron|coral|scale|raw food)"
@@ -106,6 +106,10 @@ def drop_in_open(name):
 
 def main():
     setup()
+    # runs 41 and 43: the list is a late character's: in a new game it threw away the only axe, twice, through wgo and through ladder
+    if not base_ready():
+        print("no purge in a new game: its materials and tools are what it's short of")
+        return 0
     dry = "--dry" in sys.argv
     d, by = stacks()
     if d.get("zone") == "startSite":

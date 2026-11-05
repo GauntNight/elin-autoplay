@@ -63,14 +63,14 @@ def meal_stop():
         run("fight.py", name, "60", timeout=300)
         s = call("state")["data"]
     if any(c.get("hostile") for c in s.get("nearby") or []):
-        run("leave.py", "--force", timeout=300)
+        run("leave.py", "--force", "--riding-ok", timeout=300)
         return "a hostile on the meal stop's map"
     fed = None
     for _ in range(2):
         fed = farmday.eat_one() or fed
         if call("state")["data"]["pc"]["hunger"] < THRESHOLDS["eat_at"] - 15:
             break
-    run("leave.py", timeout=300)
+    run("leave.py", "--riding-ok", timeout=300)
     print(f"  meal stop: {fed or 'nothing eaten'}")
     # run 27: this said "no meal in the Cooler Box" when eat_one refused a full pack grid; its own line says why
     return None if fed else "nothing eaten (eat_one's line above says why: no meal, a full grid, a hostile)"
@@ -164,7 +164,7 @@ def handle_ambush(_retry=False):
                 print(f"  ambush: {target['name']} refused ({last(out)[:50]}): teleport and leave", flush=True)
                 run("item.py", "scrolls of teleport", "Read", timeout=60)
                 time.sleep(1.0)
-                lv = run("leave.py", "--force", timeout=300)
+                lv = run("leave.py", "--force", "--riding-ok", timeout=300)
                 if lv.rc == 0:
                     return "cleared"
                 return "leave.py --force after the teleport: " + last(lv)
@@ -182,7 +182,7 @@ def handle_ambush(_retry=False):
     if not new_game:
         out = run("purge.py", "--free", "3", timeout=600)
         print(f"  ambush: purge: {last(out)[:100]}")
-    out = run("leave.py", timeout=300)
+    out = run("leave.py", "--riding-ok", timeout=300)
     if out.rc != 0 and "hostile" in last(out) and not _retry:
         # run 21: twice a late arrival (a snow putit, a giant fish) came up while leave.py walked
         # to the edge: fight it and leave again (once), rather than stop the trip
