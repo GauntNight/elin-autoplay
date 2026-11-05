@@ -235,7 +235,11 @@ def table():
     for label, levels in BASELINES:
         print(f"{label}: " + (", ".join(f"Lv{k} {v}" for k, v in levels.items()) or "never above Lv1 in its hour"))
     for run in runs:
-        rr = [r for r in rows if r["run"] == run]
+        rr = []
+        for r in (r for r in rows if r["run"] == run):
+            if rr and int(r["exp_total"]) < int(rr[-1]["exp_total"]):  # a sampler still running when the next character started
+                break
+            rr.append(r)
         first = {}
         for r in rr:
             first.setdefault(int(r["lv"]), float(r["minutes"]))
