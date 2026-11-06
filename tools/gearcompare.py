@@ -62,7 +62,7 @@ def fit():
     return _FIT[0], _FIT[1]
 
 
-def me():
+def my_power():
     return data("power")["party"][0]
 
 
@@ -229,7 +229,7 @@ def main():
     against = opts("--against")
     skip = {"--level", "--foe", "--against"}
     names = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] not in skip)]
-    base = me()
+    base = my_power()
     lv = level or base["lv"]
     if "--worn" in args or not names:
         card(base, "worn", lv, kinds)
@@ -266,7 +266,7 @@ def main():
             if fail:
                 stop(fail)
             try:
-                now = me()
+                now = my_power()
                 rows = card(now, f"with {carried} in place of {rival}", lv, kinds)
                 results.append((carried, rival, rows))
             finally:

@@ -83,7 +83,8 @@ Read elin-play first (rule zero). Ask `kb.py facts Mysilia` for current prices a
 - **Merchants Guild** (run 17): 30 flyers handed out with `tools/flyer.py` (the adjacent "Gift" to
   Lv1-8 townsfolk; never twice to one NPC) to join; Negotiation from Levadear; salaries come to the
   home mail post as parcels; its informers buy fame (fame/5 orens, fame falls by as much: half the
-  tax bill is fame x 2).
+  tax bill is fame x 2). `famesale.py NAME [TIMES=3] [MIN=140]` sells to one informer (Gizon, Ishbear; run 42: 263 + 210 + 168 and 191 + 153), and since the near
+  nefia refill scales with fame, a sale also brings new nefias back under the gate.
 - **Escorts and tourists take an ally slot** (run 16): with Kaberg along, one put me over the cap
   (speed 113 -> 91); Party Animal gives a second slot. Fast Travel (no ambushes; `tools/fasttravel.py NAME` from the world-map tile, run 25) is the safe way to
   move an escort; two Mysilia escorts from Olvina (392 + 236) and one back (243) paid 871 in 5 days.

@@ -195,6 +195,9 @@ def main():
                 # B1 ("sleep first, on the overworld"); sleep here on the nefia's tile first (sleep.py refuses at hunger
                 # 50+: then the ladder's own stop stands)
                 if ((state().get("pc") or {}).get("sleepPhase") or 0) >= 1:
+                    # run 42: "refused: hunger 61/71: eat first" at the door, twice: the world map offers no meal, so step in for one and out again is the ladder's job: count it here
+                    if ((state().get("pc") or {}).get("hunger") or 0) >= 50:
+                        print("  sleepy at the door and hungry: the ladder eats, then naps outside", flush=True)
                     sl = run("sleep.py", timeout=600)
                     print(f"  sleepy at the door: sleep.py rc {sl.rc}: {last(sl)[:80]}", flush=True)
                 acts = (call("acts", dx=0, dz=0, mode="all").get("data") or {}).get("acts") or []

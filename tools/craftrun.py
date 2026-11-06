@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import data, pc, refuse, run, setup, stop, walk_beside  # noqa: E402
+from common import data, last, pc, refuse, run, setup, stop, walk_beside  # noqa: E402
 from farmday import home_guard  # noqa: E402
 from home import ARMORY5, BOX_STR, SHIPPING, STATIONS  # noqa: E402
 
@@ -76,7 +76,7 @@ def main():
         dry = run(*base, "--dry", timeout=60)
         m = re.search(r"stamina (\d+)", str(dry))
         if dry.rc or not m:
-            print(f"  {recipe}: not offered or short: {str(dry).strip().splitlines()[-1][:120] if str(dry).strip() else ''}")
+            print(f"  {recipe}: not offered or short: {last(str(dry))[:120]}")
             run("close.py", timeout=30)
             continue
         cost = int(m.group(1))

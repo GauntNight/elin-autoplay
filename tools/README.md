@@ -249,6 +249,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/explore.py [MOVES=12] [MIN_HP_PCT=70]
     Prints each move, then a summary: stairs seen, frontier left, why it stopped.
     The start cell's stairs (the way back up) are remembered and not reported as new.
+- **`famesale.py`**: Sell fame to an informer (runs 32-42: done by hand each time; the near nefia refill scales with fame, so a sale pulls it back under the gate, and half the tax bill is fame x 2). Talks to NAME, sells until the offer falls under MIN or TIMES sales are done, says Bye. One dialog at a time.
+    usage: python -I tools/famesale.py NAME [TIMES=3] [MIN=140]    e.g. famesale.py Gizon, famesale.py Ishbear (stand near them: whereis.py any NAME)
+    Exit 0 done, 1 refused (not in view, no sale offered), 3 a dialog that didn't read as expected.
 - **`farm.py`**: Make and plant a farm plot (G3, run 05), through the game's own acts.
     usage: python -I tools/farm.py till X,Z [X,Z ...]          dig (shovel) then plow (hoe) each cell
            python -I tools/farm.py plant SEED X,Z [X,Z ...]    plant one SEED on each field cell

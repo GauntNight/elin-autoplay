@@ -334,7 +334,9 @@ def main():
         # run 21: even 20 s legs ran 7-27 steps and up to 79 game hours (hunger 45 -> 91, twice
         # Starving); waypoints a few tiles ahead are refused (unexplored tiles). A world-map step
         # takes ~0.75 real seconds: a 2.5 s leg is 2-3 steps, then the meal and sleep checks run
-        w = walk(tx, tz, r=near, hp=60, timeout=LEG_MS, weak_ok=weak_ok)
+        # run 42: at x5 that 2.5 s leg was 10-15 steps, ~40 game hours: hunger 45 -> 83 and 89, twice, between checks. The leg follows the game's speed
+        rate = (call("speed").get("data") or {}).get("base") or 1.0
+        w = walk(tx, tz, r=near, hp=60, timeout=max(600, int(LEG_MS / max(rate, 1.0))), weak_ok=weak_ok)
         pos = (w.get("x", last_pos[0]), w.get("z", last_pos[1]))
         why = w.get("why")
         if why == "zone":

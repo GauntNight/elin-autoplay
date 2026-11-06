@@ -302,6 +302,7 @@ def scrap_walls():
 
 def explore_floor(solo):
     spot = None
+    thrown = 0
     for _ in range(8):
         asked()
         args = ["25"] + (["--solo"] if solo else []) + (["--expendable"] if "--expendable" in sys.argv else []) + GATE
@@ -311,6 +312,19 @@ def explore_floor(solo):
         # run 42: 20-odd step limits on one cell, a game day and a half and 17 real minutes, a soil block away from the rest of the floor: a walk that ends where it began is over
         here = (pc().get("x"), pc().get("z"))
         if "step limit" in why and here == spot:
+            # run 42: candle ghosts sitting inside the walls: melee can't reach them and each one in view holds every step: throw at them, then go on
+            foes = [c for c in state().get("nearby") or [] if c.get("hostile")]
+            if foes and thrown < 4:
+                thrown += 1
+                f = min(foes, key=lambda c: c.get("dist", 99))
+                # a throw at one in a wall finds no line ("no Throw at a candle ghost"); walking up to it and fight.py killed it
+                out = run("fight.py", f.get("id") or f.get("name", ""), timeout=180)
+                if out.rc:
+                    out = run("throw.py", str(f.get("name", "")).split()[-1], "Putit In Amber", "8", timeout=180)
+                run("hotbar.py", "--deselect", timeout=30)
+                print(f"  delve: still at {here[0]},{here[1]} with {f.get('name')} in view: {last(out)[:80]}", flush=True)
+                spot = None
+                continue
             print(f"  delve: still at {here[0]},{here[1]} after a step limit: this exploring is done", flush=True)
             return
         spot = here
