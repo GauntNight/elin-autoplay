@@ -339,6 +339,11 @@ def main():
         w = walk(tx, tz, r=near, hp=60, timeout=max(600, int(LEG_MS / max(rate, 1.0))), weak_ok=weak_ok)
         pos = (w.get("x", last_pos[0]), w.get("z", last_pos[1]))
         why = w.get("why")
+        # run 42, twice: at x5 the ambush can land between two legs: the next order's world cell is "off the map" of the field, and this read as a refused walk and stopped the circuit
+        if why == "refused" and "off the map" in str(w.get("error")):
+            zn = (call("state")["data"].get("zone") or {})
+            if not (zn["region"] if "region" in zn else "ntyris" in str(zn.get("full") or "")):
+                why, w = "zone", {**w, "zone": zn.get("full")}
         if why == "zone":
             # an ambush hides the last steps (the world position isn't readable from the local
             # map): the leg's step count is a floor, not the count

@@ -188,7 +188,7 @@ def free_cards(d):
 
 def unclog(d):
     """Run 42: 13 learned recipes, a statue of Creator and a casino chip sat through two mornings' payouts: what the chest won't sell keeps its slot, and it holds 40, so the
-    day's shipment was 25. They come out first: the recipes to the trash can, the rest to the spares wagon."""
+    day's shipment was 25. They come out first, to the spares wagon (the trash can refuses a recipe, run 42)."""
     stuck = [x.get("name") for x in d.get("shipping") or [] if NEVER_SELLS.search(x.get("name") or "")]
     while stuck:
         room = free_cards(data("stock"))
@@ -200,12 +200,7 @@ def unclog(d):
         if out.rc:
             print(f"  unclog: {out.strip()[-120:]}")
             return
-        recipes = [n for n in batch if "recipe of" in n]
-        other = [n for n in batch if "recipe of" not in n]
-        if recipes:
-            print("  unclog: " + last(run("trash.py", "dump", *recipes, timeout=300))[:100])
-        if other:
-            print("  unclog: " + last(run("box.py", BOX_STR(SPARES), *other, timeout=300))[:100])
+        print("  unclog: " + last(run("box.py", BOX_STR(SPARES), *batch, timeout=300))[:100])
 
 
 def ship(plan, d, limit):

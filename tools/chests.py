@@ -33,6 +33,15 @@ def free_cards():
     return 35 - sum(1 for i in data("inv")["items"] if not i.get("equipped"))
 
 
+def from_bags():
+    """Run 42: purge's unclutter tucks a chest from a dig into a bag, where "no chest left in the pack" missed three, with 5,000 orens and 11 medals between them."""
+    for i in data("stock")["pack"]:
+        for x in i.get("items") or []:
+            if BASE in x["name"].lower() and free_cards() > 1:
+                print("  " + last(run("bag.py", i["name"], "--take", x["name"])))
+                run("close.py")
+
+
 KEEP = re.compile(r"orens|gold bar|medal|platinum|\((miracle|godly)\)|\b(strange|runic|majestic|old) tome|ancient book|spellbook|"
                   r"recipe|potion|scroll|rod of|ticket|\bcard\b|gene\b|☆|★", re.I)
 RIDE = ("a spoils bag", "a backpack", "a loot bag", "a haul bag")
@@ -96,6 +105,8 @@ def main():
     dry = "--dry" in sys.argv
     if not (state().get("zone") or {}).get("isHome") and "startSite" not in str((state().get("zone") or {}).get("full")):
         refuse("at home only")
+    if not dry:
+        from_bags()
     for _ in range(12):
         if not carried():
             print("no chest left in the pack")
