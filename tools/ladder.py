@@ -149,7 +149,8 @@ def ether_check():
     # (evasion 91 -> 47) for +22 damage a hit (my melee 35 -> 78.5 a turn); no HP or attribute: power.py's table had
     # me losing less per fight (kills twice as fast). Allowed like Gravity Point; the antibody (Miral) still cures it
     # the user, 2026-11-02: keep it while it is worth more than its cost, cure it when a bad one comes (fact #1161)
-    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1556)}
+    # run 42: the Single Ether Wing (1554, fact #898): levitation, +10 weight capacity, speed +14 and more, no back slot: PV 88 -> 80, speed 132 -> 151, no HP or attribute; allowed by the same rule
+    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1554, 1556)}
     if eth:
         refuse("an ether disease: " + ", ".join(f"{v.get('name')} Lv{v.get('lv')}" for v in eth.values())
                + ": max HP or attributes may be down; the ether antibody cures it (Miral 10 medals, Yowyn's Ecopo shop)")

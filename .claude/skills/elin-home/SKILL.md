@@ -100,7 +100,7 @@ its context menu. Separate houses need a 1-cell gap or different room-board grou
 food and offal: the can pays Ecopo, the chest 0 (the user, run 08).
 
 **Ship at once** (chest): junk stones, granite "a tool", cursed or doomed items (never equip, read or wear
-one: the user's warning; a cursed or gifted item can't be taken back off a pet), learned recipes,
+one: the user's warning; a cursed or gifted item can't be taken back off a pet),
 things made only for their first-craft ticket (signs, plates, doors, furniture with no place),
 dead furniture (the Defense Training gallows, 56 weight each: carry one at a time, two made me
 Squashed), spare torches beyond one.

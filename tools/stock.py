@@ -23,11 +23,12 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import data, refuse, run, setup, stop  # noqa: E402
-from home import SHIPPING, BOX_STR  # noqa: E402
+from common import data, last, refuse, run, setup, stop  # noqa: E402
+from home import SHIPPING, SPARES, BOX_STR  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SPELL_CAP = 100  # casts a spell (the user's ~100)
+NEVER_SELLS = re.compile(r"recipe of .*\(Learned|statue of Creator|casino chip", re.I)  # run 42: unsold through two mornings' payouts (fact: shipping chest)
 
 # Rods by kind: how many to keep (the most charges). Heals and escapes keep every charged one.
 # run 40: teleport and cure minor wound 99 -> 4: twelve and eleven rods rode in the bags, a quarter of their slots, with the bags full
@@ -185,7 +186,30 @@ def free_cards(d):
     return 35 - sum(1 for i in d.get("pack") or [] if not i.get("equipped"))
 
 
+def unclog(d):
+    """Run 42: 13 learned recipes, a statue of Creator and a casino chip sat through two mornings' payouts: what the chest won't sell keeps its slot, and it holds 40, so the
+    day's shipment was 25. They come out first: the recipes to the trash can, the rest to the spares wagon."""
+    stuck = [x.get("name") for x in d.get("shipping") or [] if NEVER_SELLS.search(x.get("name") or "")]
+    while stuck:
+        room = free_cards(data("stock"))
+        if room <= 1:
+            print(f"  unclog: no free card for {len(stuck)} stacks that never sell")
+            return
+        batch, stuck = stuck[:room - 1], stuck[room - 1:]
+        out = run("box.py", BOX_STR(SHIPPING), "--take", *batch)
+        if out.rc:
+            print(f"  unclog: {out.strip()[-120:]}")
+            return
+        recipes = [n for n in batch if "recipe of" in n]
+        other = [n for n in batch if "recipe of" not in n]
+        if recipes:
+            print("  unclog: " + last(run("trash.py", "dump", *recipes, timeout=300))[:100])
+        if other:
+            print("  unclog: " + last(run("box.py", BOX_STR(SPARES), *other, timeout=300))[:100])
+
+
 def ship(plan, d, limit):
+    unclog(d)
     # run 30: the carried bags held most of the excess and were skipped; a bag's rows come out through
     # bag.py --take (one level deep: the pack's own bags, never a box's)
     rows = [p[0] for p in plan if p[1] == "excess" and (not p[0]["bag"] or p[0]["where"] == "pack")]
