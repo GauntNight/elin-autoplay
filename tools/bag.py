@@ -146,7 +146,9 @@ def main():
             # three takes from other bags "moved" into it (shift-click goes to the top other window)
             wait_until("frames", n=10, timeout=1500)
             names = [i["name"] for i in call("inv")["data"]["items"]]
-            if hit[0]["card"] not in names and not re.search(r"\borens?$", hit[0]["card"]):
+            # run 42: a stack that merged into one in the pack changes its name ("2 Small Medals" into "32 Small Medals"): that was a false alarm
+            stem = re.sub(r"^[^A-Za-z]*(an?\s+)?", "", hit[0]["card"]).rstrip("s")
+            if not any(stem in n for n in names) and not re.search(r"\borens?$", hit[0]["card"]):
                 err = (f"!! left the bag but isn't in the pack: another container window took it "
                        f"(a carried chest or bag opened earlier?): close.py, then look inside it")
                 r = {"ok": False}

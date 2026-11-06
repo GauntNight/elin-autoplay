@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, last, refuse, run, state, stop, wait_until  # noqa: E402
+from common import overweight_stop, call, data, last, refuse, run, state, stop, wait_until  # noqa: E402
 from recall import on_world, pending, wait_out  # noqa: E402
 
 
@@ -30,6 +30,7 @@ def spell_stock(alias):
 
 
 def main():
+    overweight_stop("an evacuation")
     nums = [int(a) for a in sys.argv[1:] if re.fullmatch(r"\d+", a)]
     max_turns = nums[0] if nums else 60
     min_hp = nums[1] if len(nums) > 1 else 50

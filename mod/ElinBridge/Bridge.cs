@@ -26,7 +26,7 @@ namespace ElinAutoplay
     [BepInPlugin("elin.autoplay.bridge", "ElinBridge", Version)]
     public class Bridge : BaseUnityPlugin
     {
-        public const string Version = "0.38.0";
+        public const string Version = "0.39.0";
         public const int Port = 47323;
 
         class Request
@@ -726,6 +726,18 @@ namespace ElinAutoplay
                 ["skill"] = ap.weaponSkill?.source.alias,
                 ["skillLv"] = ap.weaponSkill?.Value ?? 0,
                 ["elements"] = types,
+                // 0.39.0 (run 42, the user: gear needs a clean comparison): what the attack's own code reads besides the dice
+                // (AttackProcess.CalcHit: crit, Perform: vorpal; ActMelee: flurry and the other weapon enchants, two-hand bonus included)
+                ["critBase"] = c.Evalue(90) + (w != null ? w.Evalue(90, ignoreGlobalElement: true) : 0),
+                ["eye"] = c.Evalue(134),
+                ["per"] = c.Evalue(73),
+                ["vorpal"] = c.Evalue(91) + (w != null ? w.Evalue(91, ignoreGlobalElement: true) : 0),
+                ["flurry"] = AttackProcess.GetWeaponEnc(c, w, 621, addSelfEnc: true),
+                ["chase"] = AttackProcess.GetWeaponEnc(c, w, 620, addSelfEnc: true),
+                ["cleave"] = AttackProcess.GetWeaponEnc(c, w, 622, addSelfEnc: true),
+                ["feint"] = AttackProcess.GetWeaponEnc(c, w, 623, addSelfEnc: true),
+                ["splash"] = AttackProcess.GetWeaponEnc(c, w, 608, addSelfEnc: true),
+                ["hitBonus"] = c.HIT,
             };
         }
 

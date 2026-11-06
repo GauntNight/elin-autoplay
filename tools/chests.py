@@ -20,7 +20,13 @@ BASE = "treasure chest"
 
 
 def carried():
-    return [i for i in data("inv")["items"] if BASE in i["name"].lower()]
+    """The chests that can be emptied now. Run 42: a locked one lists as empty, so it must not be dropped or shipped: it rides until unlock.py opens it
+    (bare hands: power skill/2 + 2, so lock 21 needs a lockpick; fact #1109)."""
+    every = [i for i in data("inv")["items"] if BASE in i["name"].lower()]
+    for i in every:
+        if i.get("lockLv"):
+            print(f"  {i['name']}: locked (lock {i['lockLv']}): it stays closed in the pack; unlock.py with a lockpick")
+    return [i for i in every if not i.get("lockLv")]
 
 
 def free_cards():
@@ -30,6 +36,11 @@ def free_cards():
 KEEP = re.compile(r"orens|gold bar|medal|platinum|\((miracle|godly)\)|\b(strange|runic|majestic|old) tome|ancient book|spellbook|"
                   r"recipe|potion|scroll|rod of|ticket|\bcard\b|gene\b|☆|★", re.I)
 RIDE = ("a spoils bag", "a backpack", "a loot bag", "a haul bag")
+
+
+def twin_locked(name):
+    """Run 42: Drop and box.py take the first chest of a name: with a locked chest of the same name in the pack, that was the locked one, contents and all."""
+    return any(i["name"] == name and i.get("lockLv") for i in data("inv")["items"])
 
 
 def to_bags(names):
@@ -65,6 +76,9 @@ def field():
             if out.rc:
                 print(out.strip())
             to_bags(batch)
+        if twin_locked(NAME):
+            print(f"  {NAME}: a locked chest has the same name: it stays in the pack until unlock.py opens that one")
+            return
         out = run("item.py", NAME, "Drop")
         print("  " + last(out))
         if out.rc or "has no" in last(out):
@@ -111,9 +125,16 @@ def main():
             print("  stacks left inside: " + last(run("packcheck.py", "--move", timeout=300)))
             continue
         run("item.py", NAME, "Close")
-        print("  " + last(run("box.py", "shipping chest", NAME)))
-        out = run("packcheck.py", "--move", timeout=300)
+        if twin_locked(NAME):
+            stop(f"{NAME}: a locked chest has the same name: unlock.py first (a lockpick), or box.py would ship the locked one")
+        out = run("box.py", "shipping chest", NAME)
         print("  " + last(out))
+        # run 42: a full shipping chest (40 stacks after stock --ship) refused the empty chest and this loop walked packcheck 12 times, 7 game hours
+        if out.rc or "did not move" in out:
+            stop("the shipping chest refused the empty chest (full until morning?): leave it, or drop it by the chest")
+        if "--no-sort" not in sys.argv:  # run 42: five chests in a row need one sort at the end, not five
+            out = run("packcheck.py", "--move", timeout=300)
+            print("  " + last(out))
     stop("12 rounds and chests left")
 
 

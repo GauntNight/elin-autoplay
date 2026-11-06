@@ -55,7 +55,8 @@ BOX_HOUSE = {home.WOOD_BOX: "Workshop", home.STONE_BOX: "Forge", home.STONE_BOX_
 for xy in home.BAG_PARTS:
     BOX_HOUSE[xy] = "Workshop"
 for xy in home.VALUABLES + home.LIBRARY:
-    BOX_HOUSE[xy] = "Storehouse"
+    if xy not in home.WAGONS:  # run 42 (G47): the wagons stand in the east yard, like the office
+        BOX_HOUSE[xy] = "Storehouse"
 BOX_HOUSE[home.STORAGE_CHEST] = "Workshop"  # run 20: the library overflow sits in the Workshop
 BOX_HOUSE[home.OVERFLOW2] = "Workshop"  # run 22: the mystic treasure chest beside it
 for xy in (home.ARMORY2, home.SPARES3, (48, 58)):  # run 23: three wooden boxes beside them (Armory 2, Spares 3, Library 2)
@@ -66,7 +67,9 @@ BOX_HOUSE[home.STORAGE_CHEST_2] = "Depot"  # run 31 (G29 M1): the second ★Stor
 BOX_HOUSE[home.OVERFLOW3] = "Depot"  # run 31: a mystic treasure chest beside it
 for xy in home.OVERFLOW4:
     BOX_HOUSE[xy] = "Depot"  # run 31: two more, installed for G30 M4
-OFFICE = {home.MAIL_POST, home.TAX_CHEST, home.SHIPPING, home.TRASH_CAN, home.PRACTICE_CHEST, home.FIAMA_CHEST, home.MAIL_PACKAGE, *home.MAIL_SPOTS}
+for xy in home.WAGONS:  # run 42 (G47): the yard's big containers belong to no house
+    BOX_HOUSE.pop(xy, None)
+OFFICE = {home.MAIL_POST, home.TAX_CHEST, home.SHIPPING, home.TRASH_CAN, home.PRACTICE_CHEST, home.FIAMA_CHEST, home.MAIL_PACKAGE, *home.MAIL_SPOTS, *home.WAGONS}
 OFFICE_TRAITS = ("TraitMailPost", "TraitShippingChest", "TraitChestPractice", "TraitTrashcan",
                  "TraitDeliveryChest", "TraitTaxChest")
 

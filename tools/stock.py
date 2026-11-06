@@ -195,9 +195,11 @@ def ship(plan, d, limit):
     moved = 0
     # the pack's own excess first (no take), then its bags, then box by box
     order = sorted(by_box, key=lambda k: (k[0] != "pack", k[1] != ""))
+    from farmday import home_guard  # run 41: a walk at home has stops; this one had none (added run 42)
     for where, bag in order:
         names = by_box[(where, bag)]
         while names and moved < limit:
+            home_guard("stock --ship")
             if where != "pack" or bag:
                 d = data("stock")
                 room = free_cards(d)

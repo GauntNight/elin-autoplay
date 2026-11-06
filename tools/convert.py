@@ -44,7 +44,8 @@ def open_grid(dx, dz, act):
 def slots():
     bs = call("buttons", all=True)["data"]["buttons"]
     ing = next((b["i"] for b in bs if b["name"].startswith("ing1")), None)
-    inv = [b for b in bs if "ButtonGrid inventory" in b["name"] and b.get("card")]
+    # run 42: the stocked list comes first in the grid and only pack stacks can be dragged: 12 granite stones in a box hid the 12 in the pack
+    inv = [b for b in bs if "ButtonGrid inventory" in b["name"] and b.get("card") and b.get("mine")]
     return ing, inv
 
 

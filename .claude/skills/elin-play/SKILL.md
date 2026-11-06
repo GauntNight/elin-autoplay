@@ -7,7 +7,7 @@ description: Operating manual for playing Elin through the ElinBridge mod in thi
 
 Related skills: **elin-goals** (long-term goals: the register in knowledge/goals.md and how to
 plan sessions by it), **elin-home** (the base: storage by category, keep/ship rules, cleaning, furniture,
-safety), **elin-town-trip** (Mysilia and back: road, ambushes, tax, shopping), **elin-closeout** (ending
+safety), **elin-town-trip** (Mysilia and back: road, ambushes, tax, shopping), **elin-gear** (is this piece better? wear it, compute, trial it: `gearcompare.py`), **elin-closeout** (ending
 a session: logs, facts, the summary and its rendered page), elin-build, elin-opening.
 
 Every action goes through the game's own code paths (ActPlan, InvOwner, the UI's own

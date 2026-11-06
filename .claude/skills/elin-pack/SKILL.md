@@ -89,7 +89,7 @@ or ship one unidentified: Kerona paid 1-14 for Miracle gear that sold for 163-21
    2,079 spent over runs 07-12 brought 373 back in sales (the review), and run 19 paid 652 for a
    Godly breastplate that shipped for 193 (three such identifies: -1,442 net; errors.csv); a Miracle
    piece that can't be worn rides home for Appraising (free, hourly) and ships once identified.
-2. **`gearcheck.py` first, then `shipstar.py`** (run 40, the user: "how often do you look at current equipment versus new?"): gearcheck prints each ☆ piece
+2. **A weapon or armour piece that might beat the worn one gets `gearcompare.py` (the elin-gear skill, run 42: an artifact sat unread in a bag for a run).** **`gearcheck.py` first, then `shipstar.py`** (run 40, the user: "how often do you look at current equipment versus new?"): gearcheck prints each ☆ piece
    beside the worn one, whole lines: read them; shipstar carries to the shipping chest only what gearcheck has shown (`--dry` lists, `--keep NAME` leaves a piece). Weigh
    duplicates: an immunity two pieces give is spare (Their Fist's sleep and blindness); a resistance one gives can cancel another's weakness (the Bucket and the copper ring).
    **Enchant scrolls:** `picker.py`; plain caps at +2, great +4, blessed +1 (ActEffect); armor +2 PV a plus, rings take them too. **Books at home: `decode.py --fetch` (ancient books, Mages
@@ -109,6 +109,8 @@ or ship one unidentified: Kerona paid 1-14 for Miracle gear that sold for 163-21
   spares chest holds them) whenever a new piece goes on.
 
 ### Carried chests and the money inside them (run 25)
+
+- **A locked chest lists as empty and its money isn't counted** (run 42: five of 14 treasure-map chests, lock 21-28, and a tool dropped them for empty). Bare hands reach lock skill/2 + 1, so carry a lockpick (skill + 10, about 2-3 charges a chest; Sayig or Sesa in Aquli Teola, Gizbird in Mysilia; none is always in stock). `unlock.py` tries until it opens. `item.py` takes the first of a name: `chests.py` won't drop or ship while a locked twin is carried; spread them on separate cells and take them one at a time.
 
 - **A chest opened from the pack is a registered window** until its menu's "Close" is pressed (`item.py
   NAME Close`; the menu shows "Open" once it is closed). Every Shift+click move while one is open goes

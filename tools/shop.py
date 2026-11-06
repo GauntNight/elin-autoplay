@@ -37,7 +37,7 @@ def main():
         stop(f"talkto: {out[-200:]}") if out.rc == 3 else refuse(f"talkto: {out[-200:]}")
     bs = data("buttons").get("buttons") or []
     # run 40: a platinum merchant's choice reads "I want to trade platinum coins"
-    wares = [b for b in bs if any(w in (b.get("text") or "") for w in ("Show me your wares", "trade platinum coins"))]
+    wares = [b for b in bs if any(w in (b.get("text") or "") for w in ("Show me your wares", "trade platinum coins", "trade small medals"))]  # run 42: Miral
     if not wares:
         texts = " | ".join((b.get("text") or "")[:30] for b in bs if b.get("text"))
         # run 21: Odysammy's dialog was left open here and every walk after it was refused
@@ -57,13 +57,14 @@ def main():
             continue
         acts = data("invacts", i=b["i"]).get("acts") or []
         buy = next((a["text"] for a in acts if a["text"].startswith("Buy 1")), "")
-        price = re.search(r"\(([\d,]+) orens\)", buy)
-        stock.append((b["card"], price.group(1) if price else "?"))
+        # run 42: Nino's wagons and Miral's medal goods printed "?": gold bars and medals are prices too
+        price = re.search(r"\(([\d,]+) (orens|small medals?|gold bars?|platinum coins?|ecopos?)\)", buy)
+        stock.append((b["card"], ((price.group(1) + ("" if price.group(2) == "orens" else " " + price.group(2).split()[0])) if price else "?")))
     date = state()["pc"].get("date", "")
     print(f"{name}'s wares ({date}): {len(stock)} stacks")
     for card, price in stock:
         flag = "  <== goal" if WANTED.search(card) else ""
-        print(f"  {price:>7}  {card}{flag}")
+        print(f"  {price:>10}  {card}{flag}")
     if where:
         text = ", ".join(f"{c} {p}" for c, p in stock) or "nothing"
         r = run("kb.py", "add", name, f"stock ({date.split()[0]})", text, "--run", opt.get("--run", ""), "--where", where)

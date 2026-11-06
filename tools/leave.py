@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import cells, refuse, run, stop, wait_until, walk  # noqa: E402
+from common import overweight_stop, cells, refuse, run, stop, wait_until, walk  # noqa: E402
 
 MIN_MEALS = 6  # the Upkeep block: 3+ days of my own food at departure, ~2 meals a day (run 32: a nefia at hunger 68)
 MIN_RATIONS = 2  # run 38: the Upkeep block's 'the next fare + 1' (the near fares are 1-2)
@@ -109,6 +109,14 @@ def try_enter(zone, r_max=12):
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    overweight_stop("leaving this map")
+    # run 42: a wgo --ambush stopped with "could not find an exit": ConEntangle refuses every step (ConEntangle.TryMove) and wears off with turns
+    for _ in range(30):
+        p = call("state")["data"].get("pc") or {}
+        if "ConEntangle" not in (p.get("conds") or p.get("conditions") or []):
+            break
+        call("act", action="Wait")
+        time.sleep(0.25)
     s = call("state")["data"]
     # run 35: the 05:00 shipping report opened on an ambush map and wgo's leave.py stopped on it (the game ignores
     # a step under it); read the income and close it here, as springday and the circuit do

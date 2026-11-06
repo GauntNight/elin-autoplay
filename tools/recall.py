@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, last, refuse, run, setup, state, stop, wait_until  # noqa: E402
+from common import overweight_stop, call, data, last, refuse, run, setup, state, stop, wait_until  # noqa: E402
 
 
 def zone():
@@ -40,6 +40,7 @@ def pending(p):
 
 def main():
     setup()
+    overweight_stop("a return")
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     nums = [int(a) for a in args if re.fullmatch(r"\d+", a)]
     words = [a for a in args if not re.fullmatch(r"\d+", a)]

@@ -185,6 +185,15 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Refuses (exit 1): a window open, no such recipe, --use matching nothing, the +1 or Craft button
     not offered (ingredients short), the SP reserve. Stops (exit 3) mid-batch at Overweight (burden
     phase 3: crafted furniture lands in the pack; run 14 ended Squashed).
+- **`craftcycle.py`**: Train Blacksmith and Carpentry to their targets at home (run 42, G48 M2): repeats a cheap recipe on plentiful materials, eats, sleeps, again. Measured at Blacksmith 4, potential 242: Bolt (1 scrap, 2 SP) pays 12 exp a SP; at Carpentry 6, potential 300: the sawmill (a log, 1 SP) pays 18 exp a SP; then desks (4 planks, 3 SP, ~10 exp a SP at 8). Every step has home_guard's stops (run 41) and a failed meal is a stop.
+    usage: python -I tools/craftcycle.py [--blacksmith N] [--carpentry N] [--cycles N] [--floor SP]   defaults 8, 12, 12 cycles, floor 12
+    Exit 0 targets reached or the cycles run, 3 stopped (a hostile above my level, HP, hunger with no meal, materials out, a tool's stop).
+- **`craftrun.py`**: A list of crafts at home's stations (run 42, G48: 30 first crafts): walks beside each station, checks the stamina, crafts one, and carries what it made to the shipping chest, or to the yard's wagon when the chest is full, before the next, since crafted furniture Squashes (a locker 56 weight, run 42). Every step goes through farmday.home_guard (run 41).
+    usage: python -I tools/craftrun.py [--min-sp N] [--keep] [--ship] STATION:RECIPE[:USE] ...
+           python -I tools/craftrun.py --min-sp 15 "blacksmith's table:Pipe" "mason's table:Sink:granite"
+      --min-sp N  stop before a craft that would leave SP under N (default 12)
+      --keep      leave what's made in the pack (materials, parts)
+    Prints each craft's SP, new items and the skill exp it paid. Exit 0 all done, 1 refused (no such station), 3 stopped (SP, a refused craft, a hostile through home_guard).
 - **`crewcheck.py`**: Solo against crew (the user, run 31: "could be you are still better alone"; run 35: "are groups better than solo at this point?"): fights.csv rows from my level band, grouped by how many allies were with me, as HP lost per fight (in % of my max HP) and game turns per fight; then (run 35 on) each nefia and circuit start/end pair in runs/activity.csv, grouped by the "[party N]" its start mark carries, as real minutes, exp and orens an hour, and minutes a conquest.
     usage: python -I tools/crewcheck.py [MIN_LV=26] [--foe-min N] [--run NN]
       --run NN  only fights.csv rows and activity marks from run NN (the A/B blocks of one session)
@@ -285,6 +294,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`flyer.py`**: Hand out flyers for the Merchants Guild trial (run 17) by throwing them at townsfolk.
     usage: python -I tools/flyer.py [GIFTS=10]
     Stops when the flyers run out, nobody new is in range, a window opens or a hostile shows up.
+- **`freecells.py`**: An ascii map of the home's cells, to pick where a big container fits (run 42, G47: a wagon is 2x2, a big wagon 4x4, and nothing listed the free floor). '.' a free cell, '#' a wall or blocked, 'o' an object or a thing, '~' water, '+' tilled field.
+    usage: python -I tools/freecells.py [X0 X1 Z0 Z1]   default 40 72 35 66, north (high z) on top
+    Reads only. Exit 0.
 - **`gather.py`**: Gather until the pack holds enough of an item: find the nearest object of a kind, harvest it with the held tool (holding the axe first if nothing is held), pick up the drops, repeat. Skips cells that offer no harvest (map edge, no path). Exit 0 at the target, on low SP, or when nothing is left in range; exit 3 (stop) on common.ready's reasons before each harvest (a hostile in view, a window, a task running, HP under 60%, Hungry, Overweight) and on a full pack; exit 1 without the tool.
     usage: python -I tools/gather.py OBJECT ITEM COUNT [min_sp] [radius] [--weak-ok] [--food-run]
       --food-run  gathering food while hungry: no hunger stop at all (the food is the fix)
@@ -293,6 +305,11 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`gearcheck.py`**: Put every identified ☆ piece in the bags beside what I wear in that slot, before anything ships (run 40, the user: "how often do you look at current equipment versus new?"). The answer was: by hand, by name, and not every batch: 14 pieces shipped on the names alone that day, and the copper ring's Lightning weakness was last weighed in run 29. elin-pack has said "equip what beats worn gear" since run 08; nothing made it happen.
     usage: python -I tools/gearcheck.py [SLOT ...]     SLOT: ring neck head body hand foot back waist weapon (default: all)
     Exit 0 done (also with nothing to compare), 1 refused.
+- **`gearcompare.py`**: Compare a piece of gear with what's worn by wearing it (run 42, the user: "make a skill/method to validate equipment cleanly between worn/wielded. Pen% value is huge on armored opponents"; the method is the elin-gear skill). A tooltip read from the pack misses what a piece does once worn: its attributes change the multiplier and the to-hit, its Mind's Eye the crits, its PV and DV the armour. So this swaps the piece on, reads the game's own numbers (bridge `power`: AttackProcess.Prepare and the sheet), swaps back and checks every worn piece is where it was. Nothing stays changed: choosing is mine, with item.py.
+    usage: python -I tools/gearcompare.py NAME [NAME ...] [--against WORN] [--level L] [--foe KIND ...] [--dry]   wear each NAME in place of WORN (default: what fills its slot)
+           python -I tools/gearcompare.py --worn [--level L] [--foe KIND ...]     the panel for what's worn now, nothing moved
+           python -I tools/gearcompare.py --judge DATE [--before DATE0]           fights from game date DATE on against those before it, same character level or better
+    Refuses with a hostile in view or a window open. Exit 0 done, 1 refused, 3 stopped (a swap that didn't go; what's worn is printed).
 - **`gene.py`**: The Gene Machine (G38, run 36): the gene plan, a gene into a member, a finished gene applied.
     usage: python -I tools/gene.py plan [MEMBER]     each member's feat points and slots, and every gene that would take
            python -I tools/gene.py start MEMBER GENE  walk to the machine, Use, pick MEMBER, Use, drag GENE onto ing1
@@ -696,6 +713,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       --shoot needs arrows: Quick Craft "makeshift arrow" makes 40 from a leaf and a branch for 3 SP (run 16)
     The weapon is whatever is equipped: equip the low-skill weapon first (and the Rigid Hand Axe
     and the buckler again before any trip).
+- **`trainpot.py`**: Buy temporary potential from a trainer (run 42, G48 M0; the user, 2026-11-06: "if you have platinum coins you should enhance the skills so they level easier"). With a trainer's "Choose a skill to train" list open, click a skill until its potential reads the target. CostTrain (fact #1296): under skill 10, 1 platinum each to +100, 2 each to +200, 3 each to +300. Each level-up of the skill takes temp/4 + 5-9 off it, so buy it just before a push on that skill.
+    usage: python -I tools/trainpot.py NAME=POT [NAME=POT ...] [--floor N]   NAME as the list shows it ("Carpentry", "Crafting"); POT the potential to reach; --floor: platinum to keep (0)
+           python -I tools/trainpot.py carpentry=300 blacksmith=300 --floor 60
+    Open the list first (talkto.py TRAINER, then click "Train me."). The list stays open at the end. Exit 0 done, 1 refused (no list, no such skill), 3 stopped (the platinum floor).
 - **`trash.py`**: Garbage goes in the home trash can (G5), never the shipping chest (the user, run 08: shipping pays 0, the can pays Ecopo). Sweep the home map's garbage piles into the pack, then dump every junk stack from the pack into the can (its drag grid: each stack dragged onto 'ing1' is destroyed for Ecopo). Stops the sweep when a hostile comes into view. Skips anyone's property.
     usage: python -I tools/trash.py [sweep R] [dump] [EXTRA_NAME ...]
            python -I tools/trash.py              sweep radius 80, then dump
@@ -712,6 +733,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/trial.py restore [--yes]       the trials' records to archive/start-runs-DATE/, the kept game's back, every
                                                           checksum verified (exit 1 and nothing more removed if one differs)
     Exit: 0 done (or shown), 1 refused, 2 the bridge.
+- **`unlock.py`**: Open a locked chest in the pack (run 42: treasure-map chests can come locked, "a cool mystic treasure chest" at lock 21; a locked chest lists as empty, and digmap.py and chests.py --field took that for empty: one was dropped on a field with its contents inside). The game's Open starts a timed task, and the next command cancels it ("You give up opening"), so each try waits for the task to end. A failed try costs no charge and no item without a lockpick; it can be tried again.
+    usage: python -I tools/unlock.py [NAME] [TRIES=8]    NAME: part of the chest's name (default: the first locked chest in the pack)
+    Exit 0 opened (or none locked), 1 refused (no such chest), 3 stopped (still locked after TRIES, a hostile, a window).
 - **`unpack.py`**: Open the mail: every package (delivery box) on the map, one at a time, with its contents listed. Deliveries, quest rewards and the tax bill arrive in packages by the hearth or the mail post, and they pile up unopened (run 04 found four, holding a tool, a can, a bottle).
     usage: python -I tools/unpack.py [--take] [--pickup] [radius]
     Then triage what came out (elin-play: use now / bring / store / sell or ship).

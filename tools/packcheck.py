@@ -104,7 +104,7 @@ ROUTES = [
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf
     # run 31 (G30 M5): loose lights (an old lantern from a nefia) wait with the decorations until they're installed
     (("holy wreath", "holy garland", "holy socks", "holy boots", "gift box", "candy cane", "doll", "lantern", "candle", "lamp"),
-     BOX_STR(home.VALUABLES[-1]) + "|" + BOX_STR(home.COLLECTIBLES), "decorations (Valuables 7 in the Depot; the collectibles shelf)"),
+     BOX_STR(home.VALUABLES[-1]) + "|" + BOX_STR(home.COLLECTIBLES) + "|" + BOX_STR(home.SPARES), "decorations (Valuables 7 in the Depot; the collectibles shelf; the yard's chest, run 42)"),
     (("book", "spellbook", "recipe", "journal", "letter", "parchment"), "|".join(BOX_STR(b) for b in home.LIBRARY), "the library (the Storehouse)"),
     (("oil", "ale", "butter", "chili", "ketchup", "salt", "sugar", "mayo", "mayonnaise", "spice", "beer", "wine",
       "sake", "sauce", "sesame", "flour", "vinegar", "tea", "cappuccino",
@@ -183,7 +183,7 @@ def has_word(low, keys):
 GEAR = re.compile(r"\[-?\d+, ?-?\d+\]|\(\d+d\d+")  # "[6, 0]" armour, "(3d5+3, 2)" weapons
 
 
-ARMORY = (BOX_STR(home.ARMORY) + "|" + BOX_STR(home.ARMORY2) + "|" + BOX_STR(home.ARMORY3) + "|" + BOX_STR(home.ARMORY4), "the armory (the Residence: residents take what beats their gear; 'Armory 2' in the Workshop, 'Armory 3' and 'Armory 4' in the Depot when full)")
+ARMORY = (BOX_STR(home.ARMORY) + "|" + BOX_STR(home.ARMORY2) + "|" + BOX_STR(home.ARMORY3) + "|" + BOX_STR(home.ARMORY4) + "|" + BOX_STR(home.ARMORY5), "the armory (the Residence: residents take what beats their gear; 'Armory 2' in the Workshop, 'Armory 3' and 'Armory 4' in the Depot when full)")
 
 
 def is_food(low):

@@ -348,6 +348,12 @@ def main():
     print(f"party melee {melee:.1f} a turn, my bow {ranged:.1f} a turn (vs Lv{lv}); effective HP {ehp:.0f}")
     vs_fixed = my_melee_vs(me, G41_LV)
     print(f"my melee vs Lv{G41_LV} (G41's yardstick: 30 a turn): {vs_fixed:.1f}")
+    # run 42: the line above leaves out crits, flurry, vorpal and weapon elements, and an artifact with all of them sat unread; for choosing gear, gearcompare.py and elin-gear
+    try:
+        from gearcompare import row as full_row
+        print(f"with crits, flurry and enchants vs Lv{G41_LV}: {full_row(me, G41_LV, 1.0, 1.0, 0, 1.0)['turn']:.1f} a turn; armour x4: {full_row(me, G41_LV, 4.0, 1.0, 0, 1.0)['turn']:.1f} (gearcompare.py)")
+    except Exception as e:  # noqa: BLE001 - a card must print whatever this does
+        print(f"(gearcompare's line: {e})")
     print("\n foe Lv | turns to kill one | HP I lose: 1 foe   3 at once   6 at once   (60% floor = lose < 40%)")
     hp = me["maxHp"]
 

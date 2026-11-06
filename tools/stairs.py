@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, pc, ready, refuse, state, stop, wait_until, walk, walk_beside  # noqa: E402
+from common import overweight_stop, call, data, pc, ready, refuse, state, stop, wait_until, walk, walk_beside  # noqa: E402
 
 TRAITS = {"down": ("TraitStairsDown", "TraitMineEntrance"), "up": ("TraitStairsUp",)}
 
@@ -68,6 +68,7 @@ def main():
     kind = next((a for a in sys.argv[1:] if a in TRAITS), None)
     if not kind:
         refuse("usage: stairs.py down|up")
+    overweight_stop("the stairs")
     why = ready(hp=70, hunger=None, hostile_r=4)
     if why:
         stop(why)

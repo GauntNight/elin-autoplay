@@ -115,6 +115,16 @@ def pc():
     return state()["pc"]
 
 
+def overweight_stop(what):
+    """Refuse a zone change at burden phase 3+ (run 42, a near-death at home: a return scroll at 161% cost 269 -> 57). Scene.cs: entering any zone
+    from anything but the world map at phase 3 rolls 1 in 5 for a tumble (phase 4 always), Chara.Stumble: MaxHP x burden% / 200, or / 100 on an
+    up stairway, which at 100%+ is a whole bar. Walking on a local map at phase 3 costs only ~a tenth of that, 1 turn in 30. `--burden-ok` to pass."""
+    p = pc()
+    if p.get("burdenPhase", 0) >= 3 and "--burden-ok" not in sys.argv:
+        refuse(f"{what}: burden {p.get('burden')}% (phase {p.get('burdenPhase')}): a zone change can tumble for MaxHP x burden% / 200 "
+               f"({int((p.get('maxHp') or 0) * (p.get('burden') or 0) / 200)} HP here): shed weight first, or --burden-ok")
+
+
 def top():
     return (state().get("layers") or {}).get("top")
 

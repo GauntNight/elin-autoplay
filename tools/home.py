@@ -58,10 +58,12 @@ BAG_PARTS = [(54, 56)]     # run 18: in the Workshop; threads, fiber, strings, r
 MAPS_BOX = (55, 56)        # run 19 (the user): 'Maps', SHARED, distribution off (allow none): treasure maps only, for
                            # Poppy's Treasure Hunt (fact #688: it takes maps from shared boxes only)
 PARTS_BOX = (53, 56)       # run 18: the sturdy box 'Parts' in the Workshop; bones, nails, batteries, microchips, scrap, fangs
-SPARES = (65, 41)          # the exquisite boss chest; potions, scrolls, rods (full since run 12)
+SPARES = (68, 44)          # G47 (run 42): the yard's ★Storage Chest; the exquisite boss chest 65,41 (15 slots) retired
 SPARES2 = (42, 47)         # run 30 (G28): the sturdy box 'Spares 2' in the Depot (was the mail package at 67,41, run 13)
-VALUABLES = [(64, 39), (67, 38), (68, 38), (68, 39), (64, 40), (66, 39), (44, 47), (44, 49), (42, 49)]  # run 39: 'Valuables 8' and 'Valuables 9' (Depot sturdy boxes) before Valuables 7, which stays last (packcheck's decorations use VALUABLES[-1]); boxes, the shelf 68,39 and the stone chest 64,40; coins, bars, medals, tickets, figures, cards, gems; run 20: 'Valuables 6' at the aisle's end (66,39: the other free cells would cut off the shelves)
-LIBRARY = [(66, 38), (42, 48), (48, 58), (47, 58), (47, 59), (67, 40), (44, 48), (65, 38)]     # a box and 'Library 3' (run 30, G28: the Depot's sturdy box, was the bin
+# G47 (run 42): Nino's wagons, 60 slots each on 2x2, in the east yard north of the Storehouse; five small valuables boxes (64,39 64,40 66,39 67,38 68,38) emptied into them and retired
+WAGONS = [(66, 46), (69, 46), (68, 44), (70, 44)]  # (68, 44): the third ★Storage Chest (Miral, 20 medals, 4 wrenches: 176 slots), the yard too
+VALUABLES = [(66, 46), (69, 46), (68, 39), (44, 47), (44, 49), (42, 49)]  # 'Valuables 7' stays last (packcheck's decorations use VALUABLES[-1]); coins, bars, medals, tickets, figures, cards, genes, gems
+LIBRARY = [(67, 40), (42, 48), (47, 58), (47, 59), (44, 48), (65, 38), (68, 44)]     # G47 (run 42): the boxes 66,38 and 48,58 retired into the yard's chest; [1] stays 'Library 3' (town.py) (run 30, G28: the Depot's sturdy box, was the bin
                            # package 64,38); books, spellbooks, recipes, letters;
                            # run 23: 'Library 2' (48,58), a wooden box in the Workshop, before the Storage Chest
                            # run 37: 'Library 5' (67,40), a sturdy box in the library room (nails from the new
@@ -71,7 +73,8 @@ LIBRARY = [(66, 38), (42, 48), (48, 58), (47, 58), (47, 59), (67, 40), (44, 48),
 ARMORY2 = (48, 59)         # run 23: 'Armory 2', a wooden box in the Workshop (private): gear when the armory is full
 ARMORY3 = (42, 50)         # run 30 (G28): 'Armory 3', a sturdy box in the Depot (private), when Armory 2 is full
 ARMORY4 = (45, 50)         # run 37: 'Armory 4', a wooden box in the Depot (private), when Armory 3 is full
-SPARES3 = (49, 58)         # run 23: 'Spares 3', a wooden box in the Workshop: potions, scrolls, rods when the others are full
+ARMORY5 = (70, 44)         # G47 (run 42): the third wagon, 60 slots, when the armory boxes are full
+SPARES3 = (68, 44)         # G47 (run 42): was 'Spares 3', a wooden box at 49,58, retired
 SPARES4 = (44, 50)         # run 38: 'Spares 4', a sturdy box in the Depot (private): the spares chests were all full
 STORAGE_CHEST = (47, 58)   # run 20: Ashland's farewell gift, the ★Storage Chest (100 slots, fireproof; no rename): the
                            # Workshop's middle row; the library's overflow
@@ -89,7 +92,7 @@ SHIPPING = (56, 52)
 TRASH_CAN = (58, 51)       # run 18: was written 57,51 (the collectibles shelf)
 COLLECTIBLES = (68, 40)    # display shelf: cards, figures, the decor backpack
 FARM_BOX2 = (59, 41)       # run 18: the old condiments box, empty, for seeds when the Farm box (a 20-slot package) is full
-SPARE_BOX = (68, 41)       # an empty wooden box in the Storehouse (run 18)
+SPARE_BOX = (68, 44)       # G47 (run 42): the wooden box 68,41 retired
 MAIL_SPOTS = [(59, 49), (60, 49)]  # run 18: mail parcels (salary, deliveries) are set down here by the mail post
 MAIL_PACKAGE = (60, 50)    # "a package labelled Sender: Mysilia Post Office" beside the mail post: no Grab offered (office)
 FIAMA_CHEST = (54, 50)     # Fiama's Lecture quest chest on the home board's cell: lock 50, worthless (fact #631)
