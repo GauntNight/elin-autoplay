@@ -85,6 +85,29 @@ def saw(sp, floor):
         run("box.py", BOX_STR(WOOD_BOX), *planks, timeout=120)
 
 
+def wood_scrap(sp, floor):
+    """Logs in the wood box: the carpenter's Scrap, 1 log and 4 SP, pays the most Carpentry a log (run 42) and makes the Blacksmith's scrap. False when there are none."""
+    room = (sp - floor) // 4
+    if room < 1:
+        return False
+    box = next(b for b in data("stock")["boxes"] if (b["x"], b["z"]) == tuple(WOOD_BOX))
+    stacks = []
+    for i in box["items"]:
+        m = re.match(r"(\d+|an?) (\w+) logs?$", i["name"])
+        if m and m.group(2) not in ("carbon", "feywood"):
+            stacks.append((int(m.group(1)) if m.group(1).isdigit() else 1, m.group(2)))
+    if not stacks:
+        return False
+    size, wood = max(stacks)
+    dx, dz = beside(STATIONS["carpenter's table"])
+    out = run("craft.py", str(dx), str(dz), "Scrap", str(min(room, size)), "--use", wood, timeout=300)
+    run("hotbar.py", "--deselect", timeout=30)
+    run("close.py", timeout=30)
+    if out.rc:
+        stop(f"Scrap: rc {out.rc}: {str(out)[-160:]}")
+    return True
+
+
 def desks(sp, floor):
     """No logs left: the carpenter's table. A desk is 4 planks and 3 SP, about 10 exp a SP at Carpentry 8 and 1.6 weight (run 42)."""
     room = (sp - floor) // 3
@@ -130,7 +153,9 @@ def main():
                 bolts(sp, floor)
             else:
                 for _ in range(5):  # stacks of logs are small: go on until the SP is used
-                    if logs_in_box() or any(LOG.match(i["name"]) and not SKIP_LOG.search(i["name"]) for i in data("inv")["items"]):
+                    if wood_scrap(pc().get("sp", 0), floor):
+                        pass
+                    elif logs_in_box() or any(LOG.match(i["name"]) and not SKIP_LOG.search(i["name"]) for i in data("inv")["items"]):
                         saw(pc().get("sp", 0), floor)
                     elif not desks(pc().get("sp", 0), floor):
                         break

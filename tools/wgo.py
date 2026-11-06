@@ -113,7 +113,8 @@ def handle_ambush(_retry=False):
         p = s["pc"]
         # run 26: two ambush maps (lake fields) put me in deep water; ready() said "wait it out" for
         # ConSuffocation, which only drowns: a scroll of teleport lands on dry ground (it did both times)
-        if p.get("inWater") or "ConSuffocation" in (p.get("conditions") or []):
+        # run 42: a water breather (gloves that "let you breathe underwater") loses nothing there: a whole sea-bed map stopped the circuit with 2 scrolls spent
+        if (p.get("inWater") or "ConSuffocation" in (p.get("conditions") or [])) and not p.get("breathesWater"):
             run("item.py", "scrolls of teleport", "Read", timeout=60)
             wait_until("frames", n=30, timeout=3000)
             s = call("state")["data"]

@@ -238,13 +238,82 @@ def condition_wait():
     return False
 
 
+def wood():
+    """Logs for a craft push (run 42, G48: Carpentry and Blacksmith out of wood at home; fact #996: a mature tree on a nefia floor gives about 3 logs): when runs/jobs/wood.txt names a
+    target, cut the trees in reach on an explored floor with nothing near, up to 12 logs a floor. They ride in the haul bag, where purge's --free can't drop them."""
+    from pathlib import Path as _P
+    try:
+        want = int((_P(__file__).resolve().parent.parent / "runs" / "jobs" / "wood.txt").read_text().strip())
+    except (OSError, ValueError):
+        return
+    log_stack = re.compile(r"^(\d+|an?) (\w+ )*?logs?$")
+
+    def held_logs():
+        n = 0
+        for i in data("stock")["pack"]:
+            for x in [i] + list(i.get("items") or []):
+                if log_stack.match(x["name"]) and "carbon" not in x["name"]:
+                    n += x.get("num") or 1
+        return n
+    have = held_logs()
+    if have >= want or (pc().get("burdenPhase") or 0) >= 1 or hostile_near(8) or pc().get("sp", 0) < 50:
+        return
+    trees = [h for h in data("find", name="tree", r=40, n=30)["hits"] if h.get("kind") == "obj" and not h.get("edge")]
+    if not trees:
+        return
+    in_pack = sum(i.get("num") or 1 for i in data("inv")["items"] if i.get("id") == "log")
+    out = run("gather.py", "tree", "log", str(in_pack + min(want - have, 12)), "40", "40", "--weak-ok", timeout=300)
+    run("hotbar.py", "--deselect", timeout=30)
+    names = [i["name"] for i in data("inv")["items"] if log_stack.match(i["name"]) and "carbon" not in i["name"]]
+    if names:
+        run("bag.py", "a haul bag", *names, timeout=120)
+        run("close.py", timeout=30)
+    print(f"  wood: {held_logs()} of {want} logs; {len(trees)} trees seen ({last(out)[:70]})", flush=True)
+
+
+def scrap_walls():
+    """Scrap for a Blacksmith push (run 42, G48: bolts take 1 scrap and 2 SP): when runs/jobs/scrap.txt names a target, mine a Machinarium's metal walls on an explored floor, ~1 SP each (wallmine.py)."""
+    from pathlib import Path as _P
+    try:
+        want = int((_P(__file__).resolve().parent.parent / "runs" / "jobs" / "scrap.txt").read_text().strip())
+    except (OSError, ValueError):
+        return
+    if "factory" not in str(zone().get("full") or "") or hostile_near(8) or pc().get("sp", 0) < 60 or (pc().get("burdenPhase") or 0) >= 1:
+        return
+
+    def have():
+        n = 0
+        for i in data("stock")["pack"]:
+            for x in [i] + list(i.get("items") or []):
+                if re.match(r"^(\d+|an?) (\w+ )*?scraps?$", x["name"]) and "paper" not in x["name"]:
+                    n += x.get("num") or 1
+        return n
+    now = have()
+    if now >= want:
+        return
+    out = run("wallmine.py", str(min(want - now, 25)), "40", "10", "--kind", "metal", timeout=600)
+    run("hotbar.py", "--deselect", timeout=30)
+    names = [i["name"] for i in data("inv")["items"] if re.match(r"^(\d+|an?) (\w+ )*?scraps?$", i["name"]) and "paper" not in i["name"]]
+    if names:
+        run("bag.py", "a haul bag", *names, timeout=120)
+        run("close.py", timeout=30)
+    print(f"  scrap: {have()} of {want} ({last(out)[:70]})", flush=True)
+
+
 def explore_floor(solo):
+    spot = None
     for _ in range(8):
         asked()
         args = ["25"] + (["--solo"] if solo else []) + (["--expendable"] if "--expendable" in sys.argv else []) + GATE
         out = run("delve.py", *args, timeout=1500)
         why = next((ln.split("stop:", 1)[1].strip() for ln in reversed(out.splitlines()) if "stop:" in ln), "")
-        print(f"  delve: {why or last(out)[:100]}")
+        print(f"  delve: {why or last(out)[:100]}", flush=True)
+        # run 42: 20-odd step limits on one cell, a game day and a half and 17 real minutes, a soil block away from the rest of the floor: a walk that ends where it began is over
+        here = (pc().get("x"), pc().get("z"))
+        if "step limit" in why and here == spot:
+            print(f"  delve: still at {here[0]},{here[1]} after a step limit: this exploring is done", flush=True)
+            return
+        spot = here
         # the exit code decides (the review of 2026-10-23): 3 is a decision stop, 1 a refusal,
         # 0 one of the floor's own ends, which the text names
         if out.rc == 3 and ("under 70%" in why or re.search(r"HP \d+/\d+ is below", why)) and spell_heal():
@@ -843,6 +912,8 @@ def floors_loop(max_danger, floors, solo):
               f"  party: {', '.join(crew) or 'none'}")
         explore_floor(solo)
         clear_view(solo)
+        wood()
+        scrap_walls()
         # run 28: the pack and all three bags filled within two nefias, and a boss chest's treasure map stayed
         # behind ("LEFT (pack full?)"): drop the junk (purge.py's rules) before the loot and the chests
         # run 33: and free 3 grid cards (cheap stacks dropped) so the meals and the chests' books have room
@@ -908,6 +979,16 @@ def floors_loop(max_danger, floors, solo):
                 wait_until("frames", n=20, timeout=3000)
                 print("  no stairs down seen yet: boxed in? cast Teleport, exploring again")
                 explore_floor(solo)
+        # run 42 (the user: "you may be stuck in the dirt, may need to mine to get a path"): one soil block held a floor for 17 real minutes
+        for _dig in range(3):
+            hits = data("find", name="stair", r=999, n=10)["hits"]
+            if any(h.get("installed") and h.get("trait") == "TraitStairsDown" for h in hits) or hostile_near(8):
+                break
+            r = run("tunnel.py", "--max", "6", timeout=300)
+            print(f"  no stairs down seen yet: tunnel: {last(r)[:90]}", flush=True)
+            if r.rc != 0 or "nothing to dig" in str(r):
+                break
+            explore_floor(solo)
         h = way_down(arrival)
         descend(h, solo)
     z, p = zone(), pc()

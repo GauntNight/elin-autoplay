@@ -241,13 +241,15 @@ def main():
             return
         pc0 = call("state")["data"]["pc"]
         hp0, wet0 = pc0["hp"], "ConWet" in (pc0.get("conditions") or [])
+        # run 42: a sea-bed ambush map (the cloak floats me over water on the world map) walled a water breather in behind these checks
+        breathes = pc0.get("breathesWater")
         for _ in range(min(10, dist + 1)):
             # Run 07 death: these blind steps walked into the Derphy den's sea in the dark and I
             # drowned. Never step onto water or an unexplored cell; stop when wet or losing HP.
             nxt = call("cell", dx=sx, dz=sz)
             # run 19: a river of "shallow water" walled an ambush map in; shallow water only wets
             nd = nxt.get("data") or {}
-            if not nxt.get("ok") or nd.get("suffocate") is True or (nd.get("water") and "shallow" not in str(nd.get("floor") or "")):
+            if not breathes and (not nxt.get("ok") or nd.get("suffocate") is True or (nd.get("water") and "shallow" not in str(nd.get("floor") or ""))):
                 print(f"  stopped: the next cell is {'water' if nxt.get('ok') else nxt.get('error')}")
                 break
             call("step", dx=sx, dz=sz)
@@ -255,11 +257,11 @@ def main():
             pc = call("state")["data"]["pc"]
             # run 26: already wet, the wet check never fired and the steps went on into deep water
             # (ConSuffocation at full HP: a teleport scroll got me out): in water at all is a stop
-            if pc.get("inWater") or "ConSuffocation" in (pc.get("conditions") or []):
+            if not breathes and (pc.get("inWater") or "ConSuffocation" in (pc.get("conditions") or [])):
                 print(f"  stopped: in water (HP {pc['hp']}): stepping back")
                 call("step", dx=-sx, dz=-sz)
                 break
-            if ("ConWet" in (pc.get("conditions") or []) and not wet0) or (pc["hp"] < hp0 and not force):
+            if ("ConWet" in (pc.get("conditions") or []) and not wet0 and not breathes) or (pc["hp"] < hp0 and not force):
                 print(f"  stopped: wet or hurt (HP {pc['hp']})")
                 call("step", dx=-sx, dz=-sz)
                 break

@@ -92,13 +92,13 @@ ROUTES = [
     # run 19 (the user): treasure maps in the shared Maps box, where Poppy's Treasure Hunt finds them
     (("treasure map",), BOX_STR(home.MAPS_BOX), "the shared Maps box (the Workshop)"),
     (("thread", "fiber", "string", "rope", "skin", "big leaf", "big leaves", "needle", "texture", "bolt"),
-     "|".join(BOX_STR(b) for b in home.BAG_PARTS), "Bag parts box (the Workshop)"),
-    (("bone", "nail", "battery", "batteries", "microchip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX), "Parts box (the Workshop)"),  # run 30: queen bees (a beehive part)
+     "|".join(BOX_STR(b) for b in home.BAG_PARTS) + "|" + BOX_STR(home.ARMORY5), "Bag parts box (the Workshop; the yard's wagon when full, run 42)"),
+    (("bone", "nail", "battery", "batteries", "microchip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5), "Parts box (the Workshop; the yard's wagon when full, run 42)"),  # run 30: queen bees (a beehive part)
     (("leaf", "leaves", "tuft of", "tufts of", "grass wall"), BOX_STR(home.FODDER_BOX), "the fodder box (the Farmhouse)"),
     (("corpse",), "ship", "the shipping chest (a fresh corpse; cook it first if food is short)"),
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
     (("paint", "dye"), "|".join(BOX_STR(b) for b in home.VALUABLES), "valuables (paint and dyes: materials; run 31: dyes for G30's flower beds)"),
-    (("platinum", "gold bar", "medal", "ecopo", "coin", "ticket", "figure", "card of", "gene of",
+    (("platinum", "gold bar", "medal", "ecopo", "coin", "ticket", "figure", "figurine", "card of", "gene of",
       "flicker of decency", "gem", "jewel", "cards of", "figures of"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW),
      "valuables (the Storehouse; the Storage Chest when full, run 21)"),
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf

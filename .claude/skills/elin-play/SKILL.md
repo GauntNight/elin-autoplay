@@ -76,6 +76,7 @@ HP floors stated in five places); the other skills point here. **In code they ar
 - Blind (a master yeek's darkness bolt): no Attack act and a step into the unseen foe does nothing;
   walk away until it clears (~7 turns), drink at 70%, then kill the yeek from range. delve.py stops
   on ConBlind. (14)
+- **Stuck on a floor** (the user, run 42: "looks like you may be stuck in the dirt, may need to mine to get a path"): one soil block held a cave floor for 17 real minutes. `tunnel.py` digs the thinnest wall to open ground out of reach; the ladder runs it after the map and Teleport, and a walk that ends where it began stops exploring. **A silent wait on a loop is how it went unseen:** every circuit gets a Monitor on its log. Never read `journal.py` during one: its window stops the loop. (42)
 - **Boxed in on a floor** (runs 25, 28): delve's "no way down" / explore.py's walks that go nowhere mean a pocket (a wreck trap, a Machinarium's metal walls): **zap a rod of teleport** (the Teleport spell fizzles at Casting 3), then explore again; mining toward the known map (granite 18, copper blocks 34) is the slow way. (25, 28)
 - **No underwater dungeons** (the user, run 17: "you can't do those kinds of dungeons"): an
   "Underwater Ruin" (Zone_dungeon_water) suffocates every turn (ConSuffocation) on top of the fight:

@@ -733,6 +733,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/trial.py restore [--yes]       the trials' records to archive/start-runs-DATE/, the kept game's back, every
                                                           checksum verified (exit 1 and nothing more removed if one differs)
     Exit: 0 done (or shown), 1 refused, 2 the bridge.
+- **`tunnel.py`**: Mine a way through when a floor looks closed (the user, run 42: "looks like you may be stuck in the dirt, may need to mine to get a path"; one soil block at 14,15 of Boring Cave B4 held 17 real minutes and a game day and a half of "delve: step limit"). Reads the explored cells, floods from me over open ground, and finds the cheapest run of walls to open ground I can't reach (the magic map shows plenty); with none known, to the nearest unexplored cell. Then it holds the pickaxe and mines that run, nearest wall first.
+    usage: python -I tools/tunnel.py [--max N=6] [--dry]    at most N walls; --dry prints the plan
+    Exit 0 dug (or "nothing to dig": no wall leads anywhere), 1 refused (no pickaxe, a window), 3 stopped (a hostile, a wall too hard, SP).
 - **`unlock.py`**: Open a locked chest in the pack (run 42: treasure-map chests can come locked, "a cool mystic treasure chest" at lock 21; a locked chest lists as empty, and digmap.py and chests.py --field took that for empty: one was dropped on a field with its contents inside). The game's Open starts a timed task, and the next command cancels it ("You give up opening"), so each try waits for the task to end. A failed try costs no charge and no item without a lockpick; it can be tried again.
     usage: python -I tools/unlock.py [NAME] [TRIES=8]    NAME: part of the chest's name (default: the first locked chest in the pack)
     Exit 0 opened (or none locked), 1 refused (no such chest), 3 stopped (still locked after TRIES, a hostile, a window).
@@ -802,6 +805,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/whereis.py Elfeus "tax chest"
     Refuses (exit 1) standing in deep water (pc.inWater, bridge 0.30.0), without a guard or an entry;
     stops (exit 3) when the sweep or the guard's walk heads into deep water (run 19's drowning).
+- **`woodrun.py`**: Cut wood on a field map for a craft push (run 42, G48: Carpentry needs about 70 logs at potential 145; a forest tile beside home gives a log and two branches a tree, 0.5 SP, about 9 real seconds; the map is fog until walked, so it alternates gather.py and explore.py). Logs go into the haul bag, where purge can't drop them; branches past the cap are dropped.
+    usage: python -I tools/woodrun.py LOGS [--minutes M=8] [--min-sp 30]
+    Stops at LOGS held in all (pack and bags), the time, SP under the floor, Hungry (a meal first, a failed meal is a stop), or a hostile it can't fight (common.ready's reasons).
+    Exit 0 target or time reached, 1 refused (not on a field map, no axe), 3 stopped.
 - **`wrecks.py`**: Mine every wreck on the explored map with the pickaxe and pick up what drops (run 06: five wrecks on one floor of Spiritual Cave; wrecks give gems, scrap, fiber, bolts, logs).
     usage: python -I tools/wrecks.py [R=60] [min_hp_pct=70] [min_sp=5]
 - **`zap.py`**: Zap a carried rod on myself N times (run 14: Magic Device, a new skill, levels with every zap). Only rods that are harmless on oneself: holy shield, holy light, cure ..., keeping KEEP charges.
