@@ -834,6 +834,9 @@ def chests():
             left = [b["card"] for b in bs if b.get("card") and not b.get("mine") and "inventory grid" in (b.get("name") or "")]
             run("close.py")
         print(f"  chest opened: {h['name']}: {', '.join(inside) or 'empty'}" + (f"; LEFT (pack full?): {', '.join(left)}" if left else ""))
+        # run 42: a kotatsu from the chest: 220%, and every way off the floor refuses at phase 3 (common.overweight_stop)
+        if (pc().get("burdenPhase") or 0) >= 3:
+            print("  chest: burden phase 3: " + last(run("purge.py", "--heavy", timeout=300))[:90])
 
 
 def stay_in_nefia():

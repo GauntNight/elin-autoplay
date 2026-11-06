@@ -13,6 +13,8 @@ usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 
             microchip each, the Gene Machine's power parts)
   --danger-ok N  passed to wgo.py: a deliberate crossing of ambush levels up to N (elin-play's route rule)
   --skip NAME    leave out a nefia whose name contains NAME (repeatable): one whose master lies below the gate
+  --until HH:MM  no new nefia after this clock time (run 42: the shipping and the close-out wait on the circuit; a nefia is ~10 real minutes)
+It registers as a job (runs/jobs/circuit.json: journal.py refuses while it runs) and runs/jobs/circuit.stop ends it between nefias.
 Started on a nefia's floor it runs the ladder there first (run 40). An empty list gets one nap to refill it (run 40).
 Exit 0 after N conquests, 1 refused (not on the world map or a nefia, the kit), 3 stopped (a ladder decision, no nefia
 in range, the unload due).
@@ -21,12 +23,14 @@ import re
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from activity import mark  # noqa: E402
 import bridge  # noqa: E402
 from common import bag_slots, TOOLS, THRESHOLDS, Output, call, data, last, refuse, run, state, stop, wait_until  # noqa: E402
+from job import register, stop_requested  # noqa: E402
 
 UNLOAD_EVERY = 4  # run 40: was 2; three bags carry 3-4 conquests, and a full bag stops the circuit by itself (below)
 BAG_FULL = 2  # run 36: a bag this close to its slots counts as full (common.bag_slots: 35, the wrenched loot bag 48)
@@ -137,10 +141,14 @@ def main():
     if not on_world() and not resume:
         refuse("not on the world map: leave.py (or evac.py) first")
     napped = False
+    until = args[args.index("--until") + 1] if "--until" in args else None
+    register("circuit")
     mark("circuit", "start", note=f"{n} nefias, danger {lo}-{hi}, r {r}")
     done = 0
     try:
         while done < n:
+            if stop_requested("circuit") or (until and time.strftime("%H:%M") >= until):
+                stop(f"asked to stop between nefias ({until or 'circuit.stop'}): {done} conquered")
             if not resume:
                 cands = candidates(lo, hi, r, skip)
                 # run 40 (fact: "nefia list refills on a sleep"): 2 nefias within 42 tiles of Palmia, then 23 within 28 after one

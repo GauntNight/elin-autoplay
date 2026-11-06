@@ -146,6 +146,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                 microchip each, the Gene Machine's power parts)
       --danger-ok N  passed to wgo.py: a deliberate crossing of ambush levels up to N (elin-play's route rule)
       --skip NAME    leave out a nefia whose name contains NAME (repeatable): one whose master lies below the gate
+      --until HH:MM  no new nefia after this clock time (run 42: the shipping and the close-out wait on the circuit; a nefia is ~10 real minutes)
+    It registers as a job (runs/jobs/circuit.json: journal.py refuses while it runs) and runs/jobs/circuit.stop ends it between nefias.
     Started on a nefia's floor it runs the ladder there first (run 40). An empty list gets one nap to refill it (run 40).
     Exit 0 after N conquests, 1 refused (not on the world map or a nefia, the kit), 3 stopped (a ladder decision, no nefia
     in range, the unload due).
@@ -528,7 +530,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                                                        the lines it added, and its author and committer
     Exit: 0 clean, 1 something found.
 - **`purge.py`**: Drop the junk out of the pack and its carried bags, by rule, on a dungeon or field map (run 28: the pack and all three bags were full after two nefias, and a boss chest's treasure map and tomes stayed in the chest; lessons run 26: "the ladder's loot fills the 35-card pack and every bag within one or two nefias").
-    usage: python -I tools/purge.py [--dry]
+    usage: python -I tools/purge.py [--dry] [--free N] [--heavy]
+      --heavy  only the pack's furniture over 5 kg, at burden phase 3 (the ladder calls it after a boss chest)
     Exit 0 done, 1 refused (at home: ship instead; a window), 3 stopped (a hostile in view).
 - **`ration.py`**: Travel rations from home (G14; runs 15 and 16 did it by hand): grind grain at the millstone, then make rations at the ration maker, both two-slot converters (TraitCrafter, numIng 2).
     usage: python -I tools/ration.py [--dry]

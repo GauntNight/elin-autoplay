@@ -14,6 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import call, data, ready, refuse, run, stop, wait_until  # noqa: E402
+from job import JOBS  # noqa: E402
 
 GUILDS = ("Fighters Guild", "Mages Guild", "Thieves Guild", "Merchants Guild")
 
@@ -48,6 +49,9 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     want = args[0] if args else "guilds"
+    # run 42: read during a circuit, its window stopped the evacuation
+    if (JOBS / "circuit.json").exists() and "--force" not in sys.argv:
+        refuse("a circuit is running: this window would stop its next step. Read it when the circuit ends (--force if runs/jobs/circuit.json is left over)")
     why = ready(hp=None, hunger=None, hostiles=False)
     if why:
         stop(why)

@@ -10,17 +10,21 @@ Never dropped: anything unidentified ("(Miracle)", "(Godly)", "strange", "murky"
 unidentified), ☆ artifacts, ★ items, the kit (teleport, return, evacuation, cure, troll blood, blankets), spellbooks,
 recipes, rods (stock.py decides those at home), gold, platinum, medals, maps, tomes.
 
-usage: python -I tools/purge.py [--dry]
+usage: python -I tools/purge.py [--dry] [--free N] [--heavy]
+  --heavy  only the pack's furniture over 5 kg, at burden phase 3 (the ladder calls it after a boss chest)
 Exit 0 done, 1 refused (at home: ship instead; a window), 3 stopped (a hostile in view).
 """
+import json
 import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import bag_slots, base_ready, call, data, ready, refuse, run, setup, stop  # noqa: E402
+from common import bag_slots, base_ready, call, data, pc, ready, refuse, run, setup, stop  # noqa: E402
 
 BAGS = ("a backpack", "a loot bag", "a spoils bag", "a haul bag")
+FURNITURE = {"ext", "deco", "util", "mech", "_furniture", "crafter", "bed", "facility", "generator", "instrument", "table", "door", "processor"}
+HEAVY = 5000  # grams, the game's table
 MATERIALS = r"(paper|grass|straw|wooden|stone|bone|sand|mica|hide|copper|silk|jelly|oak|cotton|plastic|iron|coral|scale|raw food)"
 GEAR = r"(shirt|amulet|necklace|ring|girdle|cloak|boots|shoes|hat|helm|gloves|staff|bardish|sickle|club|sword|axe|crossbow|bow|" \
        r"shield|mail|robe|breastplate|neck guard|gauntlets|spear|dagger|mace|mallet|scythe|claw|scimitar)"
@@ -104,6 +108,31 @@ def drop_in_open(name):
     return bool(call("invdo", i=drop[0]["i"]).get("ok"))
 
 
+def shed_heavy(dry):
+    """Run 42: a boss chest's kotatsu put the pack at 220%, Squashed on a conquered floor; only evac's burden refusal stood between that and a tumble of about 300 HP (fact #1299). The
+    pack's furniture over 5 kg goes, heaviest first, until the burden is under phase 3; never ☆ or ★, never a container (the bags), never the kit (the makeshift bed weighs 0.72)."""
+    game = Path(__file__).resolve().parent.parent / "knowledge" / "game" / "things.json"
+    table = {t["id"]: t for t in json.loads(game.read_text(encoding="utf-8"))}
+    heavy = []
+    for i in data("inv")["items"]:
+        t = table.get(i.get("id")) or {}
+        if i.get("equipped") or re.search("★|☆", i["name"]) or t.get("category") not in FURNITURE:
+            continue
+        if (t.get("weight") or 0) >= HEAVY:
+            heavy.append(((t.get("weight") or 0) * (i.get("num") or 1), i["name"]))
+    heavy.sort(reverse=True)
+    if not heavy:
+        print("no furniture over 5 kg in the pack")
+    for w, name in heavy:
+        if dry:
+            print(f"would drop {name} ({w / 1000:.0f} kg)")
+            continue
+        if (pc().get("burdenPhase") or 0) < 3:
+            break
+        out = run("item.py", name, "Drop", timeout=60)
+        print(f"dropped {name} ({w / 1000:.0f} kg): rc {out.rc}, burden phase {pc().get('burdenPhase')}")
+
+
 def main():
     setup()
     # Start Runs 1 and 3: the list is a late character's: in a new game it threw away the only axe, twice, through wgo and through ladder
@@ -114,6 +143,9 @@ def main():
     d, by = stacks()
     if d.get("zone") == "startSite":
         refuse("at home: ship the junk (stock.py, the shipping chest) instead of dropping it on the farm")
+    if "--heavy" in sys.argv:
+        shed_heavy(dry)
+        return 0
     why = ready(hp=None, hunger=None, burden=None, allow=("LayerInventory",), hostiles=False)
     if not why:
         # run 38: Lv2-4 wanderers 6 cells off stopped five purges on Savage Grassland B4 (the pack at 37 of 35 cards,
