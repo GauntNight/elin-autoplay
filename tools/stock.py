@@ -13,6 +13,7 @@ usage: python -I tools/stock.py                 the caps table and what is over 
        python -I tools/stock.py --ship [N]      carry up to N excess stacks to the shipping chest
        python -I tools/stock.py --read [N]      read up to N books of spells under the cap, to the last charge
        python -I tools/stock.py --list KIND     every copy of one kind ("rod of speed") with its place
+       python -I tools/stock.py --find TEXT ...  every stack of anything, capped or not, with its place and count
 Exit 0 done, 1 refused, 2 bridge, 3 stopped (the pack full, the shipping chest full).
 """
 import json
@@ -270,6 +271,13 @@ def main():
     d, items = inventory()
     if d.get("zone") != "startSite" and "--anywhere" not in args:
         refuse(f"at home only (zone {d.get('zone')}): the boxes are the Meadow's")
+    if "--find" in args:  # run 41: any item at all, not only the kinds under a cap (materials for a craft, a tally)
+        for want in args[args.index("--find") + 1:]:
+            hits = [it for it in items if want.lower() in it["name"].lower()]
+            print(f"{want}: {sum(it['num'] for it in hits)}")
+            for it in hits:
+                print(f"  {it['where']:>6}{' in ' + it['bag'] if it['bag'] else ''}: {it['name']}")
+        return
     stock = {s["spell"]: s["stock"] for s in data("power")["party"][0].get("spells") or []}  # me, not Kaberg
     plan = decide(items, stock)
     if "--list" in args:

@@ -96,7 +96,7 @@ def is_exploder(c):
     import threat
     prof = threat.profile(c.get("id") or c.get("name") or "") or {"flags": []}
     nm = (c.get("name") or "").lower()
-    return "exploder" in prof["flags"] or "kamikaze" in (c.get("id") or "") or "kamikaze" in nm or "hot guy" in nm
+    return "exploder" in prof["flags"] or "kamikaze" in (c.get("id") or "").replace("samurai_kamikaze", "") or "kamikaze" in nm or "hot guy" in nm
 
 
 def wait_out(start, max_turns=60, min_hp=50):

@@ -14,6 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call, close as bridge_close  # noqa: E402
 from common import pc, run, walk, walk_beside, wait_until  # noqa: E402
+from farmday import home_guard  # noqa: E402
 
 PICK = ("garbage", "rotten", "rubble", "empty bottle", "empty can")
 DUMP = ("garbage", "rotten", "rubble", "empty bottle", "shit", "remnant of what once was")  # run 39: remnants; run 13: empty cans are scrap (scrap.py); run 30: a fresh "shit"; run 17:
@@ -40,6 +41,7 @@ def sweep(r):
         h = hits[0]
         done.add((h["x"], h["z"]))
         if h["dist"] > 0:
+            home_guard("the trash sweep")  # run 41
             walk(h["x"], h["z"], r=0, timeout=30000)  # at home; the sweep stops on a hostile itself
             p = pc()
             if (p["x"], p["z"]) != (h["x"], h["z"]):

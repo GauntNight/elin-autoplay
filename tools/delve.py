@@ -51,7 +51,9 @@ SAFE_TO_LOOT = False
 SOAK = ("potion of blindness", "potion of confusion", "potion of slow", "potion of silence",
         "potion of paralysis", "cloudy potion", "pale potion",
         # run 24: Ether Hand (fact #845) turns bought cure potions into unidentified negative ones
-        "gluey potion", "murky potion", "spotted potion")
+        "gluey potion", "murky potion", "spotted potion",
+        # run 41 (three blasts of 46-77%, no soak potion in the pack: purge drops them): any thrown potion wets; 31 cure minors ride along
+        "potion of cure minor wound")
 
 
 def inv_items():
@@ -269,7 +271,7 @@ def main():
             # auto-combat net held) and a kamikaze samurai (id samurai_kamikaze, named "samurai")
             # hit 18% a round: both went to melee because only names were checked
             prof = threat.profile(t.get("id") or tname) or {"flags": []}
-            exploder = "exploder" in prof["flags"] or "kamikaze" in (t.get("id") or "")
+            exploder = "exploder" in prof["flags"] or "kamikaze" in (t.get("id") or "").replace("samurai_kamikaze", "")
             # run 33 (**death**): Silent Grassland's master 『Kamikaze yeek』 died to two Putit throws at close range and its
             # death blast took 214 -> -342 HP; a named (『』) exploder's blast is past any HP of mine, and its capital K
             # slipped past the name check. Named exploders stop the ladder: kill from 5+ cells by hand (cast.py bolts),

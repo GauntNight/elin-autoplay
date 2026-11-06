@@ -35,7 +35,7 @@ KIT = ("orens", "bandage", "throwing dagger", "cooler box", "backpack", "cure mi
        "pickaxe", "shears", "sleeping bag", "short bow", "long bow", "arrow", "torch", "tax bill",
        "adventure log", "potion of paralysis", "potions of paralysis", "blue herb", "iron sickle", "bronze war sickle", "hand gun", "bullets",  # run 32: Gun training (skill 1) at the dummy  # run 21: "sickle" took a ☆war sickle as kit
        "forest necklace", "edible necklace", "potion of silence", "rod of holy light", "makeshift bed", "hammer",
-       "butcher's tool", "loot bag", "spoils bag", "pouch",
+       "butcher's tool", "loot bag", "spoils bag", "haul bag", "pouch",
        "shovel",  # the user, 2026-10-29: a few of the wiki's hidden Small Medals need digging (medals.py)
        "fireproof blanket",  # the user, 2026-10-30: 3 ride along (leave.py); --move had no reason to keep them
        "potion of confusion", "potions of confusion", "rod of web", "bait", "monster ball")  # run 17: baits ride on the toolbelt (the Farm box is full; fishing anywhere)  # run 16: soak kamikazes Wet (delve.py throws them); web a foe and walk off  # run 13: butcher every corpse where it falls (G6 skins)  # run 12: Edible on roads, Forest (no blindness) in dungeons
@@ -46,7 +46,7 @@ KIT = ("orens", "bandage", "throwing dagger", "cooler box", "backpack", "cure mi
 CORE_KIT = ("orens", "cooler box", "cure minor wound", "cure major wound", "cure critical wound", "troll blood",
             "scroll of teleport", "scrolls of teleport", "evacuation", "scroll of return", "scrolls of return",
             "putit in amber", "rod of teleport", "rod of cure", "pickaxe", "short bow", "long bow", "arrow",
-            "makeshift bed", "sleeping bag", "fireproof blanket", "travel ration", "loot bag", "spoils bag", "backpack", "pouch",
+            "makeshift bed", "sleeping bag", "fireproof blanket", "travel ration", "loot bag", "spoils bag", "haul bag", "backpack", "pouch",
             "lockpick")
 # run 38 (run 37's circuit stopped 'bags full (35, 35, 35)' five times, one or two nefias each): the bags carried
 # minor kit no tool uses on a trip: the buffs are cast (Hero 116, Holy Shield 100 in stock), the attack rods and the
@@ -64,7 +64,8 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "banana", "stir-fry", "stir-fries", "manju", "croquette", "pizza",  # run 24: Tiguen's foods had no route
            "rice", "cheese", "jerky", "jerkies", "pie",  # run 19: "4 jerkies" had no route
            "sashimi", "sandwich", "onigiri",
-           "lunch box", "mousse", "shortcake",  # run 39: palulu shortcakes had no route
+           "lunch box", "mousse", "shortcake", "mochi", "avocado", "watermelon", "sack", "dumpling",  # run 41: Semnof's stock had no route
+             # run 39: palulu shortcakes had no route
             # run 36: an ally's lunch box (CHA, MAG, STR) and a mousse had no route
            "soup", "cake", "noel",  # run 30: seaweed soups, snow putit cakes, bush de noels had no route  # the review of 2026-10-23: these three sat inside the comment above
            # run 13: every fish in things.json (a carp had no route)
@@ -72,7 +73,7 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "goby", "goldfish", "mackerel", "moonfish", "muddler", "pintuna", "bream", "salmon",
            "sand borer", "sardine", "scad", "sea urchin", "shark", "striped jack", "sunfish",
            "sweetfish", "tadpole", "tilefish", "tuna", "turtle", "whale")
-JUNK = ("rotten", "garbage", "empty bottle", "shit", "salt water", "remnant of what once was")  # run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
+JUNK = ("rotten", "garbage", "empty bottle", "shit", "salt water", "remnant of what once was", "remnants of what once was")  # run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
 # (a "Return request" quest item is a vomit: packcheck dumped Casaneck's, so it is never auto-junk)
 
 # Where each kind of item lives at home (elin-home section 2 and 2a). First match wins.
@@ -81,7 +82,7 @@ ROUTES = [
     # run 12: the Border Watch plan fell through to the shipping chest; a plan is read at home
     (("plan of", "plans of"), "read", "read it now at home (a plan teaches a policy: item.py NAME Read)"),
     (("seed",), BOX_STR(home.FARM_BOX) + "|" + BOX_STR(home.FARM_BOX2), "Farm box (the Depot; Farm box 2 in the Farmhouse when full)"),
-    (("watering can", "hoe", "shovel", "fishing rod", "bait"), BOX_STR(home.FARM_BOX), "Farm box (the Depot)"),  # run 13: bait beside the rod
+    (("watering can", "hoe", "fishing rod", "bait"), BOX_STR(home.FARM_BOX), "Farm box (the Depot)"),  # run 13: bait beside the rod
     # run 18 (G12): spare room boards and plates, and walls for rotating facings, wait by the wall workshop
     (("room board", "room plate", "house plate", "house board", "plank wall", "stone wall", "log wall"),
      BOX_STR(home.WOOD_BOX), "Wood box (building parts)"),
@@ -93,7 +94,7 @@ ROUTES = [
     (("thread", "fiber", "string", "rope", "skin", "big leaf", "big leaves", "needle", "texture", "bolt"),
      "|".join(BOX_STR(b) for b in home.BAG_PARTS), "Bag parts box (the Workshop)"),
     (("bone", "nail", "battery", "batteries", "microchip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX), "Parts box (the Workshop)"),  # run 30: queen bees (a beehive part)
-    (("leaf", "leaves", "tuft of grass", "tufts of grass", "grass wall"), BOX_STR(home.FODDER_BOX), "the fodder box (the Farmhouse)"),
+    (("leaf", "leaves", "tuft of", "tufts of", "grass wall"), BOX_STR(home.FODDER_BOX), "the fodder box (the Farmhouse)"),
     (("corpse",), "ship", "the shipping chest (a fresh corpse; cook it first if food is short)"),
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
     (("paint", "dye"), "|".join(BOX_STR(b) for b in home.VALUABLES), "valuables (paint and dyes: materials; run 31: dyes for G30's flower beds)"),
@@ -106,16 +107,16 @@ ROUTES = [
      BOX_STR(home.VALUABLES[-1]) + "|" + BOX_STR(home.COLLECTIBLES), "decorations (Valuables 7 in the Depot; the collectibles shelf)"),
     (("book", "spellbook", "recipe", "journal", "letter", "parchment"), "|".join(BOX_STR(b) for b in home.LIBRARY), "the library (the Storehouse)"),
     (("oil", "ale", "butter", "chili", "ketchup", "salt", "sugar", "mayo", "mayonnaise", "spice", "beer", "wine",
-      "sake", "sauce", "sesame", "flour", "vinegar", "tea",
+      "sake", "sauce", "sesame", "flour", "vinegar", "tea", "cappuccino",
       "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3), "Pantry (the Kitchen)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
     (("grave of",), "ship", "the shipping chest (a boss's grave: junk, value 0-ish)"),
     (("Scrubber", "charm ("), "ship", "the shipping chest (☆The Scrubber, a boss-chest regular, and plain charms: run 30)"),
     # run 34: four "decide" stacks held up leave.py twice (loot from Rustic Forest and run 33's chests)
-    (("table clock", "boomerang", "beaker", "a saw"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
+    (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a dish", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
     # organs: board supply and gift jobs ask for them (a heart, grotesque offal; run 08, run 12)
     # run 15 (G14): ration grain waits by the millstone's stock: the harvest box keeps it (never shipped)
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),
-    (("offal", "heart", "liver", "kidney", "eyeball"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2), "Pantry (organs for board jobs)"),
+    (("offal", "heart", "liver", "kidney", "eyeball"), "ship", "the shipping chest (organs: the pantry is full, run 41)"),
 ]
 
 
@@ -137,9 +138,11 @@ def split_listing(text):
     if not m or m.group(1).strip() in ("", "empty"):
         return []
     items, cur, depth = [], "", 0
-    for ch in m.group(1):
+    text = m.group(1)
+    for n, ch in enumerate(text):
         depth += ch in "([" and 1 or (ch in ")]" and -1 or 0)
-        if ch == "," and depth == 0:
+        # run 41: "1,753 orens" is one item: the separator is a comma and a space
+        if ch == "," and depth == 0 and text[n + 1:n + 2] == " ":
             items.append(cur.strip())
             cur = ""
         else:
@@ -287,7 +290,7 @@ def check():
         bad.append(("backpack", n, *route(n)))
     # run 14: bag 2 is "a loot bag" (renamed with boxcfg name=): the haul rides there, so on the
     # home map all of it is out of place; quality-marked gear waits for identification
-    for haul in ("loot bag", "spoils bag"):  # run 14: bag 3 is the second haul bag
+    for haul in ("loot bag", "spoils bag", "haul bag"):  # run 14: bag 3 is the second haul bag; run 41: bag 4 (G45)
         for n in bag_items(haul):
             low = norm_name(n)
             # run 22: Loytel's ★Land Deed waits on the user (reading it claims Vernis, G13 M2): it
@@ -343,16 +346,13 @@ def main():
         z = (call("state")["data"].get("zone") or {}).get("full", "")
         if not z.startswith("Zone_startSite"):
             sys.exit("not at home: --move only works on the home map")
-        for c, n, where, label in bad:
-            name = re.sub(r"^(an?|\d+)\s+", "", n)
-            if where in ("read", "decide"):
-                print(f"   {n}: {label}")
-                continue
-            if c != "pack":
-                print("   " + last(tool("bag.py", c, "--take", name)))
-                tool("close.py")
-            if where in ("trash", "pack"):
-                continue
+        from farmday import home_guard
+        # run 41 (G46): 58 stacks took 10.9 real minutes, one walk and one window a stack; now one box.py call a destination
+        groups = {}
+
+        def flush(key):
+            names = groups.pop(key, [])
+            where, label = key
             boxes = ["shipping chest"] if where == "ship" else where.split("|")
             # run 38: every armory box full, so plain gear (a hemp shirt, a bronze mace) came back into the pack at every
             # home visit and filled it (the ladder's room check refused twice, a meal couldn't come out of the Cooler
@@ -360,14 +360,45 @@ def main():
             if (where, label) == ARMORY:
                 boxes.append("shipping chest")
             for box in boxes:
-                out = last(tool("box.py", box, name))
+                if not names:
+                    break
+                home_guard("packcheck --move")  # run 41: the box walk starved me to death at home, then walked on under attack
+                lines = tool("box.py", box, *names).splitlines()
                 tool("close.py")
                 # run 20: the "|" chain never reached the Storage Chest. It stopped at the first box
                 # whose answer was not "did not move" (a box that could not be opened or reached,
                 # "no Transfer offered", a refusal) and reported that; only a move ends the chain now
-                if ": moved " in out:
-                    break
-            print(f"   {out}  [{box}]")
+                left = []
+                for nm in names:
+                    line = next((ln for ln in lines if ln.startswith(nm + ":")), "")
+                    if line:
+                        lines.remove(line)
+                    if ": moved " in line:
+                        print(f"   {line}  [{box}]")
+                    else:
+                        left.append(nm)
+                names = left
+            for nm in names:
+                print(f"   {nm}: !! did not move: every box of its route refused ({where})")
+
+        for c, n, where, label in bad:
+            home_guard("packcheck --move")
+            name = re.sub(r"^(an?|\d+)\s+", "", n)
+            if where in ("read", "decide"):
+                print(f"   {n}: {label}")
+                continue
+            if c != "pack":
+                # a take needs a free card in the pack's grid: empty what's waiting first
+                if sum(1 for i in call("inv")["data"]["items"] if not i.get("equipped")) >= GRID_CARDS - 2:
+                    for key in list(groups):
+                        flush(key)
+                print("   " + last(tool("bag.py", c, "--take", name)))
+                tool("close.py")
+            if where in ("trash", "pack"):
+                continue
+            groups.setdefault((where, label), []).append(name)
+        for key in list(groups):
+            flush(key)
         if any(w == "trash" for _, _, w, _ in bad):
             # run 20: a one-line answer ("no Use act on the trash can from 55,52") crashed [-2]
             lines = [ln for ln in tool("trash.py", "dump").splitlines() if ln.strip()]

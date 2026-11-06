@@ -18,14 +18,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import base_ready, call, data, ready, refuse, run, setup, stop  # noqa: E402
+from common import bag_slots, base_ready, call, data, ready, refuse, run, setup, stop  # noqa: E402
 
-BAGS = ("a backpack", "a loot bag", "a spoils bag")
+BAGS = ("a backpack", "a loot bag", "a spoils bag", "a haul bag")
 MATERIALS = r"(paper|grass|straw|wooden|stone|bone|sand|mica|hide|copper|silk|jelly|oak|cotton|plastic|iron|coral|scale|raw food)"
 GEAR = r"(shirt|amulet|necklace|ring|girdle|cloak|boots|shoes|hat|helm|gloves|staff|bardish|sickle|club|sword|axe|crossbow|bow|" \
        r"shield|mail|robe|breastplate|neck guard|gauntlets|spear|dagger|mace|mallet|scythe|claw|scimitar)"
 DROP = [
-    r"\bcorpse of\b", r"^an? bones?$", r"\bgrotesque offals?\b", r"\bhearts?$", r"^an? skin$|\bskins$",
+    r"\bcorpse of\b", r"^an? bones?$", r"\bgrotesque offals?\b", r"\bhearts?$",  # skins stay (run 41, G45: a backpack takes 4, none in stock)
     r"\bpotions? of (paralysis|confusion|blindness|mutation|silence|weaken resistance|infravision|ultravision|"
     r"putitification|weakness|strip blessing|sleep|salt solution|catification|berserk)\b",
     r"\bpoisons?$", r"\bpot of dirty water\b",
@@ -56,7 +56,7 @@ KEEP = [r"\(miracle\)|\(godly\)|\(superior\)", r"^☆|^★|☆|★", r"\b(strang
         r"\b(teleport|return|evacuation|cure|troll blood|blanket|spellbook|recipe|rod of|gold bar|platinum|medal|map|tome)\b",
         r"\bmonster ball\b", r"\blockpick\b",
         # run 40: adding "iron" to MATERIALS made the kit's iron pickaxe read as iron gear ("pickaxe" holds "axe"): tools stay
-        r"\b(pickaxe|shovel|hammer|butcher's tool|hoe|sickle|fishing rod|watering can)\b",
+        r"\b(pickaxe|woodcutter|shovel|hammer|butcher's tool|hoe|sickle|fishing rod|watering can)\b",  # run 41: a woodcutter's axe was dropped on an ambush map
         # run 34: --free dropped "an ancient book titled "Ponape Scripture"" on an ambush map: decoded ancient books
         # are the Mages Guild's contribution (G36); skill books and genes never go either
         r"\b(ancient book|specialized book|skill book|genes?)\b"]
@@ -235,7 +235,7 @@ def free_cards(n):
 
 # the pack's own grid (35 cards) keeps the kit; the rest rides in the bags (run 28: a full grid ate meals
 # "a meal would fall to the floor" three times, and the ladder's chests found no room)
-PACK_KEEP = (r"(cooler box|putit in amber|axe|backpack|loot bag|spoils bag|pickaxe|scrolls? of (return|teleport|"
+PACK_KEEP = (r"(cooler box|putit in amber|axe|backpack|loot bag|spoils bag|haul bag|pouch|pickaxe|scrolls? of (return|teleport|"
              r"evacuation|identify)|potions? of (cure|troll)|orens|long bow|rods? of (teleport|cure)|arrows|skewers?|"
              r"blanket|platinum|makeshift bed|travel rations?|lockpick|hand gun|shotgun|rifle|bullets?|quarrels?|crossbow|fishing rod|baits?)")
 FREE_CARDS = 4
@@ -256,7 +256,7 @@ def unclutter():
         rods = [n for n in by["pack"] if kind in n.lower() and "blessed" not in n.lower() and n not in movable]
         rods.sort(key=lambda n: -int((re.search(r"\((\d+) charges?\)", n.lower()) or [0, 0])[1]))
         movable += rods[2:]
-    room = {b: 35 - len(by.get(b) or []) for b in BAGS if b in by}
+    room = {b: bag_slots(b) - len(by.get(b) or []) for b in BAGS if b in by}
     plan = {}
     # run 39: the meals bought at Olvina (roasts, shortcakes, cheese, imos) went into the backpack and the spoils bag,
     # where eat_one never looks (the pack and the Cooler Box only), and the walk stopped Hungry with 28 meals carried:

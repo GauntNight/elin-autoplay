@@ -135,6 +135,11 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       NAME   a word of the target's name (whole words); default the nearest hostile
     Exit 0 the target died (or none left), 1 refused (no such spell, the bridge refused the cast),
     3 stopped (MP at the floor, HP under the floor, a window, the target out of sight).
+- **`chests.py`**: Empty every mystic treasure chest in the pack at home and ship the empty chest (run 41: Poppy's Treasure Hunt leaves them on the floor for arrive.py to pick up, digmap.py brings them home; packcheck had no rule for them, and each held up a home trip, G46). Everything inside comes out to the pack, the medals and bars go through packcheck --move; a chest is worth ~112-200 shipped (elin-pack). Close each chest before the next: an open one takes every later quick move (run 25).
+    usage: python -I tools/chests.py [--dry]
+           python -I tools/chests.py --field   on a trip (run 41: five chests on a dig tour, 15 weight each, Burden phase 2): the money, medals,
+                                               unidentified pieces and books go into the pack and bags, the chest stays on the tile with the rest
+    Exit 0 done (or none), 1 refused (not at home), 3 stopped (the pack full: a chest left as it is).
 - **`circuit.py`**: The nefia circuit as one loop (the review of 2026-10-30, the user's ok): run 30's 820 points an hour was this done by hand. From the world map: `places` -> the nearest unconquered nefia of base danger LO-HI within R tiles (no underwater ones) -> wgo.py there -> Enter -> ladder.py (the gate, FLOORS floors) -> on "conquered" evac.py out -> repeat, until N nefias, or a ladder stop that isn't a conquest, or the unload is due.
     usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 5] [--unattended] [--solo] [--wrecks] [--danger-ok N] [--skip NAME ...] [--blanket-ok]
       --wrecks  mine the wrecks on each floor (ladder.py without --no-wrecks; run 34, G35: iron wrecks drop a battery and a
@@ -203,6 +208,14 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       --breathe  an underwater floor, only with water breathing in hand (the user, run 17)
     Targets come from tools/threat.py (the user, run 16: casters and high damage first, high defense
     last): a kind in its "avoid" group within 8 levels of mine (4 until run 17) stops the delve instead of a melee.
+- **`digmap.py`**: Dig up treasure maps (G44, the user 2026-11-04; run 41): the dig is on the world map itself. Each carried map's spot is in bridge `places` (TraitScrollMapTreasure.GetDest); a shovel in hand on that tile offers "Dig (Easy)" (TaskDig), and "You dig up the treasure" leaves an unguarded mystic treasure chest on the tile, unlocked. The first one (run 41, Lv21): 1,753 orens, 2 gold bars, 2 medals, two pieces, about 2 real minutes with the walk.
+    usage: python -I tools/digmap.py --list                 every carried map's spot, nearest first
+           python -I tools/digmap.py --plan [X,Z]             a greedy tour of them from here or X,Z, with each leg's worst ambush level
+           python -I tools/digmap.py [N=1] [--max-dist D=70] [--danger-ok N]   the nearest N maps: walk, dig, pick the chest, list it
+    Between legs it eats (entering the tile's field map) and sleeps on the world map when wgo.py stops for it. Each dig is a row in
+    runs/digs.csv: real seconds, game hours, map level, walk length, orens, bars, medals and the rest of the chest.
+    The chests ride home closed; their money counts as carried (elin-pack), so arrive.py's chest step empties them.
+    Exit 0 done, 1 refused (not on the world map, no shovel, no map in reach), 3 stopped (wgo.py's stop, a hostile, a window).
 - **`dishes.py`**: The Dishes box's share lock (run 19, the user's rule after run 18; facts #685-#686).
     usage: python -I tools/dishes.py [share|unshare|status]
       status (the default) prints the lock and what the box holds; share/unshare set it, read it back
@@ -213,6 +226,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/earlyday.py [CYCLES=5] [--rotate] [--throw "a boomerang"] [--no-reserve]
       --rotate  train the lowest skill among the melee weapons in the pack and bare hands
     The base is runs/earlybase.json: {"stand": [X, Z], "bed": [X, Z], "fire": [X, Z]}, stand being one cell next to the dummy and the bonfire.
+- **`eat.py`**: One or more meals by the same path the loops use (farmday.eat_one: the Cooler Box first, MEALS words), from the shell (run 41: every hand-run stop at Hungry needed a one-line script). You can't eat on the world map: enter a local map first.
+    usage: python -I tools/eat.py [--until HUNGER=50] [--max N=4]
+    Exit 0 at or under HUNGER, 1 refused (the world map), 3 stopped (no meal found, a window, a hostile).
 - **`elin_eye.py`**: Capture the Elin window's own pixels to a PNG. Read-only.
     usage: python -I tools/elin_eye.py [out.png] [--width N]
       --width N  downscale to N px wide (default 1600; 0 = full size)
@@ -409,6 +425,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Each pair walks beside the source, grabs, walks to the target (inside a walled house: through
     its door) and places. Stops at the first failure (exit 3) and says what is in hand.
     After moving a station or a box, update tools/home.py (and the skills' tables) in the same session.
+- **`namedexploder.py`**: Kill a NAMED exploder from range (runs 33 and 37: a named hot guy's death blast took 214 -> -342 and 216 -> -478; run 41: Misty Grassland B2's 『Hot guy』 halted the ladder three times at 3 cells, and each hand-run answer took a teleport). The loop the rule asks for: over 5 cells away, an arrow spell; closer, steps straight away from it; adjacent with no room, a teleport scroll. Run at speed x1.
+    usage: python -I tools/namedexploder.py [NAME="Hot guy"] [SPELL=arrow_Cold] [--rounds N=40] [--mp-floor N=12]
+    Exit 0 it's dead or out of view, 1 refused (no such foe in view), 3 stopped (MP at the floor, HP under 60%, a window).
 - **`needles.py`**: Collect needles from cacti on a beach map (the user's idea, run 08: G6's loom needs 6 needles; a cactus gives a bone needle when collected by hand, ripe or not: GrowSystemCactus.OnMineObj). Harvests every cactus on the explored map (right-click "Collect", wait, pick up the needle), then explores to reveal more. Fights hostiles 3+ levels below me; stops (exit 3) for anything stronger, HP under 70%, SP under the floor, or a window.
     usage: python -I tools/needles.py [WANT=12] [MIN_SP=10] [ROUNDS=30]
 - **`newchar.py`**: Make a new character from the title screen and start the game (Start Run 1: the steps of elin-setup section 4 as one tool, each picked by name).
@@ -495,6 +514,13 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/ration.py [--dry]
 - **`read.py`**: Print the full visible text of the top window (quest boards, letters, books, shop info), one text per line, without the 200-character cut, with colour tags removed.
     usage: python -I tools/read.py [--all]
+- **`readrecipes.py`**: Read the recipes in the home's boxes (run 41, the user: "Why don't you read the recipes you have available to you?"; "Seems we have a lot of them in various chests"). elin-pack has said to read unlearned recipes on the spot since run 08, and no tool did: packcheck filed them in the library and nothing read them from there, so 101 lay in 12 boxes, 37 never learned. A new recipe opens a craft, whose first making pays an old ticket and skill exp (firstcraft.py); a known one read again improves that recipe ("You improve the recipe": fact to come from this tool's rows) and either way the read frees a box slot.
+    usage: python -I tools/readrecipes.py [--dry] [--known] [--max N] [--here]
+      --dry    list them and where they are
+      --known  read the recipes already learned too (by default only the new ones)
+      --max N  stop after N reads, to measure a few first
+      --here   only what I carry, on any map
+    Stops on a hostile, Hungry or a low HP (common.ready). Exit 0 done, 1 refused, 3 stopped.
 - **`readskills.py`**: Read the specialized books in the home's boxes (run 40). A specialized book gives 1,000 skill exp (blessed 1,500, cursed 500), or teaches the skill when it is unknown (fact #554), and character exp comes only from skill level-ups (fact #481), so a book is exp sitting in a box: run 40 found ~30, filed in the library since run 27 because only an unlearned skill's book was ever read. This takes them box by box, reads each until it crumbles, and prints what each paid.
     usage: python -I tools/readskills.py [--dry] [--here] [--max N] [--skip SKILL ...]
       --dry     list the books and where they are
@@ -613,6 +639,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/stock.py --ship [N]      carry up to N excess stacks to the shipping chest
            python -I tools/stock.py --read [N]      read up to N books of spells under the cap, to the last charge
            python -I tools/stock.py --list KIND     every copy of one kind ("rod of speed") with its place
+           python -I tools/stock.py --find TEXT ...  every stack of anything, capped or not, with its place and count
     Exit 0 done, 1 refused, 2 bridge, 3 stopped (the pack full, the shipping chest full).
 - **`stopjob.py`**: Stop a loop Claude started in this session (2026-10-19: the user's rule, this repo only).
     usage: python -I tools/stopjob.py NAME [--wait SECONDS=600] [--no-kill]

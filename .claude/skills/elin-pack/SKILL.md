@@ -152,6 +152,8 @@ about 35 stacks in one pack slot. Check every shop and chest for one; the Cooler
 carried container works (`bag.py`). G6's crafting route (loom, needles, bolts) is in goals.md. A
 lame purse holds 4 items.
 
+**A bag takes storage wrenches (G45, run 41):** one vertical and one horizontal wrench (Miral, 6 medals each, 2 of each in stock) make 7x5 into 8x6, 48 slots: empty it, `place.py` it on a cell, stand on it, hold the wrench, right-click Upgrade, each axis once, right-click Grab. The loot bag has them (common.BAG_SLOTS). A fourth bag, 'a haul bag', since run 41. **Weight:** Dragon Slayer weighs 28 and Gravity Point takes 10 off the limit: Burden sets in at about 100 and phase 2 at about 120, so the heavy stacks stay home (51 troll blood, 29 restore body, 54 uncurse).
+
 **The backpack (run 10, 35 slots, wool):** holds what rides along but is rarely used: the rods
 (holy shield, slow, silence, teleport 11 charges), spare potions (hero, troll blood, paralysis, cure
 mutation, restore body), acidproof liquids, hero and magic-map scrolls, spare bandages, materials

@@ -63,7 +63,10 @@ MEALS = ("roasted", "roast", "on the bone", "skewer", "imo", "weed stew", "soup"
          # run 38: Very Hungry (81) at home with an ally's half-eaten lunch box in the Cooler Box: no word matched it
          "lunch box", "lunch boxes",
          # run 39: "7 palulu shortcakes" (Upan) matched no word ("cake" is whole-word)
-         "shortcake", "shortcakes")
+         "shortcake", "shortcakes",
+         # run 41: the ladder stopped Hungry twice with 22 meals in the Cooler Box (moon dumplings, sacks, avocados, watermelons)
+         "dumpling", "dumplings", "sack", "sacks", "avocado", "avocados", "watermelon", "watermelons", "mousse", "mousses",
+         "mochi", "egg", "eggs", "meat")
 NOT_MEALS = ("white mushroom", "red mushroom", "rotten")  # harmful raw mushrooms (foods.md), rotten food
 
 
@@ -200,6 +203,54 @@ def cook_stews(k):
     return last(out)[:120]
 
 
+def home_guard(what, limit=65, hard=80):
+    """Before each step of a long job at home: the meal rule below, HP, and hostiles (run 41: **the second death of the day**: an orc warrior
+    Lv11 and a scorpion Lv7 walked in during packcheck --move, box.py refused with a hostile in view and the mover went on to the next box
+    for 3.4 real minutes, 263 -> -1 HP without one swing). A foe at or under my level gets fight.py; anything else is exit 3."""
+    # run 41: the game's "winter is coming" drama sat open and every box call failed without a word for ~10 real minutes (the user saw it):
+    # read a dialog through; one that asks a choice is mine
+    s = state()
+    if s.get("drama") or (s.get("layers") or {}).get("top") == "LayerDrama":
+        print("  a dialog during " + what + ": " + last(run("talk.py", "4")))
+        s = state()
+        if s.get("drama") or (s.get("layers") or {}).get("top") == "LayerDrama":
+            sys.exit(f"stop: a dialog is open during {what}: talk.py")
+    feed_or_stop(what, limit, hard)
+    for _ in range(6):
+        s = state()
+        p = s.get("pc") or {}
+        foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
+        if p.get("hp", 0) < 0.6 * (p.get("maxHp") or 1):
+            sys.exit(f"stop: HP {p.get('hp')}/{p.get('maxHp')} during {what}: heal first")
+        if not foes:
+            return
+        f = min(foes, key=lambda c: c.get("dist", 99))
+        if "cat" in str(f.get("id")) or (f.get("lv") or 99) > p.get("lv", 0):
+            sys.exit(f"stop: {f.get('name')} Lv{f.get('lv')} at {f.get('dist')} during {what}: my decision")
+        print(f"  {f.get('name')} Lv{f.get('lv')} during {what}: fighting it")
+        # a slime's melee splash eats the gear's enchants (fight.py refuses): the Putit
+        tool = ("throw.py", f.get("name", "").split()[-1], "Putit In Amber", "8") if "slime" in str(f.get("id")) else ("fight.py", f.get("id") or f["name"])
+        r = run(*tool, timeout=300)
+        if getattr(r, "rc", 0) == 3:
+            sys.exit(f"stop: {tool[0]} stopped during {what}")
+    sys.exit(f"stop: still hostiles in view during {what}")
+
+
+def feed_or_stop(what, limit=65, hard=80):
+    """A long walk at home has a hunger stop too (run 41: **death by starvation**: arrive.py's box walk ran 3,274 turns from hunger 70
+    to 93 and HP -3 with meals in the Cooler Box and 400 mushrooms in the fridge; run 18's rule, for every unattended loop, had never
+    reached this one). At `limit` a meal; at `hard` with no meal landed, exit 3 naming what stopped."""
+    s = state()
+    h = (s.get("pc") or {}).get("hunger", 0)
+    if h < limit:
+        return
+    meal = eat_one()
+    print(f"  hunger {h} during {what}: ate {meal}")
+    h = state()["pc"].get("hunger", 0)
+    if not meal and h >= hard:
+        sys.exit(f"stop: hunger {h} during {what} and no meal landed: get food before anything else")
+
+
 def eat_one():
     # run 17 (the user: "I don't think you can eat and ignore the popup can you"): a bandit's
     # demand dialog was open on an ambush map and the meal silently did nothing (hunger 65 -> 65);
@@ -260,6 +311,9 @@ def eat_one():
         # run 14: a bare "mushrooms" matched loose raw white/red ones too (refused as ambiguous or
         # harmful); eat the Cooler Box's own stacks by their full names, never the harmful or rotten
         named = [x for x in split_listing(listing) if is_meal(x)]
+        # run 41 (run 18's gap a fourth time): what's in the Cooler Box is food unless it says otherwise, so an unknown word comes
+        # last instead of ending the loop Hungry; item.py still refuses harmful foods
+        named += [x for x in split_listing(listing) if x not in named and not re.search(r"corpse|remnant|rotten|offal", x.lower())]
         foods = named + list(MEALS)
     for food in foods:
         h0 = state()["pc"]["hunger"]

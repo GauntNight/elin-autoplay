@@ -91,7 +91,7 @@ def answer_demand(s):
         if (c.get("lv") or 0) > lv - THRESHOLDS["swarm_weak_below"]:
             return f"a bandit demand with {c.get('name')} Lv{c.get('lv')} near my level: decide by hand (talk.py)"
         prof = threat.profile(c.get("id") or c.get("name"), c.get("lv")) or {}
-        if "exploder" in (prof.get("flags") or []) or "kamikaze" in str(c.get("id") or "").lower():
+        if "exploder" in (prof.get("flags") or []) or "kamikaze" in str(c.get("id") or "").lower().replace("samurai_kamikaze", ""):
             return f"a bandit demand with an exploder ({c.get('name')}): pay it if cheap (elin-town-trip)"
     bs = call("buttons")["data"]["buttons"]
     tm = next((b for b in bs if (b.get("text") or "").strip().startswith("Try me")), None)
@@ -183,11 +183,11 @@ def handle_ambush(_retry=False):
         out = run("purge.py", "--free", "3", timeout=600)
         print(f"  ambush: purge: {last(out)[:100]}")
     out = run("leave.py", "--riding-ok", timeout=300)
-    if out.rc != 0 and "hostile" in last(out) and not _retry:
+    if out.rc != 0 and "hostile" in last(out) and int(_retry) < 3:  # run 41: once wasn't enough, a third arrival stopped a circuit
         # run 21: twice a late arrival (a snow putit, a giant fish) came up while leave.py walked
         # to the edge: fight it and leave again (once), rather than stop the trip
         print(f"  ambush: {last(out)[:80]}: fighting again")
-        return handle_ambush(_retry=True)
+        return handle_ambush(_retry=int(_retry) + 1)
     if out.rc != 0:
         return "leave.py: " + last(out)
     return "cleared"

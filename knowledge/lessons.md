@@ -16,6 +16,10 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 
 
+- A tool saying no is a stop for me too: `eat.py` said no meal at hunger 70 (an invisible foe cancelled it) and I ran recall and a 3,000-turn arrival on top of it, and died. (41)
+- A rule that says "until a run tries it" is a plan item, not a fact: the fast speed on floors waited a week as "untested" and one evening's test tripled the conquests. (41)
+- A rule in a skill with no tool behind it isn't happening: "read unlearned recipes on the spot" was in elin-pack since run 08 and 37 unread recipes piled up (the user's question found it). When adding a rule, name the tool that does it. (41)
+- Prices in my notes are hints: I'd have left Miral's without looking if I'd trusted "limited stock is expensive" (Dragon Slayer 31 medals). Read the shop when standing in it, with the wallet in hand: I went with 15 medals and 120 sat at home. (41)
 - Measure where the exp comes from before planning the next hour: Start Run 4 spent minutes 6-66 on shops, jobs and roads at 4 exp a minute with the 30-a-minute dummy beside its bed; the 20-second samples showed it at once, afterwards. (Start Run 4) (review 2026-11-05)
 - A rate measured at one level is that level's rate: the dummy's 39 a minute at skill 3 is 3 at skill 10, and "walking beats the dummy" (Start Run 3, at skill 10+) read as a general rule until Start Run 4 measured both at low skill. Say at what state a rate holds. (Start Run 4) (review 2026-11-05)
 - The largest gains of a run can sit unread in the home's boxes: tally them by kind (stock) at every session start. Run 40's ancient books, skill books and enchant armor scrolls had waited for runs. (40)
@@ -26,19 +30,10 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
   (fact #1169). (39)
 - To Lumiest, Fast Travel from home (fact #1168), never a walk: the game's path swings east from the west too
   (Palmia -> Lumiest took 3.3 days) and onto level 24-28 tiles from the north (74,99). (39)
-- Unattended circuits take base 3-8: under the gate of 12 a base-9 nefia gives B1-B4 and a base-10 B1-B3, while the
-  masters sit on B2-B5 (nefias.csv); Capricious Forest (9) ran four floors with no master. (38)
-- A Short Teleport lands at random a few cells off and can land beside the exploder it was cast to escape (twice in
-  run 38): against an adjacent exploder read a teleport scroll; cast.py now stops on an exploder inside 3 cells. (38)
-- After wgo.py arrives on a town or home tile, the first `do 0` (Enter) was ignored three times: check the zone after
-  an Enter and enter again. (38)
-- Before planning a purchase, look for the thing in the bags and every home box (`stock.py --list KIND`): five enchant
-  weapon scrolls, 19 undecoded ancient books, 50 uncurse scrolls and a rod of identify were already at hand. (38)
-- A boss chest's furniture (a drum can bath) and stones put the pack at Burden phase 2 by the next nefia's door: drop
-  chest furniture on the floor it came from. (38)
 
 ## Promoted (where the older lessons live now)
 
+- run 41 triage (the run-38 lessons): base 3-8 for unattended circuits -> circuit.py's --danger and a fact; a Short Teleport beside the exploder -> cast.py stops on an exploder inside 3 cells; the first Enter ignored after wgo.py -> a fact; look in every box before buying -> stock.py --find; chest furniture and stones -> purge.py's lists and Burden stops
 - Start Runs 5-7: long trips before food and armor (the user) -> roam.road_ready; starving on the way to food -> earlyday RESERVE_MEALS; a scroll unread at 0 HP -> roam.escape; a demand paid unread -> roam.KEEP; jobs under Lv4 -> board.py's PV 15 and 2 scrolls; stale per-character lists -> trial.py start
 - the level 1 trials (Start Runs 1-4): armor before arenas and no caves under Lv10 -> board.py --take and arena.py --any refuse, elin-opening's fast path; a flee that doesn't move -> leave.py; a death prompt -> common.crawl_up and close.py; a demand paid unread -> roam.py KEEP; full pack -> earlyday.tidy JUNK_FULL; paid recipes re-crafted -> tickets.py
 - run 40 triage: a neutral master that steals (37) -> a fact, and The Fighting Bull ring protects from thieves

@@ -32,7 +32,7 @@ def take(name):
         return True
     if grab(name) or grab(alt):
         return True
-    for bag in ("loot bag", "spoils bag", "backpack"):
+    for bag in ("loot bag", "spoils bag", "backpack", "haul bag"):
         run("bag.py", bag)
         if grab(name):
             return True

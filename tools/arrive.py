@@ -42,7 +42,7 @@ def cure():
     done = []
     for what in need:
         r = run("item.py", what, "Drink")
-        for bag in ("spoils bag", "backpack", "loot bag"):
+        for bag in ("spoils bag", "backpack", "loot bag", "haul bag"):
             if r.rc == 0:
                 break
             if run("bag.py", bag, "--take", what).rc == 0:
@@ -64,6 +64,8 @@ def main():
     why = threat(60, s)
     if why:
         stop(f"arrive: {why}")
+    from farmday import home_guard
+    home_guard("the arrival", limit=50)  # run 41: arrived at 70 with no meal landed, walked the boxes to 93 and died
     d = run("dishes.py", "share")
     print(d.strip())
     if d.rc != 0:
@@ -71,6 +73,7 @@ def main():
     print(cure())
     p = run("packcheck.py", "--move", timeout=1200)  # run 35: a full unload ran past the 300 s default twice
     print(p.strip())
+    home_guard("the arrival, after the unload")
     mail = [ln for ln in run("unpack.py").splitlines() if ln.strip() and not ln.rstrip().endswith("[bin]")]
     print("\n".join(mail))
     # run 35: April's bill (4,476) lay in the mail post through two arrivals ("opened nothing": unpack opens parcels,
@@ -78,6 +81,7 @@ def main():
     from farmday import pay_tax
     tax = pay_tax()
     print(tax or "tax: no bill in the mail post")
+    home_guard("the arrival, before the trash")
     # run 19: both test arrivals failed town.py on garbage until trash.py ran: sweep it first
     print("trash: " + (run("trash.py", timeout=600).strip().splitlines() or ["?"])[-2:][0])
     t = run("town.py")

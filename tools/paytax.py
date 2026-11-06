@@ -32,7 +32,7 @@ def main():
         # run 17: February's bill lay placed on the ground by the home board, and once grabbed it
         # went to the toolbelt and then the backpack, where neither `inv` nor the mail post sees
         # it. Look in the carried bags (the drag needs that bag's window open), then the ground.
-        for b in ("backpack", "loot bag", "spoils bag"):
+        for b in ("backpack", "loot bag", "spoils bag", "haul bag"):
             if "Tax Bill" in run("bag.py", b):
                 bag, held = b, [next(x.strip() for x in run("bag.py", b).split(":", 1)[-1].split(",") if "Tax Bill" in x)]
                 break

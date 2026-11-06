@@ -30,7 +30,7 @@ def weak_check():
     me = s["pc"].get("lv") or 0
     for c in sorted((c for c in s.get("nearby") or [] if c.get("hostile")), key=lambda c: c.get("dist", 99)):
         prof = threat.profile(c.get("id") or c.get("name")) or {"flags": []}
-        exploder = "exploder" in prof["flags"] or "kamikaze" in (c.get("id") or "") or c.get("id") == "hardgay"
+        exploder = "exploder" in prof["flags"] or "kamikaze" in (c.get("id") or "").replace("samurai_kamikaze", "") or c.get("id") == "hardgay"
         if exploder or c.get("dist", 99) <= 2 or (c.get("lv") or 0) > me - 10:
             return f"hostile in view: {c['name']} Lv{c.get('lv')} at {c.get('dist')}" + (" (an exploder)" if exploder else "")
     return None

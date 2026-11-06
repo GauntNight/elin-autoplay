@@ -15,6 +15,8 @@ place to live.
 **`tools/arrive.py` runs steps 0-3 and the town check in one go (run 19):** the Dishes box shared,
 packcheck --move, the mail, trash.py, town.py, and a food line. A hostile in view stops it first.
 
+**Books and recipes on every return:** `decode.py --fetch`, `readskills.py`, and `readrecipes.py [--known]` (run 41, the user: "Why don't you read the recipes you have available to you?": 101 lay in 12 boxes, 37 never learned, because a skill said to read them and no tool did; a new one opens a first craft worth an old ticket and skill exp, and every read frees a box slot). `chests.py` for any mystic chest in the pack. Read `gearcheck.py` before `shipstar.py`.
+
 0. **`packcheck.py --move` first** (the user, run 11: "on entering base you organize your packs...
    when leaving base you must clean your packs of useless inventory... it is a loss of treasure by
    not having those slots free"). It checks the pack, the backpack and the Cooler Box against the

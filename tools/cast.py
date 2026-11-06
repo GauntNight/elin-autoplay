@@ -28,7 +28,7 @@ import threat  # noqa: E402
 def exploder(c):
     """delve.py's test: threat.py's exploder flag, or 'kamikaze' in the id, or a hot guy by name."""
     prof = threat.profile(c.get("id") or c.get("name") or "") or {"flags": []}
-    return ("exploder" in prof["flags"] or "kamikaze" in (c.get("id") or "")
+    return ("exploder" in prof["flags"] or "kamikaze" in (c.get("id") or "").replace("samurai_kamikaze", "")
             or any(w in (c.get("name") or "").lower() for w in ("kamikaze", "hot guy")))
 
 

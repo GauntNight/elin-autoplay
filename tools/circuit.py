@@ -26,10 +26,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from activity import mark  # noqa: E402
 import bridge  # noqa: E402
-from common import TOOLS, THRESHOLDS, Output, call, data, last, refuse, run, state, stop, wait_until  # noqa: E402
+from common import bag_slots, TOOLS, THRESHOLDS, Output, call, data, last, refuse, run, state, stop, wait_until  # noqa: E402
 
 UNLOAD_EVERY = 4  # run 40: was 2; three bags carry 3-4 conquests, and a full bag stops the circuit by itself (below)
-BAG_FULL = 33  # run 36: a carried bag holds 35 stacks
+BAG_FULL = 2  # run 36: a bag this close to its slots counts as full (common.bag_slots: 35, the wrenched loot bag 48)
 
 
 def run_live(tool, *args, timeout=7200):
@@ -233,8 +233,8 @@ def main():
                 stop(f"go home: {done} nefias conquered, the unload is due (recall.py, arrive.py), then circuit.py again")
             # run 36: the count above restarts with every circuit call, and after five calls all three bags held 35
             # stacks each: two floors stalled on "a meal would fall to the floor". Full bags end the circuit too
-            bags = [i for i in data("stock", r=0)["pack"] if i.get("name") in ("a backpack", "a loot bag", "a spoils bag")]
-            if bags and all(len(b.get("items") or []) >= BAG_FULL for b in bags) and done < n:
+            bags = [i for i in data("stock", r=0)["pack"] if i.get("name") in ("a backpack", "a loot bag", "a spoils bag", "a haul bag")]
+            if bags and all(len(b.get("items") or []) >= bag_slots(b["name"]) - BAG_FULL for b in bags) and done < n:
                 stop(f"go home: the bags are full ({', '.join(str(len(b.get('items') or [])) for b in bags)} stacks): "
                      "recall.py, arrive.py, then circuit.py again")
         print(f"done: {done} nefias conquered")

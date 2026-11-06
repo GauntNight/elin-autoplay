@@ -219,7 +219,7 @@ def swarm_round(t, s):
     import threat
     for c in near:
         flags = (threat.profile(c.get("id") or c["name"]) or {"flags": []})["flags"]
-        if "exploder" in flags or "kamikaze" in (c.get("id") or "") or "slime" in (c.get("id") or ""):
+        if "exploder" in flags or "kamikaze" in (c.get("id") or "").replace("samurai_kamikaze", "") or "slime" in (c.get("id") or ""):
             return False
     r = call("cast", spell="ActSwarm", uid=t["uid"])
     return bool(r.get("ok") and (r.get("data") or {}).get("cast"))
@@ -262,7 +262,7 @@ def _fight(trk):
                    "shoot.py) or leave; --force only if it is restrained")
         # run 24: a bomb rock (exploder) took 145 -> 0 HP in melee: exploders are never meleed
         prof0 = threat.profile(t0.get("id") or t0["name"]) or {"flags": []}
-        if "exploder" in prof0["flags"] or "kamikaze" in (t0.get("id") or "") or "kamikaze" in t0["name"].lower():  # run 33: 『Kamikaze yeek』
+        if "exploder" in prof0["flags"] or "kamikaze" in (t0.get("id") or "").replace("samurai_kamikaze", "") or "kamikaze" in t0["name"].lower():  # run 33: 『Kamikaze yeek』
             refuse(f"{t0['name']} is an exploder (threat.py): never adjacent; soak it with a thrown potion and "
                    f"throw from {THRESHOLDS['kamikaze_dist']}+ cells (delve.py does), or step away; --force if restrained")
         # run 26: a slime gang meleed by hand splashed acid on every swing and the night's curses landed too:

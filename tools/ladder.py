@@ -219,13 +219,19 @@ def condition_wait():
     (run 37: ConInsane and ConDim from an Eye of Insanity, gone in 11 turns): single turns while no hostile is in view;
     False (stop) on a hostile, HP under 70%, or 30 turns."""
     from common import BAD_CONDITIONS
+    step_off()  # run 41: a Wait on the arrival stairway takes it (out and back in, the turn count standing still, in a storm's confusion)
     for _ in range(30):
         s = state()
         p = s["pc"]
         if not [c for c in p.get("conditions") or [] if c in BAD_CONDITIONS]:
             print("  condition: cleared")
             return True
-        if any(c.get("hostile") for c in s.get("nearby") or []) or p["hp"] * 100 < 70 * p["maxHp"]:
+        foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
+        # run 41: a Lv5 gangster ended the wait and the circuit at ConDim: foes 10+ levels under me get fought through it
+        if foes and p["hp"] * 100 >= 70 * p["maxHp"] and all((c.get("lv") or 99) <= p["lv"] - 10 for c in foes):
+            if fight_nearest(3):
+                continue
+        if foes or p["hp"] * 100 < 70 * p["maxHp"]:
             return False
         call("act", action="Wait")  # queued: the turn passes over the next frames
         wait_until("frames", n=20, timeout=3000)
@@ -254,6 +260,8 @@ def explore_floor(solo):
         if out.rc == 3 and "LayerShippingResult" in why:
             farmday.close_report()  # run 28: the 05:00 report stopped a floor; it's only a report (wgo closes it too)
             continue
+        if out.rc == 3 and "(Dialog)" in why and stay_in_nefia():
+            continue  # run 41: a step onto the way back asks "Really give up conquering the Nefia?" (Strange Cave, Isolated Cave)
         if out.rc == 3 and why.startswith("hungry") and farmday.eat_one():
             continue  # run 28: delve's hunger stop mid-floor; eat_one refuses with a hostile in view
         # run 36 (Dark Ruin B1): weak wanderers in view cancelled the meal four times and the floor ended Very Hungry:
@@ -380,6 +388,7 @@ def upkeep():
         stop(f"{p.get('sleepText') or 'Sleepy'}: sleep first, on the overworld (never in a dungeon)")
     if p["hunger"] >= 65:
         before = p["hunger"]
+        fight_nearest()  # run 41: a wasp Lv7 in view cancelled both meals and ended the ladder at hunger 67
         print("  meal: " + str(farmday.eat_one()))
         if pc()["hunger"] >= before:
             # run 35 (Damp Cave B2): "not eating: the pack grid is full" ended the ladder at hunger 67 with 114
@@ -452,6 +461,32 @@ def gather_party(near=3, turns=8):
 
 
 def descend(h, solo):
+    """The stairs at x1 (run 41: at x5 the walk to them ended 'stopped' four times and the Enter didn't take, twice stopping a circuit;
+    at x1 stairs.py took the same stairway at once)."""
+    prior = data("speed").get("index")
+    if prior != 1:
+        call("speed", i=1)
+    try:
+        return descend_at_x1(h, solo)
+    finally:
+        if prior != 1:
+            call("speed", i=prior)
+
+
+def see_unseen():
+    """An unseen foe beside me cancels every walk with "Enemy spotted" and no creature in view (run 41: an invisible pumpkin Lv10 on Crumbling
+    Ruin B3 ended the walk to the stairs 4 times): See Invisible once a floor, then what it shows gets fought. True when it may have helped."""
+    if getattr(see_unseen, "tried", None) == zone().get("full"):
+        return False
+    see_unseen.tried = zone().get("full")
+    r = call("cast", spell="SpSeeInvisible")
+    wait_until("frames", n=20, timeout=3000)
+    print(f"  See Invisible: {'cast' if r.get('ok') else r.get('error')}", flush=True)
+    fight_nearest(4)
+    return bool(r.get("ok"))
+
+
+def descend_at_x1(h, solo):
     before = zone().get("full")
     if not solo:
         walk(h["x"], h["z"], r=6, hp=THRESHOLDS["dungeon_hp"], stairs=True, timeout=60000, weak_ok=True)  # stops 6 short
@@ -510,6 +545,8 @@ def descend(h, solo):
                         print(f"  stairs: boxed in; {_t + 1} Teleport cast(s) and the walk took them", flush=True)
                         step_off()
                         return
+            if see_unseen():
+                return descend_at_x1(h, solo)
             stop(f"the walk to the stairs at {h['x']},{h['z']} ended 4 times: {r.get('why')}; stairs.py down: {last(out)[:80]}")
     # run 20: the walk can end beside the stairs (Kaberg on the cell): the stairway's own act walks there
     p = pc()
@@ -531,9 +568,24 @@ def descend(h, solo):
             step_off()
             return
         stop(f"no Enter on the stairway cell {h['x']},{h['z']}: {[a['text'] for a in acts]}")
-    call("do", i=enter[0]["i"])
-    wait_until("zone", timeout=15000)
-    after = zone().get("full")
+    after = before
+    for attempt in range(3):
+        call("do", i=enter[0]["i"])
+        wait_until("zone", timeout=15000)
+        after = zone().get("full")
+        if after != before:
+            break
+        # run 41 (Savage Ruin, Traditional Ruin at x5): a weak foe beside the stairs cancelled the Enter and stopped the whole circuit
+        print(f"  stairs: the Enter didn't take (try {attempt + 1}): clearing the view")
+        fight_nearest()
+        p = pc()
+        if (p["x"], p["z"]) != (h["x"], h["z"]) and walk(h["x"], h["z"], r=1, hp=THRESHOLDS["dungeon_hp"], stairs=True,
+                                                         timeout=30000, weak_ok=True).get("why") == "zone":
+            after = zone().get("full")
+            break
+        p = pc()
+        acts = call("acts", dx=h["x"] - p["x"], dz=h["z"] - p["z"], mode="all")["data"]["acts"]
+        enter = [a for a in acts if a["text"].startswith("Enter")] or enter
     if after == before:
         stop("took the stairs but the zone didn't change")
     # run 20: a wrong --in made the ladder take the way up and then delve the world map
@@ -701,6 +753,18 @@ def chests():
         print(f"  chest opened: {h['name']}: {', '.join(inside) or 'empty'}" + (f"; LEFT (pack full?): {', '.join(left)}" if left else ""))
 
 
+def stay_in_nefia():
+    """Answer No when the game asks whether to give up the conquest. False when the open dialog is something else."""
+    if "give up conquering" not in str(data("texts").get("texts")):
+        return False
+    b = next((x for x in data("buttons")["buttons"] if str(x.get("text", "")).endswith("No.")), None)
+    if not b:
+        return False
+    data("click", i=b["i"], expect="No.")
+    print("  the game asked to give up the conquest: answered No")
+    return True
+
+
 def fight_nearest(max_fights=4):
     """Fight hostiles in view at or under my level, nearest first, with fight.py (run 39: the Hungry deadlock in
     clear_view). True when none is left in view; False on a stronger foe or a fight.py refusal or stop."""
@@ -745,6 +809,8 @@ def clear_view(solo):
             if h.rc == 0:
                 continue
         if out.rc == 3 and "under 70%" in last(out) and spell_heal():
+            continue
+        if out.rc == 3 and "wait it out" in last(out) and condition_wait():  # run 41: ConDim stopped a circuit here
             continue
         if out.rc == 3:
             stop(f"delve stopped clearing the floor's view: {last(out)[:120]}")

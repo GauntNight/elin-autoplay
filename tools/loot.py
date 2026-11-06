@@ -74,7 +74,7 @@ def bag_haul():
     if not haul:
         return 0
     moved = 0
-    for bag in ("loot bag", "spoils bag"):  # run 14: bag 3 takes what the full loot bag refuses
+    for bag in ("loot bag", "spoils bag", "haul bag"):  # run 14: bag 3 takes what the full loot bag refuses; run 41: bag 4
         if not haul or not any(bag in i["name"] for i in items):
             continue
         out = run("bag.py", bag, *haul)

@@ -47,6 +47,15 @@ class Output(str):
     rc = 0
 
 
+# Carried bags' slots (run 41: a bag takes one vertical and one horizontal storage wrench, 7x5 -> 8x6; the game gives no way to read
+# a carried bag's size through the bridge, so the wrenched ones are listed here)
+BAG_SLOTS = {"a loot bag": 48}
+
+
+def bag_slots(name):
+    return BAG_SLOTS.get(name, 35)
+
+
 def setup():
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -236,10 +245,10 @@ THRESHOLDS = {
                             # healed to 98 by the spell; my HP 202 -> 208); run 33: Vernis Mine B5 (10), B6 (11), B7 (12) without a drink from a fight (B6: one teleport from an alien; B7: one drink after a trolley ride, now cancelled by common.ready); the floor gate (delve.py MAX_DANGER); unattended play: one less
                             # (run 24: 8 -> 9 at Lv23 / PV 61 on run 21's danger-8 den, 0 HP lost, no drink;
                             # run 27: 9 -> 10 at Lv26 / HP 198 on the Rustic Ruin's danger-9 B2, 6 HP lost, no drink)
-    "route_max": 12,        # run 21: the worst ambush level wgo.py walks across without --danger-ok (at
+    "route_max": 20,        # run 21: the worst ambush level wgo.py walks across without --danger-ok (at
                             # Lv21: level 9-10 ambushes cost under 10% HP; a level 21 field had a Lv22 golem)
     "unattended_minus": 1,
-    "kamikaze_dist": 4,     # throw at a suicide attacker from this far, never adjacent (run 40: 3 -> 4: a bomb rock's blast
+    "kamikaze_dist": 5,     # throw at a suicide attacker from this far, never adjacent (run 41: 4 -> 5: Warped Ruin B5 262 -> 142 through a throw; run 40: 3 -> 4: a bomb rock's blast
                             # on Ominous Forest B1 took 234 -> 115, 49%, through delve's own throw; run 35's took 58%)
     "swarm": 6,             # 6+ hostiles, or 4+ with one at or above my level: teleport and leave
     "swarm_above": 4,
