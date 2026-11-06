@@ -204,7 +204,7 @@ def route(name):
     low = norm_name(name)
     from common import hammer_scrap
     if hammer_scrap(name):  # run 13: the hammer breaks it into scrap (tools/scrap.py)
-        return BOX_STR(home.PARTS_BOX), "Parts box (scrap junk: break it with tools/scrap.py)"
+        return BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5), "Parts box (scrap junk: break it with tools/scrap.py; the yard's wagon when full, run 42)"
     # run 34 (the user: "Careful Raw Food Weapons/Armor are not things to eat", "Don't throw it away if it rots"):
     # gear made of the "raw food" material rots like food ("A Rotten Raw Food Claw") and matched JUNK's "rotten";
     # unidentified things (a capitalized name, a quality tag) and gear never go to the trash

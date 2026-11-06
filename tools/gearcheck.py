@@ -41,6 +41,12 @@ def slot_of(name):
             if off and off[0]:
                 return "weapon"
             return next((s for s, rx in SLOTS if re.search(rx, str(row.get("category")))), None)
+    # run 42: a bardish, a corset and a dog tail read as no slot and stayed unread: the longest base name of the game's table in the piece's name decides
+    wears = {"head": "head", "torso": "body", "waist": "waist", "back": "back", "foot": "foot", "arm": "hand", "shield": "shield", "amulet": "neck", "ring": "ring"}
+    hits = [k for k, r in _THINGS().items() if (r.get("defense") or r.get("offense")) and re.search(rf"\b{re.escape(k)}\b", n)]
+    if hits:
+        row = _THINGS()[max(hits, key=len)]
+        return wears.get(row.get("category"), "weapon" if row.get("offense") else None)
     return None
 
 

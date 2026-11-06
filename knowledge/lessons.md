@@ -26,13 +26,14 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 - A refusal I want past gets changed with its reason written, or obeyed: never overridden in the moment. `--danger-ok`, `--food-trip` and `--weak-ok` each cost deaths in the Start Runs, all under time pressure; the PV 15 change at Lv3 cost both scrolls and the ally, and the one that went well (a food trip at hunger 71) proves nothing. (Start Run 7) (review 2026-11-05)
 - A file cut to its last line hides what a check showed: a tool's output that decides something gets read whole; the two guns were recorded as read when they weren't, and in Start Run 7 `cut -c1-90` turned ConWet into "cond C", which I read as poison and blamed on rice. (40) (review 2026-11-05)
 - A claim about what I compared stands only if I compared it: "none are better" was written over 14 pieces whose lines I never read. (40)
-- Trip food for a long night is bought or cooked dishes, not raw crops: the Cooler Box slows rot, it doesn't stop it
-  (fact #1169). (39)
-- To Lumiest, Fast Travel from home (fact #1168), never a walk: the game's path swings east from the west too
-  (Palmia -> Lumiest took 3.3 days) and onto level 24-28 tiles from the north (74,99). (39)
+- A long job with nobody reading its log isn't running, it's unknown: one soil block held a floor for 17 real minutes while I waited on a completion notice, and the user saw it first. Every circuit gets a watcher on its log, matching the stops too, from the first minute. (42)
+- A mover written in the scratchpad skips what the repo's tools learned: mine grabbed the top thing on a cell holding two, and a wall torch shipped. Anything that moves items goes through a tool with the name check. (42)
+- Two tools at once on the bridge can both fail: a route plan run during a dig timed out. Read nothing heavy (`digmap --plan`, `journal.py`, boxes) while a loop runs. (42)
+- A question from the player is often a finding: "do you carry that intentionally?" turned up the better sword (against plated foes of my level 22.9 -> 54.4 a turn by the card, gearcompare.csv) and a method for every later piece. Answer it, then ask what else that blind spot covers. (42)
 
 ## Promoted (where the older lessons live now)
 
+- run 42 triage (the run-39 lessons): trip food for a long night is bought or cooked dishes -> fact #1169; to Lumiest by Fast Travel, never a walk -> fact #1168
 - run 41 triage (the run-38 lessons): base 3-8 for unattended circuits -> circuit.py's --danger and a fact; a Short Teleport beside the exploder -> cast.py stops on an exploder inside 3 cells; the first Enter ignored after wgo.py -> a fact; look in every box before buying -> stock.py --find; chest furniture and stones -> purge.py's lists and Burden stops
 - Start Runs 5-7: long trips before food and armor (the user) -> roam.road_ready; starving on the way to food -> earlyday RESERVE_MEALS; a scroll unread at 0 HP -> roam.escape; a demand paid unread -> roam.KEEP; jobs under Lv4 -> board.py's PV 15 and 2 scrolls; stale per-character lists -> trial.py start
 - the level 1 trials (Start Runs 1-4): armor before arenas and no caves under Lv10 -> board.py --take and arena.py --any refuse, elin-opening's fast path; a flee that doesn't move -> leave.py; a death prompt -> common.crawl_up and close.py; a demand paid unread -> roam.py KEEP; full pack -> earlyday.tidy JUNK_FULL; paid recipes re-crafted -> tickets.py
