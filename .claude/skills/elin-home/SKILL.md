@@ -251,6 +251,10 @@ fruit; it burns a branch from the pack), fishing from 48,41 (bait from offal or 
 (pigs, ducks, goats: corpses, and skins 1 in 10). Keep 3+ days in the Cooler Box; buy in Mysilia
 only when the farm can't cover a trip.
 
+**Platinum before a craft push** (the user, 2026-11-06: "you should enhance the skills so they level easier"; fact #1296): a trainer's +10 potential is
+temporary and wears down with each level-up of that skill, so train it right before the crafts, not months ahead: under skill 10, +200 costs 30 platinum and
+cuts the SP to a level by about 40% at first. Ceroyon (Olvina) and Frealord (Palmia) train the craft skills; the coins must be carried. `bridge.py skills` prints `pot`.
+
 **Income at home:** first-time crafts pay old tickets (`firstcraft.py STATION [--craft]`; 114 orens
 each in Mysilia); ☆ gear and valuables ship for more than a shop pays and each one also feeds the
 hearth (level 2); home board supply jobs.
