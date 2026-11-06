@@ -51,7 +51,8 @@ damage, the pet's gear), **Story** (main and side quests).
    knows the game: their tips (G1: the secretary trades influence for tickets) go in with credit.
 3. **Find the binding resource and every source of it**, with a rate: G1's chain is quests in
    Mysilia → influence → tickets at the secretary (~1 each) → ~13 tickets → the chest.
-4. **Estimate** the total and the time (sessions, trips) from the rate; say which numbers are
+4. **Estimate** the total and the time (sessions, trips) from the rate; a skill target's SP comes from
+   fact #1297 before it is proposed (2026-11-06: my Carpentry 20 was ~3,400 SP; the user took 12); say which numbers are
    guesses until M0.
 5. **Milestones:** verify → accumulate → convert → install or use → confirm the benefit (the
    measure moved).
