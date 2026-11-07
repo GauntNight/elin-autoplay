@@ -369,6 +369,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                   "danger 1-2 only"; an explicit N may raise it)
 - **`hygiene.py`**: Drift check for the repo (the review of 2026-10-19 set the baseline; the review of 2026-10-23 added the enforcement, age and threshold checks). Run at every close-out: it prints what has crept back since, so a full review is needed every 10-20 runs, not every one.
     usage: python -I tools/hygiene.py        exit 0 when clean, 1 with findings (advisory at close-out)
+- **`identifyall.py`**: Have a mage identify everything in the pack and bags in one step (run 43: done by hand on each pass of Tinker's Camp since run 08: a talk, three clicks, a Bye). Reads the price from the dialog and stops over MAX. Godly pieces aren't covered: the mage's artifact service does those, one at a time, and only when the slot can beat what's worn (elin-pack 3).
+    usage: python -I tools/identifyall.py [NAME=Aliyun] [MAX=1500]   stand near NAME (at Tinker's Camp: bridge.py walkto 60 55)
+    Exit 0 done (or nothing to identify), 1 refused (not in view, no such service), 3 a dialog that didn't read as expected.
 - **`invest.py`**: Invest in a shopkeeper's shop (G26, the Merchants Guild: run 29) when the price is low enough.
     usage: python -I tools/invest.py NAME [MAX=600] [TIMES=1]
     Exit 0 invested (or priced over MAX: the price is printed), 1 refused (not in view, no Invest choice), 3 a
@@ -655,6 +658,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/steal.py [R=20] [--all]     the marks in reach, best contribution first (liftable,
                                                        contribution 2+; --all lists everything)
            python -I tools/steal.py take UID [UID ...] [--max-lv 14] [--skip]
+           python -I tools/steal.py auto TARGET [R=60] --bold    in Derphy only: the marks best first until their contribution adds up to TARGET (run 43, G32:
+                                                       at DEX 61 a plain townsperson needs PER over 30 to notice at all, so the old levels and the sneak guard refused nearly every mark;
+                                                       Derphy has no guards: a witness who does notice only turns hostile)
       take: walks beside each thing, refuses while an awake possible witness of level >= --max-lv stands
       within 4 (their PER is unknown to the bridge; a level stands in for it), casts Sleight of Hand on it
       through the bridge (0.34.0 `cast spell=AI_Steal uid=N` takes things), waits the task out and reports
@@ -743,6 +749,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Exit: 0 done (or shown), 1 refused, 2 the bridge.
 - **`tunnel.py`**: Mine a way through when a floor looks closed (the user, run 42: "looks like you may be stuck in the dirt, may need to mine to get a path"; one soil block at 14,15 of Boring Cave B4 held 17 real minutes and a game day and a half of "delve: step limit"). Reads the explored cells, floods from me over open ground, and finds the cheapest run of walls to open ground I can't reach (the magic map shows plenty); with none known, to the nearest unexplored cell. Then it holds the pickaxe and mines that run, nearest wall first.
     usage: python -I tools/tunnel.py [--max N=6] [--dry]    at most N walls; --dry prints the plan
+           python -I tools/tunnel.py --to X,Z [--max N=8]   dig the cheapest way to that cell, through unexplored cells too (run 43: Traditional Cave B4's stairs lay
+                                                            magic-mapped in a closed room, one soil block and a dark cell from the corridor, and stopped a circuit)
     Exit 0 dug (or "nothing to dig": no wall leads anywhere), 1 refused (no pickaxe, a window), 3 stopped (a hostile, a wall too hard, SP).
 - **`unlock.py`**: Open a locked chest in the pack (run 42: treasure-map chests can come locked, "a cool mystic treasure chest" at lock 21; a locked chest lists as empty, and digmap.py and chests.py --field took that for empty: one was dropped on a field with its contents inside). The game's Open starts a timed task, and the next command cancels it ("You give up opening"), so each try waits for the task to end. A failed try costs no charge and no item without a lockpick; it can be tried again.
     usage: python -I tools/unlock.py [NAME] [TRIES=8]    NAME: part of the chest's name (default: the first locked chest in the pack)
@@ -819,6 +827,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Exit 0 target or time reached, 1 refused (not on a field map, no axe), 3 stopped.
 - **`wrecks.py`**: Mine every wreck on the explored map with the pickaxe and pick up what drops (run 06: five wrecks on one floor of Spiritual Cave; wrecks give gems, scrap, fiber, bolts, logs).
     usage: python -I tools/wrecks.py [R=60] [min_hp_pct=70] [min_sp=5]
+- **`yardchests.py`**: Bring in the treasure chests lying loose on the home map (run 43: seven from Poppy's Treasure Hunt lay in the yard, about 2,000 orens, 3 bars and 2 medals each; elin-home said arrive.py picked them up, and no tool did). One at a time, on its own cell: item.py takes the first of a name, and a locked twin in the pack stops chests.py (run 42). A locked one goes through unlock.py in the pack (a loose chest has no Pick Lock act) and back on its cell if it won't open.
+    usage: python -I tools/yardchests.py [--dry]     --dry lists them with their locks and moves nothing
+    Exit 0 done (or none), 1 refused (not at home), 3 stopped (home_guard's stops, chests.py's stop).
 - **`zap.py`**: Zap a carried rod on myself N times (run 14: Magic Device, a new skill, levels with every zap). Only rods that are harmless on oneself: holy shield, holy light, cure ..., keeping KEEP charges.
     usage: python -I tools/zap.py "rod of holy shield" [N=5] [--keep K=3]
     Opens the backpack (where the rods ride), holds the fullest stack of the rod (common.grab, a

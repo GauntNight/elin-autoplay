@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, last, refuse, run  # noqa: E402
+from common import call, data, last, refuse, run, stop  # noqa: E402
 
 STOLEN = Path(__file__).resolve().parent.parent / "runs" / "stolen.txt"
 
@@ -39,10 +39,18 @@ def main():
     if "--dry" in sys.argv:
         print("\n".join(names))
         return
+    # run 43: purge's unclutter and a full grid put thefts in the bags, and the shop's list shows only the pack: 15 of 27 "not sold"
+    wanted = {base(n) for n in names}
+    for bag in data("stock", r=0)["pack"]:
+        hits = [x["name"] for x in bag.get("items") or [] if base(x["name"]) in wanted]
+        if hits:
+            run("bag.py", bag["name"], "--take", *hits[:8])
+            run("close.py")
     out = run("shop.py", args[0], "--keep-open", timeout=300)
     if out.rc != 0:
         refuse(f"shop.py: {last(out) or out.rc}")
-    sold, left, gold = [], [], 0
+    sold, left = [], []
+    gold0 = data("state")["pc"].get("gold")
     for name in names:
         bs = call("buttons", all=True)["data"]["buttons"]
         hit = [b for b in bs if "inventory grid" in (b.get("name") or "") and b.get("mine") is not False
@@ -61,6 +69,10 @@ def main():
     run("close.py")
     run("talk.py")
     STOLEN.write_text("\n".join(left) + ("\n" if left else ""), encoding="utf-8")
+    # run 43: 14 "sold" with the gold, the guild total and the pack unchanged: a sale counts only when the purse moved
+    if sold and data("state")["pc"].get("gold") == gold0:
+        STOLEN.write_text("\n".join(left + [s.split(" (Sell")[0] for s in sold]) + "\n", encoding="utf-8")
+        stop(f"{len(sold)} Sell acts and the gold didn't move: the shopkeeper asleep or out of money? Nothing sold")
     print(f"sold {len(sold)}: " + "; ".join(sold))
     if left:
         print(f"not sold (not in the pack grid? bagged?): {', '.join(left)}")

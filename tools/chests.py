@@ -122,6 +122,11 @@ def main():
             run("item.py", NAME, "Close")
             print("  " + last(run("packcheck.py", "--move", timeout=300)))
             if free_cards() < min(3, len(items)):
+                # run 43: four stops in a row: unidentified pieces and rods sat in the grid with the bags half empty
+                import purge
+                purge.unclutter()
+                run("close.py")
+            if free_cards() < min(3, len(items)):
                 stop(f"{free_cards()} free cards for {len(items)} stacks: a chest stays closed in the pack")
             out = run("bag.py", NAME)
             items = split_listing(last(out))

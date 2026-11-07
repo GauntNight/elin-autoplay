@@ -19,7 +19,7 @@ gear. The user's rule (run 08): **the pack is for the trip; everything else live
 | pack | scroll of evacuation, scroll of return | 1 each |
 | pack | cure minor wound, plus one cure major | 5+ potions |
 | pack | the makeshift bed (road sleep with `sleep.py`; the bag burned in run 12) | 1 |
-| pack | lockpick (locked boss and map chests: about 3 charges a chest in run 42) | 5+ charges (the user, 2026-11-06): leave.py refuses under 5 while storage holds a pick, else warns. No station makes one, needles included (fact #1329): shops only, stock at random, 330-780 (Sayig or Sesa in Aquli Teola, Gizbird in Mysilia, Tarraf in Palmia, Alecgan in Noyel, Kerona in Derphy) |
+| pack | lockpick (locked boss and map chests: about 3 charges a chest in run 42) | 5+ charges (the user, 2026-11-06): leave.py refuses under 5 while storage holds a pick, else warns. No station makes one, needles included (fact #1329): shops only, stock at random, 330-780 (Sayig or Sesa in Aquli Teola, Gizbird in Mysilia, Tarraf in Palmia, Alecgan in Noyel, Kerona in Derphy). **Kerona is the surest** (Derphy B1 ~64,66: one on both visits of run 43, none at Gizbird, Sesa or Tarraf), and **a run spends about 15 charges**: the ladder's boss chests took 5 in 2.5 real hours, Poppy's yard chests 5 more |
 | pack | fireproof blankets with charges left (each charge saves the pack's items from one fire, fact #862) | 3 (the user, 2026-10-26 and 2026-10-30): leave.py refuses under 3 while storage holds one. None left: the loom first (5 textures + 4 carbon logs from the kiln), since shops stock them at random (Sesa or Sayig in Aquli Teola, Gizbird in Mysilia, ~360) |
 | waivers | `--blanket-ok 'why'`, `--pick-ok 'why'`, ladder's `--kit-ok 'why'` | a reason is required, and each use or short departure writes a row to `runs/waivers.csv` for the close-out (the user, 2026-11-06: run 42 waived the blankets on every circuit: 21 ladder starts on one, 14 on none, and said so only at the end) |
 | pack | one throwable status potion (silence, slow): soaks kamikaze yeeks | 1-2 |
@@ -82,7 +82,7 @@ the pack every game hour, and Aliyun at Tinker's Camp identifies the pack for 45
 or ship one unidentified: Kerona paid 1-14 for Miracle gear that sold for 163-213 identified.
 
 **On return, in this order:**
-1. Identify (Aliyun, or wait for Appraising): **Godly items need the artifact identify (660 in run 16;
+1. Identify (Aliyun, `identifyall.py` beside him, or wait for Appraising): **Godly items need the artifact identify (660 in run 16;
    it gave ☆The Immortal Necklace: no blindness, fear or thieves), Miracle and Good ones the
    identify-all (132-264, it covers the carried bags)**; unidentified items sell for 1-15, so identify
    before shipping (the user, run 15). Equip what beats worn gear (`item.py X info`, compare

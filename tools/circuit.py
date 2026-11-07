@@ -243,6 +243,14 @@ def main():
             run("purge.py", "--free", "3", timeout=600)
             clear_weak()
             ev = run("evac.py", timeout=900)
+            # run 43 (Warded Ruin B2): a hot guy clear_weak won't touch stopped the circuit at the conquered floor: the table's answer is a teleport, then the scroll
+            for _ in range(2):
+                if ev.rc != 1 or "hostile" not in str(ev):
+                    break
+                t = run("item.py", "scrolls of teleport", "Read", timeout=60)
+                print(f"  a foe in view at the evacuation: teleport ({last(t)[:40]})", flush=True)
+                wait_until("frames", n=15, timeout=2000)
+                ev = run("evac.py", timeout=900)
             if ev.rc != 0 or not on_world():
                 stop(f"evac.py rc {ev.rc}: {last(ev)[:120]} (get out by hand: stairs.py up)")
             if done % UNLOAD_EVERY == 0 and done < n:

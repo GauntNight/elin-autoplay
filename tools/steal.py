@@ -14,6 +14,9 @@ only Derphy town, Port Kapul and my own land buy them (Siyun in Derphy, ~95,81).
 usage: python -I tools/steal.py [R=20] [--all]     the marks in reach, best contribution first (liftable,
                                                    contribution 2+; --all lists everything)
        python -I tools/steal.py take UID [UID ...] [--max-lv 14] [--skip]
+       python -I tools/steal.py auto TARGET [R=60] --bold    in Derphy only: the marks best first until their contribution adds up to TARGET (run 43, G32:
+                                                   at DEX 61 a plain townsperson needs PER over 30 to notice at all, so the old levels and the sneak guard refused nearly every mark;
+                                                   Derphy has no guards: a witness who does notice only turns hostile)
   take: walks beside each thing, refuses while an awake possible witness of level >= --max-lv stands
   within 4 (their PER is unknown to the bridge; a level stands in for it), casts Sleight of Hand on it
   through the bridge (0.34.0 `cast spell=AI_Steal uid=N` takes things), waits the task out and reports
@@ -131,13 +134,53 @@ def take(uid, max_lv):
             print(f"{p['name']}: cancelled by the sneak guard ({sn['lastStop']})")
             call("sneak", r=5)  # resets lastStop
             return 0
+        if SKIP:  # run 43: a bookshelf's contents came out instead of the shelf: a log with no line for the mark isn't a reason to end the batch
+            print(f"{p['name']}: no theft in the log; next mark")
+            return 0
         stop(f"no theft in the log for {p['name']}: check witnesses (cancelled?)")
+    return 0
+
+
+def auto(target, r):
+    """Run 43: best contribution first, nearest among equals, until the sum reaches target. A named witness blocks from Lv15 as always (a unique's PER counts double: Monazess Lv26 caught
+    the first theft beside her and turned hostile), anyone else from Lv45."""
+    global SKIP
+    SKIP = True
+    z = (data("state").get("zone") or {}).get("full") or ""
+    if "derphy" not in z:
+        refuse("--bold only in Derphy: no guards there; anywhere else a witness calls one (run 33: Olno, Lv40)")
+    call("sneak", r=0)
+    from activity import mark
+    mark("thief", "start", note=f"auto {target}")
+    got, tried = 0, set()
+    try:
+        while got < target:
+            before = TAKEN
+            ps = [p for p in props(r)["props"] if p.get("liftable") and p.get("contribution", 0) >= 2 and p["uid"] not in tried]
+            if not ps:
+                print("no marks left in reach")
+                break
+            me = data("state")["pc"]
+            p = max(ps, key=lambda q: (q["contribution"], -max(abs(q["x"] - me["x"]), abs(q["z"] - me["z"]))))
+            tried.add(p["uid"])
+            take(p["uid"], 45)
+            if TAKEN > before:
+                got += p["contribution"]
+                print(f"  {got}/{target} from {TAKEN} thefts", flush=True)
+    finally:
+        mark("thief", "end", note=f"{TAKEN} stolen, +{got} when sold")
+    print(f"auto: {TAKEN} thefts, +{got} when sold (fence.py SIYUN)")
     return 0
 
 
 def main():
     setup()
     args = [a for a in sys.argv[1:]]
+    if args and args[0] == "auto":
+        if "--bold" not in args:
+            refuse("auto needs --bold, for Derphy")
+        nums = [int(a) for a in args[1:] if a.isdigit()]
+        return auto(nums[0] if nums else 82, nums[1] if len(nums) > 1 else 60)
     max_lv = 14
     if "--max-lv" in args:
         i = args.index("--max-lv")

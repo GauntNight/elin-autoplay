@@ -210,7 +210,7 @@ then up with `--height` (the torch at 62,50 sits at +4; +7 was too high, +0 on t
   - **Treasure maps go in the shared Maps box (55,56)**, distribution off: Poppy's Treasure Hunt
     turns one into a mystic treasure chest (run 19: two in ~36 days, ~3,860 orens, 3 gold bars,
     3 Small Medals, a Godly breastplate). The chest drops by Poppy (no shared box takes it);
-    arrive.py's mail step picks it up; open it from the pack and quick-save.
+    `yardchests.py` (in arrive.py since run 43: seven lay in the yard, because this line claimed a pick-up no tool did) opens and empties each. **She locks them too** (16-31): keep the lockpick stocked.
 
 ## 7. Days at home (elin-home-loop, folded in after run 12)
 

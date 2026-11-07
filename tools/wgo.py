@@ -70,7 +70,11 @@ def meal_stop():
         fed = farmday.eat_one() or fed
         if call("state")["data"]["pc"]["hunger"] < THRESHOLDS["eat_at"] - 15:
             break
-    run("leave.py", "--riding-ok", timeout=300)
+    # run 43: a meal stop on a conquered nefia's tile went down its stairs, and leave.py found no edge: "not moving", a stopped circuit
+    if (call("state")["data"].get("zone") or {}).get("nefia"):
+        run("stairs.py", "up", timeout=300)
+    else:
+        run("leave.py", "--riding-ok", timeout=300)
     print(f"  meal stop: {fed or 'nothing eaten'}")
     # run 27: this said "no meal in the Cooler Box" when eat_one refused a full pack grid; its own line says why
     return None if fed else "nothing eaten (eat_one's line above says why: no meal, a full grid, a hostile)"
@@ -136,7 +140,8 @@ def handle_ambush(_retry=False):
             break
         # run 21: foes 12+ levels under mine don't make a swarm (THRESHOLDS swarm_weak_below)
         counted = [c for c in foes if (c.get("lv") or 0) > p["lv"] - THRESHOLDS["swarm_weak_below"]]
-        n = len(counted) + (len(foes) - len(counted)) // 2 + max(0, total - len(foes))  # far weaker ones count half
+        tiny = sum(1 for c in foes if (c.get("lv") or 0) <= p["lv"] - THRESHOLDS["swarm_ignore_below"])  # run 43: twelve Lv4 geese
+        n = len(counted) + (len(foes) - len(counted) - tiny) // 2 + max(0, total - len(foes))  # far weaker ones count half, the tiny none
         above = any((c.get("lv") or 0) >= p["lv"] for c in foes)
         if n >= THRESHOLDS["swarm"] or (n >= THRESHOLDS["swarm_above"] and above):
             return f"swarm: {n} hostiles in view ({'one at or above my level' if above else 'all below me'}): teleport, then leave.py --force"

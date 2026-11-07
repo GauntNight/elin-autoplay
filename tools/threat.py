@@ -166,6 +166,9 @@ def avoid(c, my_lv):
         return False
     if c["lv"] >= my_lv - THRESHOLDS["avoid_levels"]:
         return True
+    # run 43: a master 『Lizardman』 Lv19 stopped a circuit at Lv38, then died in 11 turns for 3 HP at PV 40 (weakened)
+    if c["lv"] <= my_lv - THRESHOLDS["avoid_ignore_below"]:
+        return False
     # only fights fought within 3 levels of mine count: run 17's 45% lizardmen were at Lv18 and cost 0-7 HP at Lv30
     worst = 0
     path = ROOT / "knowledge" / "fights.csv"

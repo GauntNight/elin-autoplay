@@ -165,13 +165,14 @@ Read elin-play first (rule zero). Ask `kb.py facts Mysilia` for current prices a
   Heavy finds go home in the town's delivery box (Mysilia 56,82); containers can't go in it.
 - Olvina's board in run 06 had two music jobs (Wyward's "Baby!", "Performer wanted"): `perform.py
   harp ... --past` in the Concert Hall; +1 influence and platinum each.
+- **Thefts for the Thieves Guild (run 43):** `steal.py auto TARGET 60 --bold` in Derphy town only (no guards there): at DEX 61 a plain townsperson can't notice (rnd(PER x 2.5) against Pickpocket + DEX), so 66 thefts went through in minutes; a named witness still blocks from Lv15 (Monazess Lv26 caught one and stayed hostile). Sell to Siyun (~95,81; asleep at 05:37 and 13:04, trading at 19:37 and 23:56) with `fence.py Siyun`; Leoban on B1 refuses a high-karma buyer ("a straight-laced adventurer"). Karma -1 a theft: stop around 20. The clerk Monazess stands near 72,71 on B1.
 - **Derphy** (16,116): a ring of cliffs; enter through 21,115 -> 21,114 -> 20,114 -> 19,114 ->
   18,115 -> 17,116 (`wgo.py Derphy` paths around the cliff). No guards, pickpockets. The
   Thieves' Guild (stairs 68,73 in the pub, doorman Anastazija; member since 485-12-10, run 07). The
   **Lockpicking trainer is Nornack in the surface pub's west room (~57,73)**, no guild needed; the guild
   trainer Gizhert teaches only Gun, Marksman, Greater Evasion, Pickpocket. In the guild (level -1) the
   clerk Monazess has "Where is..." (Kerona's shop, Leoban's black market, the trainer). Kerona sells
-  lockpicks (restocks every ~5 days: 8-20 charges, 270-410), scrolls of incognito (123), one cure
+  lockpicks (restocks every ~5 days: 8-20 charges, 270-410; ~64,66 on B1, run 43), scrolls of incognito (123), one cure
   critical, small gamble chests (lock training, 115-160). Board jobs: Derphy takes criminals, but
   clients wander and can't be found (run 07's ale job). **Pickpockets: about 90 gold an hour on the
   surface** (rogues): shop and leave. Fast travel needs rations; Derphy's innkeeper wasn't found.

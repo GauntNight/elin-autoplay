@@ -90,7 +90,9 @@ def swarm(foes, lv, total=None):
     counted = [c for c in foes if (c.get("lv") or 0) > lv - THRESHOLDS["swarm_weak_below"]]
     # run 21: twelve Lv4-8 foes at Machinarium B3 took 140 -> 106 and passed the full exclusion: far
     # weaker ones count half (12 of them make 6, a swarm; run 21's crowds of 6-7 make 3)
-    n = len(counted) + (len(foes) - len(counted)) // 2 + max(0, (total or 0) - len(foes))
+    # run 43: 25+ levels under mine (twelve Lv4 geese at Lv37) don't count at all
+    tiny = sum(1 for c in foes if (c.get("lv") or 0) <= lv - THRESHOLDS["swarm_ignore_below"])
+    n = len(counted) + (len(foes) - len(counted) - tiny) // 2 + max(0, (total or 0) - len(foes))
     above = sum(1 for c in foes if (c.get("lv") or 0) >= lv)
     if n >= THRESHOLDS["swarm"] or (n >= THRESHOLDS["swarm_above"] and above):
         weak = len(foes) - len(counted)
@@ -289,7 +291,13 @@ def main():
                 # first whatever is in hand, then soak if there is a potion, else throw from range
                 d = step_away(t) if t["dist"] < THRESHOLDS["kamikaze_dist"] else t["dist"]
                 if d <= 1:
-                    halt(f"{t['name']} adjacent and no room to step away: a hit from here is a blast (teleport, or fight by hand)")
+                    # run 43 (Ominous Forest B1): this stop ended a circuit for a Lv6 yeek; the table's answer is a teleport, so read it
+                    out = run("item.py", "scrolls of teleport", "Read", timeout=60)
+                    if out.rc:
+                        halt(f"{t['name']} adjacent and no room to step away: a hit from here is a blast, and no teleport: {last(out)[:60]}")
+                    print(f"  {t['name']} adjacent and no room to step away: read a teleport", flush=True)
+                    wait_until("frames", n=10, timeout=2000)
+                    continue
                 if pot:
                     run("throw.py", tname, pot, "1", "50")
             # Open at range with the Putit In Amber (2d8+3, cold + lightning: my best ranged hit;

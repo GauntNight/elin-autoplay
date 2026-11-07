@@ -3,6 +3,8 @@ held 17 real minutes and a game day and a half of "delve: step limit"). Reads th
 can't reach (the magic map shows plenty); with none known, to the nearest unexplored cell. Then it holds the pickaxe and mines that run, nearest wall first.
 
 usage: python -I tools/tunnel.py [--max N=6] [--dry]    at most N walls; --dry prints the plan
+       python -I tools/tunnel.py --to X,Z [--max N=8]   dig the cheapest way to that cell, through unexplored cells too (run 43: Traditional Cave B4's stairs lay
+                                                        magic-mapped in a closed room, one soil block and a dark cell from the corridor, and stopped a circuit)
 Exit 0 dug (or "nothing to dig": no wall leads anywhere), 1 refused (no pickaxe, a window), 3 stopped (a hostile, a wall too hard, SP).
 """
 import heapq
@@ -11,7 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import cells, grab, pc, ready, refuse, run, setup, state, stop, top, walk_beside  # noqa: E402
+from common import cells, grab, pc, ready, refuse, run, setup, state, stop, top, walk, walk_beside  # noqa: E402
 
 NEAR = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
@@ -82,9 +84,13 @@ def plan(info, bounds, me):
                 continue
             c = info.get(m)
             if c is None:
-                # unexplored: remember the nearest as the fallback
-                if frontier is None or cost < frontier[0]:
-                    frontier = (cost, m, n)
+                # unexplored: the fallback. Run 43 (Bewitching Cave B2): "the nearest" dug along the map's edge three times with the
+                # dark middle of the floor unread: walls count against a cell, the unexplored cells around it for it, and never by the edge
+                if x0 + 2 < m[0] < x1 - 2 and z0 + 2 < m[1] < z1 - 2:
+                    dark = sum(1 for ax in range(m[0] - 5, m[0] + 6) for ay in range(m[1] - 5, m[1] + 6) if info.get((ax, ay)) is None)
+                    score = cost - dark * 0.1
+                    if frontier is None or score < frontier[0]:
+                        frontier = (score, m, n)
                 continue
             if is_open(c):
                 step = 0
@@ -97,7 +103,7 @@ def plan(info, bounds, me):
                 prev[m] = n
                 heapq.heappush(heap, (cost + step, m))
     end = target
-    if end is None and frontier is not None and frontier[0] > 0:
+    if end is None and frontier is not None and best.get(frontier[2], 0) > 0:
         end = frontier[2]  # the last wall before the dark
     if end is None:
         return [], len(seen), None
@@ -110,12 +116,95 @@ def plan(info, bounds, me):
     return walls, len(seen), (size[pieces[target]] if target else 0)
 
 
+def reach(info, me):
+    seen, todo = {me}, [me]
+    while todo:
+        x, y = todo.pop()
+        for dx, dy in NEAR:
+            n = (x + dx, y + dy)
+            if n not in seen and is_open(info.get(n)):
+                seen.add(n)
+                todo.append(n)
+    return seen
+
+
+def path_to(info, bounds, me, goal):
+    """The cheapest way from what I can reach to a cell beside `goal`, walls and dark cells at 1 each: [(cell, the cell before it), ...], the cells to open."""
+    x0, z0, x1, z1 = bounds
+    seen = reach(info, me)
+    best = {n: 0 for n in seen}
+    heap = [(0, n) for n in seen]
+    heapq.heapify(heap)
+    prev = {}
+    while heap:
+        cost, n = heapq.heappop(heap)
+        if cost > best.get(n, 1e9):
+            continue
+        if max(abs(n[0] - goal[0]), abs(n[1] - goal[1])) <= 1:
+            out = []
+            while n in prev:
+                out.append((n, prev[n]))
+                n = prev[n]
+            return list(reversed(out)), len(seen)
+        for dx, dy in NEAR:
+            m = (n[0] + dx, n[1] + dy)
+            if not (x0 < m[0] < x1 and z0 < m[1] < z1):
+                continue
+            c = info.get(m)
+            step = 1 if c is None else 0 if is_open(c) else 1 + min(int(c.get("blockHard") or 0), 100) / 1000 if mineable(c) else None
+            if step is None or cost + step >= best.get(m, 1e9):
+                continue
+            best[m] = cost + step
+            prev[m] = n
+            heapq.heappush(heap, (cost + step, m))
+    return None, len(seen)
+
+
+def dig_to(goal, most, dry):
+    p = pc()
+    info, bounds = read_floor()
+    path, reached = path_to(info, bounds, (p["x"], p["z"]), goal)
+    if path is None:
+        print(f"nothing to dig: {reached} cells in reach and no way to {goal[0]},{goal[1]}")
+        return 1
+    print(f"{reached} cells in reach; {len(path)} cell(s) to {goal[0]},{goal[1]}: " + " ".join(f"{x},{z}" for (x, z), _ in path))
+    if dry:
+        return 0
+    if len(path) > most:
+        print(f"over --max {most}: not digging")
+        return 1
+    for (x, z), (bx, bz) in path:
+        why = ready(hp=60, hunger=None, burden=None)
+        if why and "held" not in why:
+            stop(f"not mining: {why}")
+        w = walk(bx, bz, r=0, weak_ok=True)
+        q = pc()
+        if (q["x"], q["z"]) != (bx, bz):
+            stop(f"the walk to {bx},{bz} ended: {w.get('why')}")
+        c = cells([(x, z)]).get((x, z)) or {}
+        if is_open(c):
+            continue
+        if not grab("pickaxe", prefer=None):
+            run("hotbar.py", "--deselect", timeout=30)
+            refuse("no pickaxe in the pack")
+        out = run("harvest.py", str(x - bx), str(z - bz), timeout=120)
+        print(f"  {x},{z}: " + (re.sub(r"\s+", " ", str(out))[-90:]))
+        if out.rc:
+            run("hotbar.py", "--deselect", timeout=30)
+            stop(f"harvest.py at {x},{z}: rc {out.rc}")
+    run("hotbar.py", "--deselect", timeout=30)
+    return 0
+
+
 def main():
     setup()
     args = sys.argv[1:]
-    most = int(args[args.index("--max") + 1]) if "--max" in args else 6
+    most = int(args[args.index("--max") + 1]) if "--max" in args else (8 if "--to" in args else 6)
     if top():
         refuse(f"{top()} is open")
+    if "--to" in args:
+        gx, gz = args[args.index("--to") + 1].split(",")
+        return dig_to((int(gx), int(gz)), most, "--dry" in args)
     p = pc()
     info, bounds = read_floor()
     walls, reached, beyond = plan(info, bounds, (p["x"], p["z"]))

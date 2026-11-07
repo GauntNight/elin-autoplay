@@ -5,7 +5,8 @@ order, with the Dishes box shared first. leave.py made it private on the way out
   2. dishes.py share: at home the residents eat only from shared boxes, with no free meal (#685);
      then a drained attribute or a harmful mutation gets its potion (cure(): run 35)
   3. packcheck.py --move: the pack, the backpack and the Cooler Box against the trip kit
-  4. unpack.py: the mail (packages are listed; the storage bins are left out); a tax bill there is paid (run 35)
+  4. unpack.py: the mail (packages are listed; the storage bins are left out); a tax bill there is paid (run 35);
+     yardchests.py: treasure chests lying loose (Poppy's Treasure Hunt, run 43)
   5. trash.py (garbage piles and the pack's junk into the trash can), then town.py: G12's five checks
 Then a line on food: my hunger and what the Dishes box holds (the residents eat ~8 dishes a home
 day: cookdishes.py). Keep the stay short and sleep on the world map (elin-home 6).
@@ -20,7 +21,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import base_ready, refuse, run, setup, state, stop, threat  # noqa: E402
+from common import base_ready, last, refuse, run, setup, state, stop, threat  # noqa: E402
 
 
 BODY, MIND = ("STR", "DEX", "END", "CHA"), ("PER", "LER", "WIL", "MAG")  # Element.List_Body / List_Mind
@@ -81,6 +82,14 @@ def main():
     from farmday import pay_tax
     tax = pay_tax()
     print(tax or "tax: no bill in the mail post")
+    # run 43: seven of Poppy's chests lay in the yard, and elin-home said this tool picked them up
+    y = run("yardchests.py", timeout=900)
+    print(y.strip())
+    if y.rc:
+        stop(f"arrive: yardchests.py: {last(y) or y.rc}")
+    if "none" not in last(y):
+        p = run("packcheck.py", "--move", timeout=1200)
+        print(p.strip())
     home_guard("the arrival, before the trash")
     # run 19: both test arrivals failed town.py on garbage until trash.py ran: sweep it first
     print("trash: " + (run("trash.py", timeout=600).strip().splitlines() or ["?"])[-2:][0])

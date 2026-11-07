@@ -274,7 +274,9 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 14,       # run 40: raised one step at Lv35 / HP 237, unattended limit 12 -> 13: Forgotten Ruin B5 and Isolated
+    "max_danger": 15,       # run 43: raised one step at Lv38 / HP 277, unattended limit 13 -> 14: Traditional Cave B4, danger 13 (the
+                            # unattended limit), cleared without a drink or a teleport, 12 HP lost on the floor.
+                            # run 40: raised one step at Lv35 / HP 237, unattended limit 12 -> 13: Forgotten Ruin B5 and Isolated
                             # Machinarium B3, both danger 12 (the unattended limit), cleared without a drink or a teleport
                             # (the rule: elin-play's floor gate); the Swarm ability is new too.
                             # run 36: lowered one step: Dark Ruin B5 at danger 12 (unattended limit 13) took 218 -> 0 in one
@@ -292,6 +294,8 @@ THRESHOLDS = {
     "swarm": 6,             # 6+ hostiles, or 4+ with one at or above my level: teleport and leave
     "swarm_above": 4,
     "swarm_weak_below": 12, # run 21: hostiles this many levels under mine count half toward a swarm
+    "avoid_ignore_below": 15,  # run 43: an avoid-group kind this far under my level is an ordinary foe (a Lv19 master, 3 HP at Lv38)
+    "swarm_ignore_below": 25,  # run 43: twelve Lv4 geese at Lv37, PV 82 stopped a walk as a swarm of 6; this far under mine they don't count
                             # (two stops on Lv1-7 crowds at Lv21; "HP decides, not the count", run 04)
     "swarm_ability_min": 3, # run 40: the Swarm ability (a 0.9x blow on every hostile within 3 cells) replaces a swing from this many
     "swarm_ability_sp": 40, # run 40: SP comes back only from sleep; Swarm costs 12 and never spends the last of it

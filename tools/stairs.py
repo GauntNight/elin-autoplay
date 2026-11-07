@@ -41,7 +41,9 @@ def step_into(x, z, tries=3):
                 wait_until("frames", n=10, timeout=2000)
                 break
         p = pc()
-    if max(abs(p["x"] - x), abs(p["z"] - z)) > 1:
+    for _ in range(3):  # run 43: at x5 one walk ended short and the ladder's nap stopped "Sleepy" with the stairs 5 cells away
+        if max(abs(p["x"] - x), abs(p["z"] - z)) <= 1:
+            break
         walk_beside(x, z, weak_ok=True)
         p = pc()
     if max(abs(p["x"] - x), abs(p["z"] - z)) > 1:

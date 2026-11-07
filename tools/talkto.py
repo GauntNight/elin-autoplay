@@ -6,6 +6,7 @@ The name is matched as a whole word (common.pick); two different creatures fitti
 refusal (exit 1), so "guard" with two guards in view asks for the full name. Stops (exit 3) when
 a dialog or window is already open, the player is mid-task, or a hostile is in view.
 """
+import os
 import sys
 from pathlib import Path
 
@@ -34,7 +35,8 @@ def main():
             sys.exit(f"{name} is not in view")
         # a dialog or window already open swallows the Talk (run 17's bandit demand); the
         # world map has no Talk act; a hostile in view is a decision first
-        why = ready(s, hp=None, hunger=None, idle=True, world_ok=True, burden=None, allow=("LayerInventory",))
+        # run 43: Monazess turned hostile over a theft and stood between me and Leoban's shop: FENCE_HOSTILE_OK lets one talk go ahead
+        why = ready(s, hp=None, hunger=None, idle=True, world_ok=True, burden=None, allow=("LayerInventory",), hostiles=not os.environ.get("FENCE_HOSTILE_OK"))
         if why:
             stop(why)
         pc = s["pc"]

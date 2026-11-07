@@ -137,6 +137,13 @@ def room_check():
         grid = sum(1 for i in call("inv")["data"]["items"] if not i.get("equipped"))
         free = 35 - grid
     if free < 3:
+        # run 43: "nothing cheap to drop" twice while the bags had 20+ slots each: the grid's stacks go into them first
+        import purge
+        purge.unclutter()
+        run("close.py")
+        grid = sum(1 for i in call("inv")["data"]["items"] if not i.get("equipped"))
+        free = 35 - grid
+    if free < 3:
         refuse(f"the pack grid has {free} free cards (want 3): unload at home (packcheck.py --move, stock.py --ship) "
                "or drop junk before a dungeon")
 
@@ -152,7 +159,8 @@ def ether_check():
     # me losing less per fight (kills twice as fast). Allowed like Gravity Point; the antibody (Miral) still cures it
     # the user, 2026-11-02: keep it while it is worth more than its cost, cure it when a bad one comes (fact #1161)
     # run 42: the Single Ether Wing (1554, fact #898): levitation, +10 weight capacity, speed +14 and more, no back slot: PV 88 -> 80, speed 132 -> 151, no HP or attribute; allowed by the same rule
-    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1554, 1556)}
+    # run 43: Mana Battery (1564, "Absorb mana from rods" in the game's table): max HP and attributes unchanged at Lv38 (272 before and after); same rule
+    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1554, 1556, 1564)}
     if eth:
         refuse("an ether disease: " + ", ".join(f"{v.get('name')} Lv{v.get('lv')}" for v in eth.values())
                + ": max HP or attributes may be down; the ether antibody cures it (Miral 10 medals, Yowyn's Ecopo shop)")
@@ -633,6 +641,14 @@ def descend_at_x1(h, solo):
                         return
             if see_unseen():
                 return descend_at_x1(h, solo)
+            # run 43 (Traditional Cave B4): the map showed the stairs in a closed room one soil block and a dark cell off the corridor
+            key = (zone().get("full"), h["x"], h["z"])
+            if key not in DUG_TO:
+                DUG_TO.add(key)
+                r3 = run("tunnel.py", "--to", f"{h['x']},{h['z']}", timeout=300)
+                print(f"  stairs walled off: tunnel: {last(r3)[:90]}", flush=True)
+                if r3.rc == 0:
+                    return descend_at_x1(h, solo)
             stop(f"the walk to the stairs at {h['x']},{h['z']} ended 4 times: {r.get('why')}; stairs.py down: {last(out)[:80]}")
     # run 20: the walk can end beside the stairs (Kaberg on the cell): the stairway's own act walks there
     p = pc()
@@ -755,6 +771,14 @@ def shrines():
         print(f"  shrine used: {name}: " + " / ".join((state().get("log") or [])[-2:]))
 
 
+DUG_TO = set()  # stairways tunnel.py --to has been tried for: once each
+
+
+def master_dead():
+    """The zone's name carries the mark once the master is dead (run 21)."""
+    return "Conquered" in str(zone().get("name") or "")
+
+
 def chests():
     """Open every unlocked treasure chest on the explored floor and Take All (run 21: the masters'
     exquisite chests on the Machinarium's B4 and the Tangled Forest's B2 were opened by hand after
@@ -782,6 +806,13 @@ def chests():
                     break
                 walk(h["x"] + nx, h["z"] + nz, r=0, hp=THRESHOLDS["dungeon_hp"], timeout=15000)
                 p = pc()
+            if max(abs(h["x"] - p["x"]), abs(h["z"] - p["z"])) > 1:
+                # run 43 (Earthy Ruin B2): a boss chest left behind, 6 cells off: dig to it, as for walled-off stairs
+                r3 = run("tunnel.py", "--to", f"{h['x']},{h['z']}", timeout=300)
+                print(f"  chest walled off? tunnel: {last(r3)[:90]}", flush=True)
+                if r3.rc == 0:
+                    walk_beside(h["x"], h["z"], r=0, hp=THRESHOLDS["dungeon_hp"], timeout=30000)
+                    p = pc()
             if max(abs(h["x"] - p["x"]), abs(h["z"] - p["z"])) > 1:
                 print(f"  chest not reached: {h['name']} at {h['x']},{h['z']} (the walk ended at {p['x']},{p['z']})")
                 continue
@@ -971,7 +1002,7 @@ def floors_loop(max_danger, floors, solo):
         # the stairs: a second pass after the map
         for _again in range(3):
             hits = data("find", name="stair", r=999, n=10)["hits"]
-            if any(h.get("installed") and h.get("trait") == "TraitStairsDown" for h in hits):
+            if any(h.get("installed") and h.get("trait") == "TraitStairsDown" for h in hits) or master_dead():
                 break
             # run 34: on Lively Cave B1 a rod of magic map showed the stairs 8 cells away after two full explorations: map
             # the floor first (a scroll of magic map from the pack, else the rod), then explore again only if still none
@@ -993,7 +1024,7 @@ def floors_loop(max_danger, floors, solo):
         # run 35 (Tangled Machinarium B1): a pocket of metal walls; the map and two explorations saw no stairs down, and
         # one Teleport cast (it works at Casting 6; it fizzled at 3) landed where the next pass found them at once
         hits = data("find", name="stair", r=999, n=10)["hits"]
-        if not any(h.get("installed") and h.get("trait") == "TraitStairsDown" for h in hits) and not hostile_near(8):
+        if not any(h.get("installed") and h.get("trait") == "TraitStairsDown" for h in hits) and not hostile_near(8) and not master_dead():
             c = call("cast", spell="SpTeleport")
             if c.get("ok") and (c.get("data") or {}).get("cast"):
                 wait_until("frames", n=20, timeout=3000)
@@ -1002,13 +1033,24 @@ def floors_loop(max_danger, floors, solo):
         # run 42 (the user: "you may be stuck in the dirt, may need to mine to get a path"): one soil block held a floor for 17 real minutes
         for _dig in range(3):
             hits = data("find", name="stair", r=999, n=10)["hits"]
-            if any(h.get("installed") and h.get("trait") == "TraitStairsDown" for h in hits) or hostile_near(8):
+            if any(h.get("installed") and h.get("trait") == "TraitStairsDown" for h in hits) or hostile_near(8) or master_dead():
                 break
             r = run("tunnel.py", "--max", "6", timeout=300)
             print(f"  no stairs down seen yet: tunnel: {last(r)[:90]}", flush=True)
             if r.rc != 0 or "nothing to dig" in str(r):
                 break
             explore_floor(solo)
+        # run 43 (Mystical Grassland B4): the master died in a later explore pass, after the conquered check above; the ladder then cast
+        # Magic Map, teleported and tunnelled, and stopped "no way down" with the boss chest unopened
+        if master_dead():
+            print("  purge: " + last(run("purge.py", "--free", "3", timeout=900))[:100])
+            print("  " + last(run("loot.py", "40", timeout=900))[:120])
+            shrines()
+            chests()
+            call("act", action="QuickSave")
+            p = pc()
+            print(f"conquered: {zone().get('name')}: the master is dead (evacuation goes straight out)  HP {p['hp']}/{p['maxHp']}  {p['date']}")
+            return
         h = way_down(arrival)
         descend(h, solo)
     z, p = zone(), pc()

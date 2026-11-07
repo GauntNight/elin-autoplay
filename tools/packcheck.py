@@ -108,7 +108,7 @@ ROUTES = [
     (("book", "spellbook", "recipe", "journal", "letter", "parchment"), "|".join(BOX_STR(b) for b in home.LIBRARY), "the library (the Storehouse)"),
     (("oil", "ale", "butter", "chili", "ketchup", "salt", "sugar", "mayo", "mayonnaise", "spice", "beer", "wine",
       "sake", "sauce", "sesame", "flour", "vinegar", "tea", "cappuccino",
-      "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3), "Pantry (the Kitchen)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
+      "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
     (("grave of",), "ship", "the shipping chest (a boss's grave: junk, value 0-ish)"),
     (("Scrubber", "charm ("), "ship", "the shipping chest (☆The Scrubber, a boss-chest regular, and plain charms: run 30)"),
     # run 34: four "decide" stacks held up leave.py twice (loot from Rustic Forest and run 33's chests)
@@ -204,7 +204,8 @@ def route(name):
     low = norm_name(name)
     from common import hammer_scrap
     if hammer_scrap(name):  # run 13: the hammer breaks it into scrap (tools/scrap.py)
-        return BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5), "Parts box (scrap junk: break it with tools/scrap.py; the yard's wagon when full, run 42)"
+        # run 43: the Parts box and the one wagon both full on the last arrival: a light stand stayed unmoved (G47's done-when): every wagon after them
+        return BOX_STR(home.PARTS_BOX) + "|" + "|".join(BOX_STR(w) for w in [home.ARMORY5] + [w for w in home.WAGONS if w != home.ARMORY5]), "Parts box (scrap junk: break it with tools/scrap.py; the yard's wagons when full, runs 42-43)"
     # run 34 (the user: "Careful Raw Food Weapons/Armor are not things to eat", "Don't throw it away if it rots"):
     # gear made of the "raw food" material rots like food ("A Rotten Raw Food Claw") and matched JUNK's "rotten";
     # unidentified things (a capitalized name, a quality tag) and gear never go to the trash
