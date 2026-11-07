@@ -30,6 +30,7 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 - A mover written in the scratchpad skips what the repo's tools learned: mine grabbed the top thing on a cell holding two, and a wall torch shipped. Anything that moves items goes through a tool with the name check. (42)
 - Two tools at once on the bridge can both fail: a route plan run during a dig timed out. Read nothing heavy (`digmap --plan`, `journal.py`, boxes) while a loop runs. (42)
 - A question from the player is often a finding: "do you carry that intentionally?" turned up the better sword (against plated foes of my level 22.9 -> 54.4 a turn by the card, gearcompare.csv) and a method for every later piece. Answer it, then ask what else that blind spot covers. (42)
+- A rule with a bare waiver flag isn't a rule: the user's 3 blankets met `--blanket-ok` on every circuit (21 ladder starts on one, 14 on none) and the close-out only said they had run out. The user's question about minimums found it. A waiver now names its reason and leaves a row the close-out reads out. (42)
 
 ## Promoted (where the older lessons live now)
 

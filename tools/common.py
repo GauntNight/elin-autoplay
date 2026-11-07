@@ -74,6 +74,35 @@ def stop(msg):
     sys.exit(3)
 
 
+WAIVERS = TOOLS.parent / "runs" / "waivers.csv"
+
+
+def waiver_reason(flag):
+    """The reason written after FLAG on the command line, None without the flag; a bare FLAG is refused. The user,
+    2026-11-06: run 42 passed --blanket-ok on every circuit (21 ladder starts on one blanket, 14 on none, against the
+    user's 3) and the close-out only said they had run out. A flag that skips a rule now says why, and log_waiver
+    leaves a row that the close-out reads out."""
+    if flag not in sys.argv:
+        return None
+    i = sys.argv.index(flag)
+    why = sys.argv[i + 1].strip() if i + 1 < len(sys.argv) else ""
+    if why.startswith("--") or len(why) < 8 or not re.search(r"[A-Za-z]", why):
+        refuse(f"{flag} needs a reason, written after it: {flag} 'what was checked and why this goes ahead' "
+               "(it goes to runs/waivers.csv and the close-out reports it)")
+    return why
+
+
+def log_waiver(tool, what, why):
+    """A row in runs/waivers.csv each time a rule really was skipped or came up short: the close-out's list."""
+    import csv
+    new = not WAIVERS.exists()
+    with WAIVERS.open("a", encoding="utf-8", newline="") as f:
+        out = csv.writer(f)
+        if new:
+            out.writerow(["at", "tool", "what", "why"])
+        out.writerow([time.strftime("%Y-%m-%d %H:%M"), tool, what, why])
+
+
 def last(text):
     lines = [ln for ln in (text or "").splitlines() if ln.strip()]
     return lines[-1] if lines else ""

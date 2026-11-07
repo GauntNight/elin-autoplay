@@ -149,8 +149,9 @@ Mermaid rules (each one cost a re-render on 2026-10-17):
   2. `python -I tools/ollama_stop.py` (the only allowed way to end it), on its own, so the allow rule matches.
   3. `python -I tools/offcheck.py`: exit 0 means nothing is left. Anything listed gets dealt with now by its printed
      command, or named to the user; monitors from another project's session are only reported. Paste its lines into the run log.
-- Tell the user: the goals and results in a few lines, the open questions, the page link, and
-  what `offcheck.py` said. A later request that needs the graph starts the server again, and this step runs again after it.
+- Tell the user: the goals and results in a few lines, the open questions, the page link, what `offcheck.py` said,
+  and every row of `runs/waivers.csv` from this run, grouped and counted, or that there were none (the user, 2026-11-06:
+  run 42 skipped the blanket rule on every circuit and the close-out only said they had run out). A later request that needs the graph starts the server again, and this step runs again after it.
 
 ## What this skill changed
 

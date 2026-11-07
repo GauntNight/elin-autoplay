@@ -20,19 +20,19 @@ Exit 0 after FLOORS floors. The run is marked in runs/activity.csv (activity.mar
 the floors done at every exit).
 
 usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
-                                 [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok] [--blanket-ok]
+                                 [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why']
   --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
   --in X,Z  the way in on the first floor when I am no longer standing on it
   --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen
-  --kit-ok  skip the escape-kit count (a deliberate short trip)
-  --blanket-ok  waive only the fireproof blanket (run 36: none for sale; the rest of the kit is still counted)
+  --kit-ok 'why'  skip the escape-kit count (a deliberate short trip); the reason goes to runs/waivers.csv
+  --blanket-ok 'why'  waive only the fireproof blanket (run 36: none for sale; the rest of the kit is still counted); a row in runs/waivers.csv each time it is used
 """
 import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import THRESHOLDS, Output, call, data, last, named, pc, refuse, run, setup, state, stop, wait_idle, wait_until, walk, walk_beside  # noqa: E402
+from common import THRESHOLDS, Output, call, data, last, log_waiver, named, pc, refuse, run, setup, state, stop, wait_idle, wait_until, waiver_reason, walk, walk_beside  # noqa: E402
 from activity import mark  # noqa: E402
 from job import register, stop_requested  # noqa: E402
 import delve  # noqa: E402
@@ -106,8 +106,10 @@ def kit_check():
         blankets = -1
     # run 36: the blanket burned out and neither Aquli Teola seller had one: --blanket-ok waives only this line (the
     # escape kit itself is fire-safe: rods of teleport, the Evacuation spell), never the teleports, heals or return
-    if blankets == 0 and "--blanket-ok" in sys.argv:
-        print("  kit: no charged fireproof blanket (--blanket-ok: scrolls and books can burn)")
+    why = waiver_reason("--blanket-ok")
+    if blankets == 0 and why:
+        print(f"  kit: no charged fireproof blanket (--blanket-ok: scrolls and books can burn: {why})")
+        log_waiver("ladder", "a nefia with no charged fireproof blanket", why)
     elif blankets == 0:
         short.append("no charged fireproof blanket (fire burns the scrolls and books: Gizbird in Mysilia, Sesa or Sayig in Aquli Teola, the loom)")
     shown = [f"{x}: {k[x]}" for x in ("teleport", "cure potions", "cure rod charges", "heal casts", "return") if x in k]
@@ -115,7 +117,7 @@ def kit_check():
     shown.append(f"blankets: {blankets if blankets >= 0 else 'unread'}")
     print("  kit: " + ", ".join(shown))
     if short:
-        refuse("the escape kit is short: " + "; ".join(short) + " (buy or fetch it, or --kit-ok for a deliberate short trip)")
+        refuse("the escape kit is short: " + "; ".join(short) + " (buy or fetch it, or --kit-ok 'why' for a deliberate short trip)")
 
 
 def room_check():
@@ -1015,6 +1017,8 @@ def floors_loop(max_danger, floors, solo):
 
 def main():
     setup()
+    kit_why = waiver_reason("--kit-ok")  # the user, 2026-11-06: no silent way round the kit: both flags need a reason
+    waiver_reason("--blanket-ok")  # a bare flag stops here, before the floors
     argv = sys.argv[1:]
     nums = [int(a) for i, a in enumerate(argv) if re.fullmatch(r"\d+", a) and (i == 0 or argv[i - 1] != "--in")]
     max_danger = nums[0] if nums else DEFAULT_MAX_DANGER
@@ -1029,7 +1033,10 @@ def main():
         stop(f"{zone().get('full')} is not a dungeon floor")
     ether_check()
     room_check()
-    if "--kit-ok" not in sys.argv:
+    if kit_why:
+        print(f"  kit: not counted (--kit-ok: {kit_why})")
+        log_waiver("ladder", "the escape kit not counted", kit_why)
+    else:
         kit_check()
     print(f"danger cap {max_danger}" + (" (unattended)" if "--unattended" in sys.argv else "") + f", {floors} floors")
     mark("nefia", "start")

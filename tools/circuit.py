@@ -8,7 +8,8 @@ The home unload every two nefias (elin-play: the bags fill) is NOT done here: th
 that arrive.py already does). A ladder stop for a decision (rc 3) stops the circuit too: it is a decision.
 Marks itself as one activity ("circuit") on top of the ladder's own marks.
 
-usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 5] [--unattended] [--solo] [--wrecks] [--danger-ok N] [--skip NAME ...] [--blanket-ok]
+usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 5] [--unattended] [--solo] [--wrecks] [--danger-ok N] [--skip NAME ...] [--blanket-ok 'why']
+  --blanket-ok 'why'  passed to each ladder: a nefia with no charged blanket, a row in runs/waivers.csv each time (the user, 2026-11-06)
   --wrecks  mine the wrecks on each floor (ladder.py without --no-wrecks; run 34, G35: iron wrecks drop a battery and a
             microchip each, the Gene Machine's power parts)
   --danger-ok N  passed to wgo.py: a deliberate crossing of ambush levels up to N (elin-play's route rule)
@@ -29,7 +30,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from activity import mark  # noqa: E402
 import bridge  # noqa: E402
-from common import bag_slots, TOOLS, THRESHOLDS, Output, call, data, last, refuse, run, state, stop, wait_until  # noqa: E402
+from common import bag_slots, TOOLS, THRESHOLDS, Output, call, data, last, refuse, run, state, stop, wait_until, waiver_reason  # noqa: E402
 from job import register, stop_requested  # noqa: E402
 
 UNLOAD_EVERY = 4  # run 40: was 2; three bags carry 3-4 conquests, and a full bag stops the circuit by itself (below)
@@ -135,7 +136,11 @@ def main():
     skip = [args[i + 1] for i, a in enumerate(args) if a == "--skip" and i + 1 < len(args)]
     # run 36: --blanket-ok passes through to the ladder, only on purpose (the blanket burned out and neither Aquli Teola
     # seller had one; the escape kit itself is fire-safe: rods of teleport and the Evacuation spell)
-    extra = [a for a in ("--unattended", "--solo", "--expendable", "--blanket-ok") if a in args]
+    # 2026-11-06, the user: the flag now carries its reason, and run 42 passed it on every circuit without one
+    extra = [a for a in ("--unattended", "--solo", "--expendable") if a in args]
+    blanket_why = waiver_reason("--blanket-ok")
+    if blanket_why:
+        extra += ["--blanket-ok", blanket_why]
     # run 40: seven hand-run ladders in one morning after a stop inside a nefia: from a nefia's floor it picks up where it stopped
     resume = not on_world() and bool((state().get("zone") or {}).get("nefia"))
     if not on_world() and not resume:

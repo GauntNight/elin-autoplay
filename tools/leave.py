@@ -3,13 +3,14 @@ nearest border cell that offers "Enter". If no explored border cell is known (am
 start mid-map, run 03), walk straight toward the nearest side of the map's bounds (bridge
 0.11.0 `zone.bounds`) and look again. Refuses (exit 1) while a hostile is in view unless --force,
 and at home while the pack holds items off the trip kit, holds no shovel, carries under 3 fireproof blankets
-while storage holds one, or the Dishes box is shared; anywhere, while the party is over the ally cap. Stops
+or 5 lockpick charges while storage holds more, or the Dishes box is shared; anywhere, while the party is over the ally cap. Stops
 (exit 3) when a dialog opens on the way out (an escort client out of reach: answered No), when a
 hostile comes into view or stands adjacent on the way to the edge, and when no exit is found.
 
 usage: python -I tools/leave.py [--force] [--pack-ok] [--dishes-ok] [--gear-ok] [--shovel-ok] [--food-ok]
-                                [--blanket-ok] [--party-ok] [--rations-ok]
-At home it first checks the pack (packcheck.py) and makes the Dishes box private (dishes.py).
+                                [--blanket-ok 'why'] [--pick-ok 'why'] [--party-ok] [--rations-ok]
+At home it first checks the pack (packcheck.py) and makes the Dishes box private (dishes.py). --blanket-ok and --pick-ok
+need a reason, and leaving short of either writes a row to runs/waivers.csv, which the close-out reports (the user, 2026-11-06).
 """
 import re
 import sys
@@ -18,11 +19,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import overweight_stop, cells, refuse, run, stop, wait_until, walk  # noqa: E402
+from common import log_waiver, overweight_stop, cells, refuse, run, stop, wait_until, waiver_reason, walk  # noqa: E402
 
 MIN_MEALS = 6  # the Upkeep block: 3+ days of my own food at departure, ~2 meals a day (run 32: a nefia at hunger 68)
 MIN_RATIONS = 2  # run 38: the Upkeep block's 'the next fare + 1' (the near fares are 1-2)
 MIN_BLANKETS = 3  # the Upkeep block (the user, 2026-10-26): G23's fireproof blankets, 3 always in the pack
+MIN_PICK_CHARGES = 5  # the Upkeep block (the user, 2026-11-06): about two locked chests; run 42 spent 14 charges on five
 
 
 def count(items, match):
@@ -53,6 +55,19 @@ def blanket(name):
     items from one fire (fact #862)."""
     m = re.search(r"\((\d+) charges?\)", name.lower())
     return "fireproof blanket" in name.lower() and (m is None or int(m.group(1)) > 0)
+
+
+def pick_charges(items):
+    """Charges on the usable lockpicks in `items` and any bag among them ("a lockpick (16 Charges)"). A name showing no
+    count reads as enough, as blanket() does; common.grab won't hold a cursed or doomed pick, so those count for nothing."""
+    n = 0
+    for it in items or []:
+        low = it["name"].lower()
+        if "lockpick" in low and "cursed" not in low and "doomed" not in low:
+            m = re.search(r"\((\d+) charges?\)", low)
+            n += (int(m.group(1)) if m else MIN_PICK_CHARGES) * (it.get("num") or 1)
+        n += pick_charges(it.get("items"))
+    return n
 
 
 def try_enter(zone, r_max=12):
@@ -109,6 +124,7 @@ def try_enter(zone, r_max=12):
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    blanket_why, pick_why = waiver_reason("--blanket-ok"), waiver_reason("--pick-ok")  # a bare flag stops here, before any step
     overweight_stop("leaving this map")
     # run 42: a wgo --ambush stopped with "could not find an exit": ConEntangle refuses every step (ConEntangle.TryMove) and wears off with turns
     for _ in range(30):
@@ -175,18 +191,42 @@ def main():
                    "(food in the bags doesn't count: eat_one never looks there) from the harvest box or a pantry, or --food-ok")
     # the user, 2026-10-30: "add Fire Blankets to the list of things to try to get before we leave home". G23 made
     # six in run 28, but packcheck's KIT never named them, so its --move could carry them back into storage
-    if at_base and "--blanket-ok" not in sys.argv:
+    # the user, 2026-11-06: run 42 never met the 3 and said so only at the end, so going short now leaves a row either way
+    if at_base:
         have = carried(blanket)
-        if have < MIN_BLANKETS:
+        if have < MIN_BLANKETS and blanket_why:
+            print(f"short of fireproof blankets: {have} carried, under {MIN_BLANKETS} (--blanket-ok: {blanket_why})")
+            log_waiver("leave", f"{have} fireproof blankets carried, under {MIN_BLANKETS}", blanket_why)
+        elif have < MIN_BLANKETS:
             from common import data
             stored = [f"{b['name']} {b['x']},{b['z']}" for b in data("stock")["boxes"]
                       if count(b.get("items") or [], blanket)]
             if stored:
                 refuse(f"leaving home refused: {have} fireproof blankets carried, under {MIN_BLANKETS}, and storage "
-                       f"holds more: {', '.join(stored)} (box.py \"BOX\" --take \"fireproof blanket\"; --blanket-ok)")
-            print(f"short of fireproof blankets: {have} carried, under {MIN_BLANKETS}, none in storage: buy one (Sesa "
-                  "or Sayig in Aquli Teola, Gizbird in Mysilia, ~360) or make one at the loom (5 textures + 4 carbon "
-                  "logs from the kiln)")
+                       f"holds more: {', '.join(stored)} (box.py \"BOX\" --take \"fireproof blanket\"; --blanket-ok 'why')")
+            print(f"short of fireproof blankets: {have} carried, under {MIN_BLANKETS}, none in storage: make them at the "
+                  "loom (5 textures + 4 carbon logs from the kiln), the sure source, or buy one (Sesa or Sayig in Aquli "
+                  "Teola, Gizbird in Mysilia, ~360, stock at random)")
+            log_waiver("leave", f"{have} fireproof blankets carried, under {MIN_BLANKETS}", "none in storage: warned, not refused")
+    # the user, 2026-11-06: nothing checked for a lockpick, and the ladder leaves behind a chest bare hands can't open
+    # (run 42: five locked map chests held 8,699 orens, 10 bars, 7 medals). No station makes one (fact on the lockpick):
+    # shops only, so an empty storage warns, as the blankets and rations do
+    if at_base:
+        from common import data
+        st = data("stock")
+        have = pick_charges(st["pack"])
+        if have < MIN_PICK_CHARGES and pick_why:
+            print(f"short of lockpick charges: {have} carried, under {MIN_PICK_CHARGES} (--pick-ok: {pick_why})")
+            log_waiver("leave", f"{have} lockpick charges carried, under {MIN_PICK_CHARGES}", pick_why)
+        elif have < MIN_PICK_CHARGES:
+            stored = [f"{b['name']} {b['x']},{b['z']}" for b in st["boxes"] if pick_charges(b.get("items"))]
+            if stored:
+                refuse(f"leaving home refused: {have} lockpick charges carried, under {MIN_PICK_CHARGES}, and storage "
+                       f"holds more: {', '.join(stored)} (box.py \"BOX\" --take lockpick; --pick-ok 'why')")
+            print(f"short of lockpick charges: {have} carried, under {MIN_PICK_CHARGES}, none in storage: no station makes "
+                  "one, so buy on the next town trip (stock at random, 330-780: Sayig or Sesa in Aquli Teola, Gizbird in "
+                  "Mysilia, Tarraf in Palmia, Alecgan in Noyel, Kerona in Derphy)")
+            log_waiver("leave", f"{have} lockpick charges carried, under {MIN_PICK_CHARGES}", "none in storage: warned, not refused")
     # run 38: goals.md's Upkeep says leave.py checks "travel rations on hand (the next fare + 1)", but nothing did: I
     # left with none, and a Fast Travel back from Capricious Forest (2) was impossible. The blanket's shape: refuse
     # while storage holds rations, else say where to buy them (inns: Upan, Tiguen, Robean, 47 each)

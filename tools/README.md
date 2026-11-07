@@ -141,7 +141,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                                                unidentified pieces and books go into the pack and bags, the chest stays on the tile with the rest
     Exit 0 done (or none), 1 refused (not at home), 3 stopped (the pack full: a chest left as it is).
 - **`circuit.py`**: The nefia circuit as one loop (the review of 2026-10-30, the user's ok): run 30's 820 points an hour was this done by hand. From the world map: `places` -> the nearest unconquered nefia of base danger LO-HI within R tiles (no underwater ones) -> wgo.py there -> Enter -> ladder.py (the gate, FLOORS floors) -> on "conquered" evac.py out -> repeat, until N nefias, or a ladder stop that isn't a conquest, or the unload is due.
-    usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 5] [--unattended] [--solo] [--wrecks] [--danger-ok N] [--skip NAME ...] [--blanket-ok]
+    usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 5] [--unattended] [--solo] [--wrecks] [--danger-ok N] [--skip NAME ...] [--blanket-ok 'why']
+      --blanket-ok 'why'  passed to each ladder: a nefia with no charged blanket, a row in runs/waivers.csv each time (the user, 2026-11-06)
       --wrecks  mine the wrecks on each floor (ladder.py without --no-wrecks; run 34, G35: iron wrecks drop a battery and a
                 microchip each, the Gene Machine's power parts)
       --danger-ok N  passed to wgo.py: a deliberate crossing of ambush levels up to N (elin-play's route rule)
@@ -412,16 +413,17 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                                                         (--log: a row in runs/index.csv for the run tracker)
 - **`ladder.py`**: Go down a multi-floor dungeon one floor at a time (run 20, the user: "we need some dungeons ... to level up two weapon skill"): on each floor delve.py until the floor is explored, loot.py, wrecks.py, a QuickSave, then the stairway that isn't the way in, and down. Lesimas and other quest dungeons aren't nefias, so delve.py's floor gate skips them: the gate here covers every floor.
     usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
-                                     [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok] [--blanket-ok]
+                                     [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why']
       --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
       --in X,Z  the way in on the first floor when I am no longer standing on it
       --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen
-      --kit-ok  skip the escape-kit count (a deliberate short trip)
-      --blanket-ok  waive only the fireproof blanket (run 36: none for sale; the rest of the kit is still counted)
-- **`leave.py`**: Leave a local outdoor map (ambush site, wilds, home) back to the world map through the nearest border cell that offers "Enter". If no explored border cell is known (ambush maps start mid-map, run 03), walk straight toward the nearest side of the map's bounds (bridge 0.11.0 `zone.bounds`) and look again. Refuses (exit 1) while a hostile is in view unless --force, and at home while the pack holds items off the trip kit, holds no shovel, carries under 3 fireproof blankets while storage holds one, or the Dishes box is shared; anywhere, while the party is over the ally cap. Stops (exit 3) when a dialog opens on the way out (an escort client out of reach: answered No), when a hostile comes into view or stands adjacent on the way to the edge, and when no exit is found.
+      --kit-ok 'why'  skip the escape-kit count (a deliberate short trip); the reason goes to runs/waivers.csv
+      --blanket-ok 'why'  waive only the fireproof blanket (run 36: none for sale; the rest of the kit is still counted); a row in runs/waivers.csv each time it is used
+- **`leave.py`**: Leave a local outdoor map (ambush site, wilds, home) back to the world map through the nearest border cell that offers "Enter". If no explored border cell is known (ambush maps start mid-map, run 03), walk straight toward the nearest side of the map's bounds (bridge 0.11.0 `zone.bounds`) and look again. Refuses (exit 1) while a hostile is in view unless --force, and at home while the pack holds items off the trip kit, holds no shovel, carries under 3 fireproof blankets or 5 lockpick charges while storage holds more, or the Dishes box is shared; anywhere, while the party is over the ally cap. Stops (exit 3) when a dialog opens on the way out (an escort client out of reach: answered No), when a hostile comes into view or stands adjacent on the way to the edge, and when no exit is found.
     usage: python -I tools/leave.py [--force] [--pack-ok] [--dishes-ok] [--gear-ok] [--shovel-ok] [--food-ok]
-                                    [--blanket-ok] [--party-ok] [--rations-ok]
-    At home it first checks the pack (packcheck.py) and makes the Dishes box private (dishes.py).
+                                    [--blanket-ok 'why'] [--pick-ok 'why'] [--party-ok] [--rations-ok]
+    At home it first checks the pack (packcheck.py) and makes the Dishes box private (dishes.py). --blanket-ok and --pick-ok
+    need a reason, and leaving short of either writes a row to runs/waivers.csv, which the close-out reports (the user, 2026-11-06).
 - **`lockpick.py`**: Lockpicking practice on the home's practice chest (the user's tip, run 16: "you could buy a practice chest and practice lock picking skill"). Lockpicking is a low skill (1.8 in run 15), so its level-ups come cheap, and each is 10-14 character exp.
     usage: python -I tools/lockpick.py [MAX_TRIES=30] [min_sp=10]
     Exit 0 opened (or already open: relocks on its tick), 3 stopped (SP, a hostile, a window).
