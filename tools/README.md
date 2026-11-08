@@ -660,7 +660,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/steal.py [R=20] [--all]     the marks in reach, best contribution first (liftable,
                                                        contribution 2+; --all lists everything)
            python -I tools/steal.py take UID [UID ...] [--max-lv 14] [--skip]
-           python -I tools/steal.py auto TARGET [R=60] --bold    in Derphy only: the marks best first until their contribution adds up to TARGET (run 43, G32:
+           python -I tools/steal.py auto TARGET [R=60] --bold [--karma-floor 20]    in Derphy only: the marks best first until their contribution adds up to TARGET,
+                                                       karma falls to the floor, or the burden reaches phase 2 (run 44) (run 43, G32:
                                                        at DEX 61 a plain townsperson needs PER over 30 to notice at all, so the old levels and the sneak guard refused nearly every mark;
                                                        Derphy has no guards: a witness who does notice only turns hostile)
       take: walks beside each thing, refuses while an awake possible witness of level >= --max-lv stands
