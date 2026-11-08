@@ -329,7 +329,10 @@ def eat_one():
         named = [x for x in split_listing(listing) if is_meal(x)]
         # run 41 (run 18's gap a fourth time): what's in the Cooler Box is food unless it says otherwise, so an unknown word comes
         # last instead of ending the loop Hungry; item.py still refuses harmful foods
-        named += [x for x in split_listing(listing) if x not in named and not re.search(r"corpse|remnant|rotten|offal", x.lower())]
+        # run 44: "a marbled meat of 『Public performer』" was eaten on a nefia's floor: "Eeeek! It's human flesh!", insanity.
+        # A named creature's meat (『』) and anything of a person is never food
+        named += [x for x in split_listing(listing) if x not in named and not re.search(r"corpse|remnant|rotten|offal", x.lower())
+                  and "『" not in x and not re.search(r"\bflesh\b|\b(of|from) [A-Z][a-z]+ the\b", x)]
         foods = named + list(MEALS)
     for food in foods:
         h0 = state()["pc"]["hunger"]
