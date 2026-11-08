@@ -12,6 +12,7 @@ Refuses (exit 1): a nefia without --user-ok, the home map without --home-ok, a w
 at or over THRESHOLDS["sleep_hunger"] (50: eat first). Exit 3 when the click didn't put me to sleep (run 40).
 Bridge 0.16.0+ (`buttons` names the slot's hot item; `click` runs it).
 """
+import re
 import sys
 import time
 from pathlib import Path
@@ -50,13 +51,24 @@ def main():
     if not slot:
         refuse("no 'Use bed in inventory' slot on the F-key hotbar")
     slept = False
+    # run 44: the sleeping bag was gone and the hotbar's sleep said "There's no bed in your backpack. You can use Rest
+    # Ability to sleep but..."; the ability bar's Rest (card 'Rest', no text: pick it by card) slept me in Mifu Village
+    beds = [i for i in call("inv")["data"]["items"]
+            if re.search(r"sleeping bag|makeshift bed|\bbed\b", i["name"].lower()) and "recipe" not in i["name"].lower()]
     # run 40: right after a walk (three times at a nefia's door) the click starts nothing, no message, and the same click
     # works a moment later; the failed door nap cost Tainted Forest, which expired during the nap from B1
     for attempt in range(3):
-        slot = [b for b in call("buttons", all=True)["data"]["buttons"] if b.get("hot") == "HotItemActionSleep"]
-        if not slot:
+        btns = call("buttons", all=True)["data"]["buttons"]
+        rest = [b for b in btns if "ButtonAbility" in (b.get("name") or "") and b.get("card") == "Rest"]
+        slot = [b for b in btns if b.get("hot") == "HotItemActionSleep"]
+        if not beds and rest:
+            if attempt == 0:
+                print("no bed carried: the Rest ability", flush=True)
+            call("rclick", i=rest[0]["i"])
+        elif not slot:
             refuse("no 'Use bed in inventory' slot on the F-key hotbar")
-        call("click", i=slot[0]["i"])
+        else:
+            call("click", i=slot[0]["i"])
         wait_until("layer", timeout=3000)  # the sleep layer comes up a moment after the click
         for _ in range(150):
             s = call("state")["data"]

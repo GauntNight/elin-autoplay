@@ -106,7 +106,24 @@ def wanted(card, extra):
     return False
 
 
+def from_bags(extra):
+    """Run 44: the sweep's garbage went into the pack and purge's unclutter tucked it into the pouch, where the dump
+    (the pack grid only) never saw it: 214 garbages and 33 cans, weight 108, Overweight at home and HP 276 -> 119 on
+    the arrival walks. Junk in a carried bag comes out into the pack first, as many stacks as there are free cards."""
+    from common import data, run
+    for bag in data("stock").get("pack") or []:
+        if bag.get("items") is None or "cooler" in bag["name"].lower():
+            continue
+        junk = [x["name"] for x in bag["items"] if wanted(x["name"], extra)]
+        free = 35 - sum(1 for i in data("stock").get("pack") or [] if not i.get("equipped"))
+        if junk and free > 1:
+            out = run("bag.py", bag["name"], "--take", *junk[:free - 1])
+            run("close.py")
+            print(f"  out of {bag['name']}: {', '.join(junk[:free - 1])} (rc {out.rc})")
+
+
 def dump(extra):
+    from_bags(extra)
     hits = call("find", name="trash can", r=999, n=1)["data"]["hits"]
     if not hits:
         sys.exit("no trash can on this map")

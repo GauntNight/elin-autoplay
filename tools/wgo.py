@@ -66,7 +66,8 @@ def meal_stop():
         run("leave.py", "--force", "--riding-ok", timeout=300)
         return "a hostile on the meal stop's map"
     fed = None
-    for _ in range(2):
+    # run 44: two mini salads (about 6 hunger each) left me at 60, still Hungry, and the walk stopped anyway: eat to the mark
+    for _ in range(6):
         fed = farmday.eat_one() or fed
         if call("state")["data"]["pc"]["hunger"] < THRESHOLDS["eat_at"] - 15:
             break
@@ -366,6 +367,13 @@ def main():
             mx, mz = map(int, rep["data"]["me"].split(","))
             last_pos, frm, start, steps = (mx, mz), f"{mx},{mz}", s["pc"]["date"], 0
             print(f"  ambush cleared; walking on from {mx},{mz}")
+            # run 44, a near-death: five ambushes in a row, each leg ending on one, and this `continue` skipped the hunger
+            # and sleep checks below every time: 5 game days with no meal, Starving, HP 273 -> 65 on the way to a map
+            if (s["pc"].get("hunger") or 0) >= THRESHOLDS["eat_at"]:
+                why_not = meal_stop()
+                if why_not:
+                    log_leg(start, frm, label, 0, f"stopped at {mx},{mz}: {why_not}")
+                    stop(f"hungry after an ambush and {why_not}: look.py")
             continue
         steps += max(abs(pos[0] - last_pos[0]), abs(pos[1] - last_pos[1]))
         last_pos = pos

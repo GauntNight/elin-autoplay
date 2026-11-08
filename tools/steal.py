@@ -14,7 +14,8 @@ only Derphy town, Port Kapul and my own land buy them (Siyun in Derphy, ~95,81).
 usage: python -I tools/steal.py [R=20] [--all]     the marks in reach, best contribution first (liftable,
                                                    contribution 2+; --all lists everything)
        python -I tools/steal.py take UID [UID ...] [--max-lv 14] [--skip]
-       python -I tools/steal.py auto TARGET [R=60] --bold    in Derphy only: the marks best first until their contribution adds up to TARGET (run 43, G32:
+       python -I tools/steal.py auto TARGET [R=60] --bold [--karma-floor 20]    in Derphy only: the marks best first until their contribution adds up to TARGET,
+                                                   karma falls to the floor, or the burden reaches phase 2 (run 44) (run 43, G32:
                                                    at DEX 61 a plain townsperson needs PER over 30 to notice at all, so the old levels and the sneak guard refused nearly every mark;
                                                    Derphy has no guards: a witness who does notice only turns hostile)
   take: walks beside each thing, refuses while an awake possible witness of level >= --max-lv stands
@@ -34,6 +35,8 @@ SKIP = False  # --skip: pass over a watched mark instead of stopping the batch
 TAKEN = 0     # thefts this run (the activity mark, run 33)
 STEEL_WORDS = ("alarm clock", "wall lamp", "pendant light", "monitor", "computer", "electronics", "training machine",
                "street lamp")  # steel by default (things.json defMat; fact #726): check the material once taken
+BURDEN_STOP = 2  # auto stops at this burden phase (run 44); --burden-phase 3 while the fence is in town and I stay until the sale
+KARMA_FLOOR = 20  # auto stops here (run 44): under 0 is a criminal, and the guild's stealing rank needs no more than this margin
 UNIQUE_LV = 15  # a named NPC: PER x 2.5 x 2 against Pickpocket + DEX; 6 until the 2026-10-30 review (the user agreed: 60% of marks
                 # were skipped, and the bridge sneak guard now cancels a theft the moment a witness comes within 5): run 34 tests 15
 
@@ -113,6 +116,9 @@ def take(uid, max_lv):
         stop(f"a witness who could notice: {', '.join(bad)}")
     r = call("cast", spell="AI_Steal", uid=uid)
     if not r.get("ok"):
+        if SKIP and "no creature or thing" in str(r.get("error")):  # run 44: the mark was gone by the cast (picked up or moved)
+            print(f"{p['name']}: skipped, gone by the cast ({r.get('error')})")
+            return 0
         stop(f"cast refused: {r.get('error')}")
     for _ in range(90):  # 20 turns of the task
         time.sleep(0.7)
@@ -121,7 +127,10 @@ def take(uid, max_lv):
             break
     lines = log_tail(8)
     print(f"{p['name']} (+{p['contribution']} if sold): " + " / ".join(lines[-4:]))
-    got = [i for i in call("inv")["data"]["items"] if p["name"].split(" ", 1)[-1] in i["name"]]
+    # run 44: "blanket" was found inside "a fireproof blanket (7 Charges)", my own kit, which went to stolen.txt and
+    # fence.py sold it (bought back for 528). Only a stack whose base name is the mark's own counts.
+    from fence import base
+    got = [i for i in call("inv")["data"]["items"] if base(i["name"]) == base(p["name"])]
     if any("you steal" in l.lower() for l in lines):
         global TAKEN
         TAKEN += 1
@@ -161,6 +170,15 @@ def auto(target, r):
                 print("no marks left in reach")
                 break
             me = data("state")["pc"]
+            # run 44: nothing stopped a batch short of Karma 0 (a criminal under it); run 43's last batch ran to
+            # Overweight 151% with the fence asleep. Each theft is Karma -1.
+            if me.get("karma") is not None and me["karma"] <= KARMA_FLOOR:
+                print(f"stop: karma {me['karma']} at the floor {KARMA_FLOOR} (--karma-floor N): conquests pay it back")
+                break
+            if (me.get("burdenPhase") or 0) >= BURDEN_STOP:
+                print(f"stop: burden phase {me['burdenPhase']} ({me.get('burdenText')}): sell or stash before more thefts"
+                      f" (--burden-phase 3 only while the fence is in this town and I stay until the sale)")
+                break
             p = max(ps, key=lambda q: (q["contribution"], -max(abs(q["x"] - me["x"]), abs(q["z"] - me["z"]))))
             tried.add(p["uid"])
             take(p["uid"], 45)
@@ -179,6 +197,15 @@ def main():
     if args and args[0] == "auto":
         if "--bold" not in args:
             refuse("auto needs --bold, for Derphy")
+        global KARMA_FLOOR, BURDEN_STOP
+        if "--karma-floor" in args:
+            i = args.index("--karma-floor")
+            KARMA_FLOOR = int(args[i + 1])
+            del args[i:i + 2]
+        if "--burden-phase" in args:
+            i = args.index("--burden-phase")
+            BURDEN_STOP = min(3, int(args[i + 1]))  # never past 3: Overweight is where a zone change tumbles (common.overweight_stop)
+            del args[i:i + 2]
         nums = [int(a) for a in args[1:] if a.isdigit()]
         return auto(nums[0] if nums else 82, nums[1] if len(nums) > 1 else 60)
     max_lv = 14

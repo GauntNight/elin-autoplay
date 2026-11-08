@@ -17,6 +17,9 @@ from home import SHIPPING  # noqa: E402
 from job import JOBS  # noqa: E402
 
 CHEST_MAX = 40  # fact #1001: the shipping chest's stacks
+# Run 44: Queen's Victory went into the chest. It was off its finger only because the Fighting Bull (thief protection) is
+# worn in Derphy, and gearcheck had recorded it there as a candidate. Pieces kept for a swap never ship.
+KEPT = ("The Fighting Bull", "Queen's Victory")
 
 
 def pieces(keep):
@@ -42,7 +45,7 @@ def free_cards():
 def main():
     setup()
     args = sys.argv[1:]
-    keep = [args[i + 1] for i, a in enumerate(args) if a == "--keep"]
+    keep = [args[i + 1] for i, a in enumerate(args) if a == "--keep"] + list(KEPT)
     if not (data("state").get("zone") or {}).get("full", "").startswith("Zone_startSite"):
         refuse("not on the home map")
     # run 40 (the user: "how often do you look at current equipment versus new?"): this tool made shipping unread pieces easy, and 14

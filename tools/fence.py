@@ -14,6 +14,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import call, data, last, refuse, run, stop  # noqa: E402
 
 STOLEN = Path(__file__).resolve().parent.parent / "runs" / "stolen.txt"
+KIT = ("fireproof blanket", "lockpick", "scroll of teleport", "scroll of evacuation", "scroll of return", "potion of cure",
+       "rod of", "cooler box", "putit in amber", "sleeping bag", "travel ration", "pickaxe", "shovel")
 
 
 def listed():
@@ -52,6 +54,10 @@ def main():
     sold, left = [], []
     gold0 = data("state")["pc"].get("gold")
     for name in names:
+        # run 44: my own fireproof blanket was on the list (steal.py's loose name match) and sold; the kit never goes
+        if any(k in name.lower() for k in KIT):
+            print(f"  kept: {name} (a kit item, never fenced)")
+            continue
         bs = call("buttons", all=True)["data"]["buttons"]
         hit = [b for b in bs if "inventory grid" in (b.get("name") or "") and b.get("mine") is not False
                and base(b.get("card") or "") == base(name)]

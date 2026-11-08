@@ -46,6 +46,17 @@ def main():
             refuse("a hostile is in view: elin-play reads evacuation only with no foe in view (fight or step away first)")
         names = [i["name"] for i in data("inv")["items"] if re.search(r"scrolls? of evacuation", i["name"].lower())]
         if not names:
+            # run 44: 8 blessed scrolls rode in the spoils bag, the spell failed twice with a foe near, and the floor
+            # was left by a return scroll: a scroll comes out of a carried bag before the spell is tried
+            for bag in data("stock").get("pack") or []:
+                hit = [x["name"] for x in bag.get("items") or [] if re.search(r"scrolls? of evacuation", x["name"].lower())
+                       and "cursed" not in x["name"].lower()]
+                if hit and "cooler" not in bag["name"].lower():
+                    run("bag.py", bag["name"], "--take", hit[0])
+                    run("close.py")
+                    names = [i["name"] for i in data("inv")["items"] if re.search(r"scrolls? of evacuation", i["name"].lower())]
+                    break
+        if not names:
             # run 34: the conquests' exits spent the last scroll while the Evacuation spell held 31 casts (read from
             # books on 489-12-01); the bridge's cast op (cure.py's path) casts it with no hotbar button
             stock = spell_stock("SpEvac")

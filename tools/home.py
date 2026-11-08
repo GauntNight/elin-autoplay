@@ -61,7 +61,7 @@ PARTS_BOX = (53, 56)       # run 18: the sturdy box 'Parts' in the Workshop; bon
 SPARES = (68, 44)          # G47 (run 42): the yard's ★Storage Chest; the exquisite boss chest 65,41 (15 slots) retired
 SPARES2 = (42, 47)         # run 30 (G28): the sturdy box 'Spares 2' in the Depot (was the mail package at 67,41, run 13)
 # G47 (run 42): Nino's wagons, 60 slots each on 2x2, in the east yard north of the Storehouse; five small valuables boxes (64,39 64,40 66,39 67,38 68,38) emptied into them and retired
-WAGONS = [(66, 46), (69, 46), (68, 44), (70, 44)]  # (68, 44): the third ★Storage Chest (Miral, 20 medals, 4 wrenches: 176 slots), the yard too
+WAGONS = [(66, 46), (69, 46), (68, 44), (70, 44)]  # (68, 44): the third ★Storage Chest (Miral, 20 medals, 9 wrenches since run 44: 276 slots), the yard too
 VALUABLES = [(66, 46), (69, 46), (68, 39), (44, 47), (44, 49), (42, 49)]  # 'Valuables 7' stays last (packcheck's decorations use VALUABLES[-1]); coins, bars, medals, tickets, figures, cards, genes, gems
 LIBRARY = [(67, 40), (42, 48), (47, 58), (47, 59), (44, 48), (65, 38), (68, 44)]     # G47 (run 42): the boxes 66,38 and 48,58 retired into the yard's chest; [1] stays 'Library 3' (town.py) (run 30, G28: the Depot's sturdy box, was the bin
                            # package 64,38); books, spellbooks, recipes, letters;

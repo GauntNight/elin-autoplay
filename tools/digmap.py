@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, last, pc, refuse, run, setup, state, stop, top, wait_idle  # noqa: E402
+from common import THRESHOLDS, call, data, last, pc, refuse, run, setup, state, stop, top, wait_idle, wait_until  # noqa: E402
 
 LOG = Path(__file__).resolve().parent.parent / "runs" / "digs.csv"
 FIELDS = ["logged_at", "game_date", "seconds", "game_hours", "lv", "walked", "orens", "bars", "medals", "other"]
@@ -71,7 +71,7 @@ def enter_and_eat():
 def upkeep():
     """Eat and sleep before a leg, the way a nefia's door gets it (elin-play: sleep on the overworld)."""
     p = pc()
-    if p.get("hunger", 0) >= 55:
+    if p.get("hunger", 0) >= THRESHOLDS["eat_at"]:  # run 44: 55 here, 45 everywhere else
         enter_and_eat()
         p = pc()
     if (p.get("sleepPhase") or 0) >= 1:
@@ -85,7 +85,17 @@ def walk_to(tx, tz, danger_ok):
     if danger_ok:
         args += ["--danger-ok", str(danger_ok)]
     for _ in range(12):
-        me = data("places", r=1)["me"]
+        try:
+            me = data("places", r=1)["me"]
+        except Exception as e:  # run 44: an ambush landed just after wgo's arrival, and 'places' raised on the field map
+            if "not on the world map" not in str(e):
+                raise
+            import wgo
+            outcome = wgo.handle_ambush()
+            print(f"  an ambush on arrival: {outcome}", flush=True)
+            if outcome != "cleared":
+                stop(f"an ambush on the way to {tx},{tz}: {outcome}")
+            continue
         if me == f"{tx},{tz}":
             return True
         upkeep()
@@ -236,6 +246,39 @@ def main():
             w.writerow(row)
         print(f"  {row['seconds']} s, {row['game_hours']} game hours: {listing}")
         done += 1
+        unload()
+
+
+FRUITLESS = False  # an unload that found nothing to empty ends the tries for this tour (run 44)
+
+
+def unload():
+    """Run 44: 20 maps in one tour, and a closed chest weighs 15 (Burden 2 at five): at burden phase 2 step into the
+    tile's field map, empty the chests there with chests.py --field (they stay behind), and come back up. Run 41 did
+    this by hand."""
+    global FRUITLESS
+    p = data("state")["pc"]
+    if (p.get("burdenPhase") or 0) < 2 or FRUITLESS:
+        return
+    # run 44: the weight was medals, bars and food, the one chest locked and the next nested inside it: chests.py found
+    # nothing six times, and each try stepped into the tile's field map (danger 36 by Specwing: a shiva and a penguin)
+    pack = data("stock").get("pack") or []
+    if not any("treasure chest" in (x.get("name") or "").lower() for i in pack for x in [i] + (i.get("items") or [])):
+        return
+    acts = call("acts", dx=0, dz=0, mode="all").get("data", {}).get("acts") or []
+    enter = [a for a in acts if a["text"] == "Enter"]
+    if not enter:
+        print("  burden phase 2 and no field map here: the chests ride on")
+        return
+    call("do", i=enter[0]["i"])
+    wait_until("zone", timeout=10000)
+    out = run("chests.py", "--field", timeout=900)
+    print(f"  unload at burden phase {p.get('burdenPhase')}: chests.py --field rc {out.rc}: {last(out)[:100]}", flush=True)
+    if "no chest left" in str(out) or "locked chest" in str(out):
+        FRUITLESS = True  # nothing it can empty: no more field-map trips for it this tour
+    lv = run("leave.py", "--force", timeout=300)
+    if lv.rc != 0:
+        stop(f"leave.py rc {lv.rc} after the unload: {last(lv)[:100]}")
 
 
 if __name__ == "__main__":

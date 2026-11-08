@@ -185,7 +185,10 @@ def main():
         from farmday import is_meal
         # run 36: 65 "stale mushrooms" counted as 65 meals at 490-06-10; seven game days on they were 61 rotten ones and
         # the ladder stopped Hungry on Unknown Grassland B1 with only milk and the travel rations left: stale doesn't count
-        meals = edible(lambda n: is_meal(n) and "rotten" not in n.lower() and "stale" not in n.lower())
+        meals = edible(lambda n: is_meal(n) and "rotten" not in n.lower() and "stale" not in n.lower()
+                       and not re.search(r"\bmini\b", n.lower()))
+        # run 44: 24 mini salads passed the count as 24 meals and lasted about an hour (~2-6 hunger each): three count as one
+        meals += edible(lambda n: is_meal(n) and bool(re.search(r"\bmini\b", n.lower())) and "rotten" not in n.lower()) // 3
         if meals < MIN_MEALS:
             refuse(f"leaving home refused: {meals} meals carried, under {MIN_MEALS} (3 days): restock the Cooler Box "
                    "(food in the bags doesn't count: eat_one never looks there) from the harvest box or a pantry, or --food-ok")
@@ -227,6 +230,23 @@ def main():
                   "one, so buy on the next town trip (stock at random, 330-780: Sayig or Sesa in Aquli Teola, Gizbird in "
                   "Mysilia, Tarraf in Palmia, Alecgan in Noyel, Kerona in Derphy)")
             log_waiver("leave", f"{have} lockpick charges carried, under {MIN_PICK_CHARGES}", "none in storage: warned, not refused")
+    # run 44: the sleeping bag left the pack at a home sort, and the next long walk stopped Very Sleepy ("There's no bed
+    # in your backpack"); sleep.py on the road needs a bed carried. Refuse while storage holds one; else warn (the Rest
+    # ability sleeps without a bed: fact on Rest)
+    if at_base and "--bed-ok" not in sys.argv:
+        from common import data
+        st = data("stock")
+
+        def bed(name):
+            n = name.lower()
+            return "sleeping bag" in n or "makeshift bed" in n or n.endswith(" bed") or " bed " in n
+
+        if not carried(bed):
+            stored = [f"{b['name']} {b['x']},{b['z']}" for b in st["boxes"] if count(b.get("items") or [], bed)]
+            if stored:
+                refuse(f"leaving home refused: no bed carried, and storage holds one: {', '.join(stored[:3])} "
+                       "(box.py \"BOX\" --take \"sleeping bag\"; --bed-ok to go anyway)")
+            print("no bed carried and none in storage: sleep on the road with the Rest ability (fact on Rest)")
     # run 38: goals.md's Upkeep says leave.py checks "travel rations on hand (the next fare + 1)", but nothing did: I
     # left with none, and a Fast Travel back from Capricious Forest (2) was impossible. The blanket's shape: refuse
     # while storage holds rations, else say where to buy them (inns: Upan, Tiguen, Robean, 47 each)

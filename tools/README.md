@@ -396,6 +396,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`job.py`**: A long loop's registration, so it can be stopped (2026-10-19, after run 10's runaway loop).
 - **`journal.py`**: Read the journal (run 33: opened by hand five times for the guild ranks and Gold Beneath's step). The injected MenuJournal key does nothing after a restart (run 15); the hotbar's own Journal button (a HotItemLayer whose hover tip reads "Journal") opens LayerJournal. The Quests tab lists the main quests and the four guild entries; an entry's text shows under "Quests in progress".
     usage: python -I tools/journal.py guilds          the four guilds: rank, contribution, salary
+           python -I tools/journal.py list            every entry on the Quests tab (run 44: G52 needed the
+                                                      story's open quests, and an entry's name had to be guessed)
            python -I tools/journal.py "Gold Beneath"  one entry's text
     Exit 0, 1 refused (no Journal button), 3 stopped (a window already open).
 - **`kb.py`**: Knowledge graph for Elin: the game's own data tables (exported through the bridge) joined with what was observed in play (knowledge/facts.jsonl). Answers "how do I make X", "what uses X", "what does station S make", "what do I know about X" without re-reading game code.

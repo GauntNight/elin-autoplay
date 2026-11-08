@@ -4,6 +4,8 @@ HotItemLayer whose hover tip reads "Journal") opens LayerJournal. The Quests tab
 the four guild entries; an entry's text shows under "Quests in progress".
 
 usage: python -I tools/journal.py guilds          the four guilds: rank, contribution, salary
+       python -I tools/journal.py list            every entry on the Quests tab (run 44: G52 needed the
+                                                  story's open quests, and an entry's name had to be guessed)
        python -I tools/journal.py "Gold Beneath"  one entry's text
 Exit 0, 1 refused (no Journal button), 3 stopped (a window already open).
 """
@@ -65,6 +67,14 @@ def main():
                 contrib = re.search(r"Contribution: [\d,]+ / [\d,]+", t)
                 salary = re.search(r"Salary: [^\n]+", t)
                 print(f"{g}: {rank.group(0) if rank else '?'}; {contrib.group(0) if contrib else '?'}; {salary.group(0) if salary else ''}")
+        elif want == "list":
+            bs = data("buttons").get("buttons") or []
+            names = [(b.get("text") or "").strip() for b in bs if "ButtonGeneral" in (b.get("name") or "")]
+            for n in names:
+                if n:
+                    print(n)
+            if not any(names):
+                print("(no entries listed: the Quests tab may not be the one open)")
         else:
             t = entry_text(want)
             if t is None:

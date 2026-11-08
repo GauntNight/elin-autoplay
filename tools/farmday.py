@@ -40,6 +40,22 @@ _BF = (str(home.BONFIRE[0] - BONFIRE_STAND[0]), str(home.BONFIRE[1] - BONFIRE_ST
 # Whole words with plurals (the review of 2026-10-23: "imo" fitted "kimono" and "pie" "pieces" as
 # substrings), so "roast" covers roasts and "jerky" jerkies; run 14: the plural first ("mushroom"
 # hit a loose raw white one).
+RATION_RESERVE = 5  # run 44: travel rations kept back for Fast Travel fares (1 + hours/24 each); the rest are food
+
+
+def rations_carried():
+    """Travel rations in the pack and every carried container (the Cooler Box included)."""
+    import re as _re
+    from common import data
+    n = 0
+    for it in data("stock").get("pack") or []:
+        for x in [it] + (it.get("items") or []):
+            if "travel ration" in (x.get("name") or "").lower():
+                m = _re.match(r"(\d+) ", x["name"])
+                n += int(m.group(1)) if m else 1
+    return n
+
+
 MEALS = ("roasted", "roast", "on the bone", "skewer", "imo", "weed stew", "soup", "bread", "salad", "tomato", "mushrooms", "mushroom",
          "truffle", "api nut",  # run 10: tomatoes, mushrooms
          # run 20: the last food in the Cooler Box was 3 jerkies and eat_one returned None at hunger 78
@@ -272,7 +288,7 @@ def eat_one():
         pack_meals = [i["name"] for i in carried if is_meal(i["name"]) and "rotten" not in i["name"].lower()
                       and (i.get("num") or 1) == 1
                       # run 28 (twice): the last travel ration is the Fast Travel fare; only past Very Hungry
-                      and ("ration" not in i["name"].lower() or s["pc"].get("hunger", 0) >= 80)]
+                      and ("ration" not in i["name"].lower() or s["pc"].get("hunger", 0) >= 80 or rations_carried() > RATION_RESERVE)]
         if not pack_meals:
             # run 28: the full grid stopped five meals in one night; move non-kit stacks into the bags and try again
             try:
@@ -320,7 +336,9 @@ def eat_one():
         # run 29: the Cooler Box held no meal, the MEALS fallback reached "travel ration" and wgo's meal stop ate
         # one of two at hunger 33 (the run 28 rule covered only the full-grid path): a ration is the Fast Travel
         # fare, never a meal under hunger 80 on any path
-        if "ration" in food.lower() and h0 < 80:
+        # run 44: with 11 rations and nothing else, "never under 80" stopped a ladder at hunger 67 on a danger-12 floor:
+        # only the reserve (RATION_RESERVE, the next fare and one spare) is kept back
+        if "ration" in food.lower() and h0 < 80 and rations_carried() <= RATION_RESERVE:
             continue
         # run 39 (Warded Ruin B2): the mushrooms had rotted and the Cooler Box held only milk: milk is drunk, not eaten
         # ("It is drinkable", Nutrition 5), so the Eat act was never offered and the ladder stopped Hungry

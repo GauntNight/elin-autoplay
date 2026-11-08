@@ -91,6 +91,24 @@ def on_world():
     return z["region"] if "region" in z else "ntyris" in str(z.get("full") or "")
 
 
+def fed_nap():
+    """A nap on the world map, after a meal when hunger is 50+ (run 44: 'sleepy at the door: refused: hunger 58/62: eat first'
+    three times in one evening; sleep.py won't nap hungry and the world map has no Eat). wgo.meal_stop enters the local map
+    under me (a nefia's tile goes in and back up its stairs), eats to the mark, and comes back up."""
+    if ((state().get("pc") or {}).get("hunger") or 0) >= 50:
+        import wgo
+        why = wgo.meal_stop()
+        print(f"  a meal before the nap: {why or 'fed'}", flush=True)
+        # run 44 (Savage Ruin): the meal stop ate on B1 with a drone in view and its stairs up didn't take, so the nap was
+        # refused "in a nefia" and the circuit looked for the world map's Enter from inside the floor
+        for _ in range(2):
+            if not (state().get("zone") or {}).get("nefia"):
+                break
+            print("  still on the nefia's floor after the meal: stairs up", flush=True)
+            run("stairs.py", "up", timeout=300)
+    return run("sleep.py", timeout=600)
+
+
 def candidates(lo, hi, r, skip=()):
     rep = call("places", r=r)
     if not rep.get("ok"):
@@ -160,7 +178,7 @@ def main():
                 # nap on the spot. Once a circuit, when the game lets me sleep
                 if not cands and not napped:
                     napped = True
-                    sl = run("sleep.py", timeout=600)
+                    sl = fed_nap()
                     print(f"  no nefia in range: a nap to refill the list: sleep.py rc {sl.rc}: {last(sl)[:70]}", flush=True)
                     if (state().get("layers") or {}).get("top"):
                         run("close.py", timeout=60)
@@ -209,9 +227,7 @@ def main():
                 # 50+: then the ladder's own stop stands)
                 if ((state().get("pc") or {}).get("sleepPhase") or 0) >= 1:
                     # run 42: "refused: hunger 61/71: eat first" at the door, twice: the world map offers no meal, so step in for one and out again is the ladder's job: count it here
-                    if ((state().get("pc") or {}).get("hunger") or 0) >= 50:
-                        print("  sleepy at the door and hungry: the ladder eats, then naps outside", flush=True)
-                    sl = run("sleep.py", timeout=600)
+                    sl = fed_nap()
                     print(f"  sleepy at the door: sleep.py rc {sl.rc}: {last(sl)[:80]}", flush=True)
                 acts = (call("acts", dx=0, dz=0, mode="all").get("data") or {}).get("acts") or []
                 ent = [a for a in acts if a["text"] == "Enter"]

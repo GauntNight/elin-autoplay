@@ -21,6 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import bag_slots, base_ready, call, data, pc, ready, refuse, run, setup, stop  # noqa: E402
+from packcheck import errand  # noqa: E402  (run 44: carry.txt items never drop)
 
 BAGS = ("a backpack", "a loot bag", "a spoils bag", "a haul bag")
 FURNITURE = {"ext", "deco", "util", "mech", "_furniture", "crafter", "bed", "facility", "generator", "instrument", "table", "door", "processor"}
@@ -211,7 +212,10 @@ def drop_bag_excess(limit):
     # chest, so they aren't dropped here; the same for spellbooks with charges (the user asked why so much loot was dumped)
     rows = [it for it, v, _why in stock.decide(items, spells) if v == "excess" and it["where"] == "pack"
             and (it.get("bag") or not re.search(PACK_KEEP, it["name"].lower()))
-            and not re.search(r"\b(rod|spellbook) of .*\((?!0 )\d+ charges?\)", it["name"].lower())]
+            and not re.search(r"\b(rod|spellbook) of .*\((?!0 )\d+ charges?\)", it["name"].lower())
+            # run 44: the potion of ether antibody (10 medals, carried for the corruption-300 disease) went from the loot
+            # bag as "stock excess" on a nefia floor; an errand's items (runs/carry.txt) and an antibody never drop
+            and "antibody" not in it["name"].lower() and not errand(it["name"].lower())]
     done = 0
     for it in rows[:max(0, limit)]:
         if it.get("bag") and "moved" not in run("bag.py", it["bag"], "--take", it["name"]):

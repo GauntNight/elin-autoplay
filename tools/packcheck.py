@@ -92,15 +92,15 @@ ROUTES = [
     # run 19 (the user): treasure maps in the shared Maps box, where Poppy's Treasure Hunt finds them
     (("treasure map",), BOX_STR(home.MAPS_BOX), "the shared Maps box (the Workshop)"),
     (("thread", "fiber", "string", "rope", "skin", "big leaf", "big leaves", "needle", "texture", "bolt"),
-     "|".join(BOX_STR(b) for b in home.BAG_PARTS) + "|" + BOX_STR(home.ARMORY5), "Bag parts box (the Workshop; the yard's wagon when full, run 42)"),
+     "|".join(BOX_STR(b) for b in home.BAG_PARTS) + "|" + BOX_STR(home.ARMORY5) + "|" + BOX_STR(home.SPARES), "Bag parts box (the Workshop; the yard's wagon when full, run 42; the yard's chest last, run 44)"),
     (("bone", "nail", "battery", "batteries", "microchip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5), "Parts box (the Workshop; the yard's wagon when full, run 42)"),  # run 30: queen bees (a beehive part)
     (("leaf", "leaves", "tuft of", "tufts of", "grass wall"), BOX_STR(home.FODDER_BOX), "the fodder box (the Farmhouse)"),
     (("corpse",), "ship", "the shipping chest (a fresh corpse; cook it first if food is short)"),
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
-    (("paint", "dye"), "|".join(BOX_STR(b) for b in home.VALUABLES), "valuables (paint and dyes: materials; run 31: dyes for G30's flower beds)"),
+    (("paint", "dye"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.SPARES), "valuables (paint and dyes: materials; run 31: dyes for G30's flower beds; the yard's chest last, run 44)"),
     (("platinum", "gold bar", "medal", "ecopo", "coin", "ticket", "figure", "figurine", "card of", "gene of",
-      "flicker of decency", "gem", "jewel", "cards of", "figures of"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW),
-     "valuables (the Storehouse; the Storage Chest when full, run 21)"),
+      "flicker of decency", "gem", "jewel", "cards of", "figures of"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
+     "valuables (the Storehouse; the Storage Chest when full, run 21; the yard's 276-slot chest last, run 44)"),
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf
     # run 31 (G30 M5): loose lights (an old lantern from a nefia) wait with the decorations until they're installed
     (("holy wreath", "holy garland", "holy socks", "holy boots", "gift box", "candy cane", "doll", "lantern", "candle", "lamp"),
@@ -178,6 +178,16 @@ def has_word(low, keys):
     "fish" a fishing rod). A multi-word key is matched as a phrase."""
     low = (low or "").lower()
     return any(re.search(_word_re(k), low) for k in keys)
+
+
+def is_kit(low):
+    """A KIT word, but never a spellbook or a spent rod (run 44: "arrow" took the spellbooks of arrow of the moonlit night
+    and ice arrow, "cure minor wound" its spellbooks, "rod of cure" two rods at 0 charges: 13 of them sat in the pack
+    as kit and left it 2 cards over full, so shipstar couldn't carry a piece)."""
+    low = (low or "").lower()
+    if "spellbook" in low or re.search(r"\(0 charges?\)", low):
+        return False
+    return has_word(low, KIT)
 
 
 GEAR = re.compile(r"\[-?\d+, ?-?\d+\]|\(\d+d\d+")  # "[6, 0]" armour, "(3d5+3, 2)" weapons
@@ -272,14 +282,14 @@ def check():
             continue  # run 11: --move shipped 19 mushrooms (box.py reached into the open Cooler Box)
         elif errand(low):
             continue
-        elif has_word(low, HOME_ONLY) or not has_word(low, KIT):
+        elif has_word(low, HOME_ONLY) or not is_kit(low):
             bad.append(("pack", n, *route(n)))
     for n in bag_items("backpack"):
         low = norm_name(n)
         if has_word(low, HOME_ONLY):
             bad.append(("backpack", n, *route(n)))
             continue
-        if has_word(low, KIT) or is_food(low) or errand(low):
+        if is_kit(low) or is_food(low) or errand(low):
             continue
         # the user, run 12: scrolls, potions and rods ride in the backpack, where fire can't burn
         # them (a hot guy's blast destroyed a rod, the sleeping bag and two scrolls in the open pack)
@@ -298,6 +308,8 @@ def check():
             # rides in the bag until they decide, and blocked every departure as "no rule"
             if has_word(low, AWAITING_USER):
                 continue
+            if errand(low):  # run 44: carry.txt's Small Medals went back to the valuables twice from the loot bag
+                continue
             if any(q in low for q in ("(godly)", "(miracle)", "(good)", "(great)", "(excellent)")):
                 unid.append(n)
                 continue
@@ -306,13 +318,13 @@ def check():
                 continue
             # run 18: the spoils bag is the kit's overflow (the pack sits at its stack limit, so
             # crafted, bought and swapped-out items kept landing in bags where tools can't see them)
-            if haul == "spoils bag" and (has_word(low, KIT) or has_word(low, ("potion", "scroll", "rod of"))):
+            if haul == "spoils bag" and (is_kit(low) or has_word(low, ("potion", "scroll", "rod of"))):
                 continue
             # run 14: 10 bone arrows looted into the bag went to the armory; kit goes back to the pack
             # run 36: only the core kit (CORE_KIT); minor kit rides in the bag it's in
-            if has_word(low, KIT) and not has_word(low, CORE_KIT):
+            if is_kit(low) and not has_word(low, CORE_KIT):
                 continue
-            if has_word(low, KIT):
+            if is_kit(low):
                 bad.append((haul, n, "pack", "the pack (trip kit)"))
             elif is_food(low):
                 # the review of 2026-10-23: a looted sandwich went to the stone box through "sand";

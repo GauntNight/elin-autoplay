@@ -40,6 +40,8 @@ def from_bags():
             if BASE in x["name"].lower() and free_cards() > 1:
                 print("  " + last(run("bag.py", i["name"], "--take", x["name"])))
                 run("close.py")
+            elif BASE in x["name"].lower():  # run 44: four chests sat in the bags behind a full grid, and "no chest left" six times
+                print(f"  {x['name']} in {i['name']}: no free card to take it out (free {free_cards()}): bag or drop a stack first")
 
 
 KEEP = re.compile(r"orens|gold bar|medal|platinum|\((miracle|godly)\)|\b(strange|runic|majestic|old) tome|ancient book|spellbook|"
