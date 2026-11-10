@@ -137,9 +137,11 @@ def shift_all(cards, src_of, dst_name, what, light=False):
 
 def contents_only(fx, fz, tx, tz, bag):
     """Carry the stacks of the box at (fx, fz) into the box at (tx, tz), trip by trip."""
+    from farmday import home_guard  # run 45: the elin-play rule (a long walk at home has stops too), missing here
     total = []
     for trip in range(12):
         close_all(lambda *_: None)
+        home_guard(f"boxshift {fx},{fz} -> {tx},{tz}")
         open_box(fx, fz)
         bagname = open_bag(bag)
         bs = call("buttons", all=True)["data"]["buttons"]

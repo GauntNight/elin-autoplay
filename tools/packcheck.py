@@ -202,6 +202,9 @@ def is_food(low):
     # run 34: "a card of turtle" came out of the spoils bag as food ("turtle" is a fish word): cards and figures are valuables
     if "seed" in low or "gene of" in low or "card of" in low or "figure of" in low or has_word(low, JUNK):
         return False
+    # run 45: "a spellbook of summon fish" was sent to the pack as food on every sort ("fish"); books are never food
+    if has_word(low, ("book", "spellbook", "recipe", "scroll", "rod", "potion")):
+        return False
     if has_word(low, FOOD_OK):
         return True
     # run 32: a pepper potage packed for the trip went back to the Pantry while leave.py counted it as a meal:

@@ -42,6 +42,14 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Storage rule (Props.ListThingStack): at home a station draws ingredients from the pack and
     every installed container on the map, at any distance, but one stack per recipe slot. So
     keep each crafting material in a single stack, in one box.
+- **`boxcount.py`**: Count every home container by hand (G54 M0, the user 2026-11-08: "you may need to hand count the boxes and do a full sweep to check inventory"): the bridge's stock op reports a ★Storage Chest as 96 slots whatever its wrenches (fact #1014), but the open container window shows "USED / SIZE" (run 45: the yard chest 68,44 read 199 / 280). So this walks to each installed container the stock op lists, opens it, reads that line, closes it, and writes one row per container with the stock op's contents by kind.
+    usage: python -I tools/boxcount.py [--run NN] [--walk-all] [X,Z ...]
+      Walks only the ★Storage Chests (the one kind whose window has the line); --walk-all opens every container (run 45's
+      sweep: 72 opened, three locked: the practice chest, Fiama's quest chest, a boss chest at 65,40).
+      writes runs/boxcount-NN.csv (x, z, name, used, size, by_stock_op, top contents) and prints the totals:
+      containers, real slots, used, free; and the small ones (size 24 or less) with what they hold.
+    Every step runs farmday.home_guard first (run 41: a box walk with no stops ended in two deaths).
+    Exit 0 counted, 2 the bridge, 3 stopped (home_guard, a container that wouldn't open).
 - **`boxshift.py`**: Move a box that holds things (G12, run 18): a filled container can't be grabbed ("You can't put that in your backpack!"), so empty it into a carried bag with the game's Shift+click (with the box and the bag open, a box stack goes into the bag), grab the empty box, place it, open it there and Shift+click the same stacks back. The box keeps its own name, sharing and priority settings.
     usage: python -I tools/boxshift.py FX,FZ TX,TZ [--bag "loot bag"]
            python -I tools/boxshift.py FX,FZ TX,TZ --contents   only the contents, into the box already
@@ -490,7 +498,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       --dry   print the network (cells per door and in all) and stop
     Doors and the hub are the ones in tools/home.py's comments (run 31): each entry is (door outside step, name).
     Exit 0 laid or listed; 3 a place.py stop.
-- **`paytax.py`**: Pay the oldest tax bill at home (G1's tax chest). The chest opens a drag grid (run 08: its old "Deliver" menu entry is gone): take the bill from the mail post, stand beside the chest, Use it, drag the bill onto the 'ing1' slot, close. Refuses when the gold doesn't cover the bill.
+- **`paytax.py`**: Pay the oldest tax bill at home (G1's tax chest). The chest opens a drag grid (run 08: its old "Deliver" menu entry is gone): take the bill from the mail post, stand beside the chest, Use it, drag the bill onto the 'ing1' slot, close. Refuses when the gold doesn't cover the bill. A carried ★Tax Bill Of 1 Oren goes first; it covers the month, so the real bill in the mail post is shipped (run 45).
     usage: python -I tools/paytax.py
 - **`perform.py`**: Play an instrument song after song for a music quest ("Baby!": score N music points at a party), and stop safely. Run 05: the party's Concert Hall has its instruments installed on the map (a harpsichord there); the game's Play Music act walks to it and plays one song.
     usage: python -I tools/perform.py [INSTRUMENT] [min_sp] [max_songs] [min_hp_pct] [--past]
@@ -510,6 +518,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       e.g. python -I tools/picker.py "scroll of identify" Read "Paper Decorative Ring"
            python -I tools/picker.py "acidproof liquid" Blend "Rigid Hand Axe"
            python -I tools/picker.py "rod of identify" Zap "stone bejeweled amulet"   (a rod is held, then zapped)
+- **`pickup.py`**: Pick up a named thing lying on my cell (or a cell beside me) and check it reached the pack (run 45: the act on a cell with two big wagons is "Pick all", with one "Pick (a big wagon)"; act.py "Pick all" found nothing, and the walk home that followed in the same shell line left the wagon behind: a wasted 25-game-hour leg). Whatever the game calls the act ("Pick all", "Pick (NAME)", "Grab (NAME)"), this takes the thing and counts it in the pack and the bags before and after.
+    usage: python -I tools/pickup.py NAME [DX DZ]       NAME: part of the thing's name ("big wagon"); DX DZ: a cell beside me
+    Exit 0 picked up (the pack holds one more), 1 refused (nothing by that name on the cell), 3 stopped (the act ran, the count didn't
+    change). Gate the next step on it: `pickup.py "big wagon" && leave.py`.
 - **`place.py`**: Hold an inventory item and place it on absolute map cells, in order, through the game's own right-click "Place" (TaskBuild). For each cell: if Place isn't offered, wait a turn (a pet standing there) and then walk next to it; after placing, check the cell changed. Doors go onto existing wall cells.
     usage: python -I tools/place.py ITEM X,Z [X,Z ...] [--height N]
       e.g. python -I tools/place.py "grass wall" 59,51 59,52 59,53

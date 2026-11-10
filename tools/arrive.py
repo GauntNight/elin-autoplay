@@ -5,7 +5,8 @@ order, with the Dishes box shared first. leave.py made it private on the way out
   2. dishes.py share: at home the residents eat only from shared boxes, with no free meal (#685);
      then a drained attribute or a harmful mutation gets its potion (cure(): run 35)
   3. packcheck.py --move: the pack, the backpack and the Cooler Box against the trip kit
-  4. unpack.py: the mail (packages are listed; the storage bins are left out); a tax bill there is paid (run 35);
+  4. unpack.py --take --pickup: the mail (each package emptied into the pack and grabbed, run 45; the storage bins are left
+     out), the packages shipped after the trash step; a tax bill there is paid (run 35);
      yardchests.py: treasure chests lying loose (Poppy's Treasure Hunt, run 43)
   5. trash.py (garbage piles and the pack's junk into the trash can), then town.py: G12's five checks
 Then a line on food: my hunger and what the Dishes box holds (the residents eat ~8 dishes a home
@@ -75,7 +76,10 @@ def main():
     p = run("packcheck.py", "--move", timeout=1200)  # run 35: a full unload ran past the 300 s default twice
     print(p.strip())
     home_guard("the arrival, after the unload")
-    mail = [ln for ln in run("unpack.py").splitlines() if ln.strip() and not ln.rstrip().endswith("[bin]")]
+    # run 45: 26 spam packages (one junk item each) had piled up around the office: this step only listed them.
+    # Now it empties them into the pack and grabs each; the trash step below takes the junk, the packages ship
+    mail = [ln for ln in run("unpack.py", "--take", "--pickup", timeout=900).splitlines()
+            if ln.strip() and not ln.rstrip().endswith("[bin]")]
     print("\n".join(mail))
     # run 35: April's bill (4,476) lay in the mail post through two arrivals ("opened nothing": unpack opens parcels,
     # not bills); springday's pay_tax was the only payer and no farm round ran. Pay it here (paytax.py refuses short)
@@ -93,6 +97,10 @@ def main():
     home_guard("the arrival, before the trash")
     # run 19: both test arrivals failed town.py on garbage until trash.py ran: sweep it first
     print("trash: " + (run("trash.py", timeout=600).strip().splitlines() or ["?"])[-2:][0])
+    from common import data
+    pk = [it for it in data("stock")["pack"] if it.get("id") == "cardboard_box"]
+    if pk:  # run 45: the emptied mail packages ship (~17 each); a package that still holds something stays put
+        print("packages: " + (run("box.py", "shipping chest", *["package"] * len(pk)).strip().splitlines() or ["?"])[-1])
     t = run("town.py")
     print("town: " + (t.strip().splitlines() or ["?"])[-1])
     pc = state()["pc"]

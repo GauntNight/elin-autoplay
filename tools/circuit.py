@@ -165,12 +165,21 @@ def main():
         refuse("not on the world map: leave.py (or evac.py) first")
     napped = False
     until = args[args.index("--until") + 1] if "--until" in args else None
+    deadline = None
+    if until:
+        # run 45: "--until 00:00" at 18:28 stopped at once ("18:28" >= "00:00" as strings): a time already past today is tomorrow's
+        import datetime as _dt
+        hh, mm = map(int, until.split(":"))
+        now = _dt.datetime.now()
+        deadline = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+        if deadline <= now:
+            deadline += _dt.timedelta(days=1)
     register("circuit")
     mark("circuit", "start", note=f"{n} nefias, danger {lo}-{hi}, r {r}")
     done = 0
     try:
         while done < n:
-            if stop_requested("circuit") or (until and time.strftime("%H:%M") >= until):
+            if stop_requested("circuit") or (deadline and _dt.datetime.now() >= deadline):
                 stop(f"asked to stop between nefias ({until or 'circuit.stop'}): {done} conquered")
             if not resume:
                 cands = candidates(lo, hi, r, skip)

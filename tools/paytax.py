@@ -1,6 +1,7 @@
 """Pay the oldest tax bill at home (G1's tax chest). The chest opens a drag grid (run 08: its old
 "Deliver" menu entry is gone): take the bill from the mail post, stand beside the chest, Use it,
 drag the bill onto the 'ing1' slot, close. Refuses when the gold doesn't cover the bill.
+A carried ★Tax Bill Of 1 Oren goes first; it covers the month, so the real bill in the mail post is shipped (run 45).
 
 usage: python -I tools/paytax.py
 """
@@ -73,7 +74,17 @@ def main():
     time.sleep(1)
     run("close.py")
     after = call("state")["data"]["pc"]["gold"]
-    print(f"paid {(r.get('data') or {}).get('dragged')}: gold {gold} -> {after}")
+    paid = (r.get("data") or {}).get("dragged") or held[0]
+    print(f"paid {paid}: gold {gold} -> {after}")
+    if "Of 1 Oren" in paid:
+        # run 45: a ★Tax Bill Of 1 Oren (Miral, 3 medals) pays the month (the counter drops by one, fact #1382), but the month's real
+        # bill stays in the mail post, and the next arrival would pay it as well: ship the oldest real one
+        out = run("box.py", MAIL_POST)
+        real = [b for b in re.findall(r"★Tax Bill Of [\d,]+ Orens", out) if amount(b) > 1]
+        if real:
+            name = "Of " + real[-1].split("Of ")[1]
+            print("  the real bill it covered: " + last(run("box.py", MAIL_POST, "--take", name)))
+            print("  " + last(run("box.py", "shipping chest", name)))
 
 
 if __name__ == "__main__":
