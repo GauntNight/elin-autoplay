@@ -820,7 +820,7 @@ def chests():
             # run 21: the Capricious Ruin's master chest (lock 11) opened on the first try with a
             # lockpick held (Trait.TryOpenLock: a pick never harms the contents; prying can)
             from common import grab
-            if not grab("lockpick"):
+            if not grab("lockpick", prefer="charges"):  # run 45: two lockpicks (12 and 5 charges) refused the bare name
                 # run 35 (Damp Cave B3): a lock-8 master chest was left with Lockpicking 33; a bare Pick Lock opened it
                 # by hand (983 orens, 3 platinum). Trait.TryOpenLock: bare power is skill/2 + 2, "too difficult" at or
                 # under the lock, and a failure costs 1 SP and gives skill exp; only prying (TryPryOpenLock) harms items
@@ -836,7 +836,9 @@ def chests():
                     break
                 call("do", i=pick[0]["i"])
                 wait_until("idle", timeout=20000)
-            run("item.py", "lockpick", "Put away")
+            held = pc().get("held") or ""
+            if "lockpick" in held.lower():  # run 45: the full name, since two lockpicks make "lockpick" ambiguous
+                run("item.py", held, "Put away")
         acts = data("acts", dx=h["x"] - p["x"], dz=h["z"] - p["z"], mode="all").get("acts") or []
         op = [a for a in acts if a["text"].startswith("Open (") and "chest" in a["text"]]
         if not op:

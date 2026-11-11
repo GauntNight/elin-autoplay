@@ -6,6 +6,7 @@ usage: python -I tools/picker.py ITEM ACTION TARGET
   e.g. python -I tools/picker.py "scroll of identify" Read "Paper Decorative Ring"
        python -I tools/picker.py "acidproof liquid" Blend "Rigid Hand Axe"
        python -I tools/picker.py "rod of identify" Zap "stone bejeweled amulet"   (a rod is held, then zapped)
+       python -I tools/picker.py SpIdentify Cast "Silver Robe"   (a spell from the stock: run 45, Aliyun asleep)
 """
 import re
 import sys
@@ -50,7 +51,14 @@ def main():
         if m and int(m.group(1)) >= cap:
             sys.exit(f"refused: {now[0]} is at +{m.group(1)}: {item} caps at +{cap}; it would resist and be used up (--force)")
     log0 = call("state")["data"].get("log") or []
-    if action.lower() == "zap":
+    if action.lower() == "cast":
+        # run 45: 16 Miracle pieces rode in the bags while Aliyun slept; the Identify spell (195 casts in stock) opens the same
+        # picker grid as the scroll. ITEM is the spell's alias (power.py lists them: SpIdentify, SpUncurse)
+        r = call("cast", spell=item)
+        if not r.get("ok"):
+            sys.exit(f"cast {item}: {r.get('error')}")
+        print(f"cast {item}")
+    elif action.lower() == "zap":
         print(last(tool("item.py", item, "Grab")))
         acts = call("acts", dx=0, dz=0, mode="right")["data"]["acts"]
         zap = [a for a in acts if a["text"].startswith("Zap")]

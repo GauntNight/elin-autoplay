@@ -105,6 +105,15 @@ def fed_nap():
             if not (state().get("zone") or {}).get("nefia"):
                 break
             print("  still on the nefia's floor after the meal: stairs up", flush=True)
+            # run 45 (Mystical Cave's neighbour, B1): a puppet Lv12 beside the stairs refused both climbs; a foe at or under my level
+            # is fought first (fight.py keeps its own HP rules), anything stronger still stops at the ladder's door
+            s = state()
+            me = (s.get("pc") or {}).get("lv") or 0
+            foes = sorted((c for c in s.get("nearby") or [] if c.get("hostile") and (c.get("lv") or 99) <= me),
+                          key=lambda c: c.get("dist", 99))
+            if foes:
+                f = run("fight.py", foes[0].get("id") or foes[0]["name"], timeout=300)
+                print(f"  fought {foes[0]['name']} Lv{foes[0].get('lv')} by the stairs: rc {f.rc}", flush=True)
             run("stairs.py", "up", timeout=300)
     return run("sleep.py", timeout=600)
 

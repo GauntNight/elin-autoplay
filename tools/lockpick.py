@@ -32,7 +32,7 @@ def hold_lockpick():
     """The lockpick in hand through common.grab (a whole-word match; cursed stacks skipped)."""
     if matches("lockpick", [pc().get("held") or ""]):
         return
-    if not grab("lockpick", what="tool"):
+    if not grab("lockpick", prefer="charges", what="tool"):
         refuse("no lockpick in the pack")
 
 

@@ -395,7 +395,13 @@ def main():
                         left.append(nm)
                 names = left
             for nm in names:
-                print(f"   {nm}: !! did not move: every box of its route refused ({where})")
+                # run 45: "a spotted potion" left the bag under another name (identified on the way) and every box "refused" it:
+                # an item no longer in the pack by that name isn't a full box (G47 counts only those)
+                from common import _key, data
+                flat = [it["name"] for top in data("stock")["pack"] for it in [top] + (top.get("items") or [])]
+                gone = not any(_key(nm) in _key(n) for n in flat)
+                print(f"   {nm}: " + ("!! not in the pack by this name any more (identified or renamed on the way?): nothing to move"
+                                       if gone else f"!! did not move: every box of its route refused ({where})"))
 
         for c, n, where, label in bad:
             home_guard("packcheck --move")

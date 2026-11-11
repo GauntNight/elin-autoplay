@@ -133,6 +133,12 @@ def handle_ambush(_retry=False):
             s = call("state")["data"]
             p = s["pc"]
         why = ready(s, hp=THRESHOLDS["dungeon_hp"], hunger=None, hostiles=False)
+        if why and "wait it out" in why:
+            # run 45: two circuits stopped on an ambush map for ConConfuse and ConDim among Lv5-12 foes, cleared by hand with
+            # ladder.condition_wait each time (single turns, foes 10+ levels under me fought, a stop on anything stronger)
+            import ladder
+            if ladder.condition_wait():
+                continue
         if why:
             return why
         foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
