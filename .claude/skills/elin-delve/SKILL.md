@@ -1,0 +1,270 @@
+---
+name: elin-delve
+description: Nefia circuits in Elin, the main activity (47% of logged time) - finding nefias and selling fame when the near ones run over the gate (famesale.py), the circuit loop and its flags (circuit.py), what the ladder does on each floor and what to do at each of its stops (ladder.py, delve.py), the floor gate and how it is raised, exploders and the throw distance, threat order, the escape reserve, the kit, the unload cadence, food and sleep on floors, leaving a floor, and monitoring an unattended loop. Use before entering any nefia or dungeon, when starting or watching a circuit, at every ladder or delve stop, and when a fight on a floor goes wrong.
+---
+
+# Delving: nefia circuits
+
+The numbers (HP floors, the swarm count, the gate, the throw distance) are **elin-play's thresholds table**, read by the
+tools from `THRESHOLDS` in `tools/common.py`; this skill is the procedure around them. What a death costs and why the
+layers stand in this order: `knowledge/risk.md` (the user, run 16). Kit: **elin-pack 1**. Routes between nefias: **elin-travel**.
+
+## 1. Before the first nefia of a session
+
+- **The kit** (elin-pack 1): `ladder.py` refuses to start under 2 scrolls of teleport, 3 cure potions, an evacuation and a
+  return (it opens the backpack to count; `--kit-ok 'why'` and `--blanket-ok 'why'` override, each with a row in
+  `runs/waivers.csv`), under 3 free grid cards (`ladder.room_check`, run 33) or with an ether disease it doesn't allow
+  (`ladder.ether_check`). A light (night maps and quest instances show 8 cells without one, run 05), the pickaxe, the Putit. (05, 08, 20)
+- **Go in at all:** the floor gate and the kit decide; power.py's level-only table is advice only (it predicts the median
+  fight 50x too high, run 16): `threat.py NAME` per kind decides; Lv5+ for the first. (04, 05, 16)
+- **Carried gold:** spend down first, or box it at home: carried orens are currency and can't be boxed (run 16), but
+  picked-up coins are an item stack (`box.py 57,54 "685 orens"`, back with `--take` before the tax day). A death past the
+  beginner period drops 33-67% of the carried orens on the death tile (Chara.ApplyDeathPenalty; no items or levels are
+  lost; run 12 took 1,373 into danger 8-9). (the user, run 03; run 15)
+- **Solo is the default since run 38** (the user, 2026-11-01: "solo seems to work better for now at least so we'll stick
+  with it and optimize"; G38: solo 7.4 real minutes a conquest against the crew's 10.0, exp even; fact #1139): the allies
+  wait at home. With one along, take it as an expendable shield (`delve.py --expendable`, the user, run 16): back home free
+  in 0-7 days (Zone.Revive), -10 affinity; Strategy tab "Always stay by you while in combat" on; a teleport scroll leaves
+  her behind; two slots at CHA 19 with Party Animal (CHA 20 opens a third; Lonely Soul pays +3% HP and speed per empty
+  slot: facts #746-#747). `crewcheck.py` reads fights.csv by allies present.
+- **Sleepy at a dungeon's door? Sleep on the overworld first** (the user, run 17): `sleep.py` on the world-map tile, then
+  enter. Read `power.py`'s speed before a dungeon: sleepiness and hunger cost speed, and speed is damage and escape (08).
+- **Game speed:** x5 on floors (`bridge.py speed 3`; the user, 2026-11-06: "5x is fine", watched or not; run 41: a conquest
+  in about 8 real minutes against run 40's 28, and no blast or fight went worse for it). `fight.py` drops to x1 for its
+  rounds and `ladder.descend` takes the stairs at x1 (at x5 the walk to them ended short). `speed 1` by hand only the
+  moment a named exploder or a hard stop is in play.
+
+## 2. Finding nefias, and fame sales
+
+- `bridge.py places 60` on the world map lists them (radius 25 from home showed none in run 16; 60 listed 20); `circuit.py`
+  reads the same list and takes the nearest unconquered one in its danger band. Floors persist within a visit (B2 -> B3 ->
+  B2 showed the same floors): plan a nefia as one pass.
+- **The spawn rule (Region.cs, run 27, fact #897):** 70 random sites region-wide, each lives 7 game days; the shortfall
+  refills **once a game day when the world map is entered** (leaving any local map: a meal stop, a sleep stop, a town), at
+  random points of the whole region, so walking the world map spawns nothing and nothing spawns "around me". Level: 1 in 3
+  from my level (the danger 16-31 ones), 2 in 3 from FameLv x 75-124% - 3 + a little. Random nefias expire within days
+  (run 20: two were gone after 3-4 day walks): look again on arrival.
+- **When the near ones run over the gate, sell fame** (runs 27, 32-42): `famesale.py NAME [TIMES=3] [MIN=140]` beside an
+  informer of the Merchants Guild (Gizon, Ishbear; `whereis.py any NAME` first). A sale takes 20% of fame (run 27 at
+  Ishbear in Palmia: ~1,040 -> ~665 brought danger 3-7; run 42: 263 + 210 + 168 and 191 + 153 orens), half the tax bill is
+  fame x 2, and since the refill scales with fame, new nefias come back under the gate. After a day passes, enter and leave
+  a local map, then `places` again. `circuit.py`'s "no nefia" stop names the fame sale.
+- **Which danger** (the user asked, run 28: "what Nefia level is good for us"): `runs/nefias.csv` holds each conquest's
+  base danger, master floor and boss chest. Through run 28 (19 conquests) the chest averaged 579 at base 3, ~760 at 4-5 and
+  ~890 at 6-7, platinum 1-3 at every level; masters sit on B2-B4, so the band's top stays under the gate by the floors
+  below the first (fact #1136: base 11-12 nefias met the gate before their master). **Add a row at every conquest**: the
+  file has none after run 40 (the review of 2026-11-11), so the current mix is unrecorded.
+- **No underwater dungeons** (the user, run 17: "you can't do those kinds of dungeons"): an "Underwater Ruin"
+  (Zone_dungeon_water) suffocates every turn (ConSuffocation) on top of the fight: 112 -> 20 HP on a danger 4 B1 while
+  delve.py waited on its HP rule, and the user walked me out. `wgo.py` and `delve.py` refuse them unless `--breathe`,
+  which is for water breathing in hand.
+
+## 3. The circuit
+
+From the world map: `python -I tools/circuit.py [N=4] [--danger LO-HI] [--r TILES] [--floors 5] [--unattended] [--solo]
+[--danger-ok N] [--skip NAME ...] [--until HH:MM] [--wrecks] [--blanket-ok 'why']`. It takes the nearest unconquered
+nefia of that base danger within R tiles, `wgo.py` there, Enter, `ladder.py`, on "conquered" `evac.py` out, and repeats.
+
+- **The line in use** (runs 43-45, the notes in `runs/activity.csv`): `circuit.py 8 --danger 3-12 --r 30 --unattended`
+  for most starts; a narrower band and radius (`--danger 3-10 --r 20` or `--r 25`) at other times. `--danger-ok 30` rides
+  on the circuits since run 43 (two near nefias were skipped past level 22 fields; run 42's crossings up to 44 cost no
+  potion: elin-travel's far-maps rule). The tool's own defaults (3-7, r 15) date from run 30.
+- `--skip NAME` leaves out a nefia whose master lies below the gate; `--until HH:MM` starts no new nefia after that clock
+  time (run 42: the shipping and the close-out wait on the circuit; a nefia is ~10 real minutes); `--wrecks` mines each
+  floor's wrecks (off by default: wreck stones fill the bags; a ladder run by hand needs `--no-wrecks`, run 35: without
+  it the floors mine wrecks into granite and logs, Burden twice).
+- **What it does itself** (runs 39-44): sleeps on the tile when Sleepy before each Enter; eats before a nap (`fed_nap`) and
+  takes the stairs up first when the meal stop left me on a floor; fights hostiles 10+ levels under mine before each
+  evacuation (`clear_weak`); naps once to refill an empty list; started on a nefia's floor it runs the ladder there first.
+- **The unload:** every **four** conquests (`circuit.UNLOAD_EVERY`; run 40: was two, three bags carry 3-4 conquests) and
+  whenever the carried bags are full, the circuit stops with "go home: ...". It doesn't unload: `recall.py`, then
+  `arrive.py` (elin-home 1), then `circuit.py` again. Return needs a local map: the circuit ends each conquest on the
+  nefia's world-map tile and `recall.py` refuses there ("enter a local map first", run 36).
+- **It stops (exit 3) for a decision:** any ladder stop that isn't a conquest, no nefia in range, every nefia past the
+  route limit, the unload. It registers as a job (`runs/jobs/circuit.json`: `journal.py` refuses while it runs, because its
+  window stops the loop) and `runs/jobs/circuit.stop` ends it between nefias.
+- Grassland nefias run long (fact #1175; run 39: 40-70 real minutes each).
+
+## 4. The ladder: one floor at a time
+
+`python -I tools/ladder.py [MAX_DANGER] [FLOORS=3] [--unattended] [--no-wrecks] [--solo] [--expendable] [--in X,Z]`
+(the circuit calls it). Per floor: `delve.py` until the floor is explored (frontier walking; fights at or below my level
+with the Putit as opener, soaks exploders, stops on the HP rules), `loot.py`, a QuickSave, then the stairway that isn't the
+way in. The gate covers every floor here (delve's own gate covers nefias only: Lesimas and Nymelle aren't).
+
+**It does these itself** (runs 20-43): uses every safe shrine (replenish, armor (the picker gets the worn piece with the
+lowest plus), knowledge, enlightenment, invention, wheel; never strife or material); opens every treasure chest (a locked
+one with the lockpick, never pried) and a boss chest is emptied completely (elin-pack 4); ends on "conquered" when the
+zone's name carries the mark; clears a wanderer in view before looting; frees 3 grid cards a floor (`purge.py --free 3`:
+purge drops junk by rule and unclutters the grid into the emptiest bag); naps outside from any floor (evac, sleep, Enter;
+re-walked floors don't spend the quota); casts See Invisible once a floor; waits up to 8 turns for allies over 3 cells
+away; runs `tunnel.py` after the map and Teleport when a floor looks closed, and `tunnel.py --to` for magic-mapped stairs
+in a closed room or a boss chest it can't reach; fights **Evolved** creatures at or below my level (their gene, a superior
+one half the time; loot takes genes first) and stops above; gets off a mine trolley at once (`common.ready`); the walk to
+the stairs ignores far weaker foes.
+
+**Its stops, and what to do at each** (a stop is a decision: never fight past one, never chain the next step on it):
+
+| Stop | Do |
+|---|---|
+| the floor's danger is over the cap | back up the stairs I came down (the arrival cell); `circuit.py --skip NAME` for that nefia |
+| delve stopped on HP (the table's drink line) | no foe in view: `cure.py` (the Cure Minor Wound spell, free) before a potion; heal to the table's heal-to and go on while the escape reserve holds (section 7) |
+| a swarm | teleport, then `leave.py --force` (the table's swarm row) |
+| an "avoid" kind near my level | range it or leave (section 6) |
+| an exploder close, or a **named** one | section 6; a named one is killed from range at x1 (`namedexploder.py`) or the floor is left |
+| blindness (ConBlind) | walk away until it clears (~7 turns), drink by the table, then kill the caster from range (run 14) |
+| low HP after a floor, SP under 10 | heal; SP comes back only from sleep: out, and sleep on the overworld |
+| Sleepy | never in a dungeon: `evac.py`, `sleep.py` on the world-map tile, Enter again (the ladder's own nap does this) |
+| a meal that didn't lower hunger, "no meal" | `eat.py` on the food actually in the pack; none: leave and restock (section 8) |
+| no way down, a walk that ends where it began | a pocket: section 7 (a rod of teleport, `tunnel.py`); the true bottom or a locked story stairway is a hand decision |
+| the pack at 42+ stacks, the bags full | `purge.py --free N`; bags full: the unload (section 3) |
+| burden phase 2 or 3 | shed weight before any zone change (`purge.py --heavy`, section 7) |
+| "Enemy spotted" with nobody in view | an invisible foe beside me (run 41: a walk to the stairs ended four times): See Invisible (`ladder.see_unseen` does it once a floor), then fight what it shows |
+| a window, a dialog | read it first (`talk.py`, `read.py`), then `close.py` |
+| a neutral Evolved creature ends the exploring | a known gap (the review of 2026-11-11: delve lists it as a foe and fight.py answers "target not in view" without `--force`): decide by hand |
+
+## 5. The floor gate, and how it moves
+
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **16** since run 45, at Lv39); `ladder.py` takes
+the same number for every floor and **15** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
+auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
+`hygiene.py` checks it against the code: `common.py`, the table and this section change together.
+
+**The rule (the user, 2026-11-12): the gate is raised step by step, on evidence.** The evidence is the lowest HP on each
+floor, recorded with the floor's danger: `circuit.py` writes a row per conquest to `runs/conquests.csv` (the zone, its
+danger, the gate in force, my level, the lowest HP percent the ladder printed, unattended or not; `runs/nefias.csv` was
+kept by hand and stops at run 40). Read that table before changing the gate. One step up
+only after a floor at the limit was cleared without a drink; one step down after a near-death at or under the limit.
+Each change goes into the `THRESHOLDS` comment and a fact (fact #1047 and its successors).
+
+The steps so far: danger 4 at Lv7 (run 05), 5 at Lv9 (07), 8 at Lv12-16 (run 12; risk.md), 8 -> 9 at Lv23 (run 24: run
+21's danger-8 den, 0 HP lost, no drink), 9 -> 10 at Lv26 (run 27: the Rustic Ruin's danger-9 B2, 6 HP lost, no drink), up
+to 14 by run 34 (Vernis Mine B5-B7 at 10-12 in run 33; Chilly Cave B3 at 13), **down to 13 at Lv33** (run 36: a
+near-death, 218 -> 0 in one round on Dark Ruin B5 at danger 12 under the unattended 13), 14 at Lv35 (run 40: two
+danger-12 floors at the unattended limit cleared without a drink), 15 at Lv38 (run 43: Traditional Cave B4 at danger 13,
+12 HP lost, no drink), 16 at Lv39 (run 45: Ruined Grassland B2, Mossy Grassland B3 and Warped Machinarium B3, all danger
+14, cleared at full HP with no drink). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
+most floors sit far under the gate.
+
+## 6. Fights on a floor
+
+- **Threat order** (the user, run 16; `threat.py NAME`, `--table [LV]`, `--write` refreshes knowledge/threat.csv): each
+  kind's offense, defense, group and tricks from the game's race, job and spell tables plus fights.csv. Exploders never
+  adjacent; **kill first** high offense + low defense, casters, potion-throwers, summoners, blinders, paralysers, healers,
+  from range (a goblin wizard did most of a 57 -> 29 drop beside a special Orc, run 06); **kill last** high defense + low
+  offense. An **avoid** kind (high offense + high defense) within 8 levels of mine (4 until run 17: two Lv12 lizardmen
+  took 45% of my HP in two turns at Lv18) stops `delve.py` and `fight.py`: range it or leave; **15+ levels under mine
+  it's an ordinary foe** (`avoid_ignore_below`, run 43: a master 『Lizardman』 Lv19 died in 11 turns for 3 HP at Lv38);
+  at any level once a recorded fight cost 30% of my HP (`avoid_seen_pct`, run 33: aliens Lv18 at Lv30).
+- **From range first:** casters, archers, yeek warriors, shamans, mummies, drones, slimes, floating eyes (the Putit, the
+  bow with arrows, the rod of slow); melee only what shrugs at range. `shoot.py` exits "no ammo" without arrows or pebbles
+  (the user caught a whole trip of empty shots, run 12), and delve then throws the Putit. (06, 08, 12)
+- **Evasive kinds** (threat.py `evasive`: race DV 20+, or 15+ at speed 150+: bats, fairies, the metal bells; the user,
+  run 34: "that kind of adversary we should know is hard to kill with swords"): `fight.py` casts an arrow spell each round
+  (Fire Bolt solo: a bolt's line can hit the crew) while MP >= 25, then throws the ★Putit In Amber (hit 128% against the
+  axe's 105%); melee last (`--melee` to force it). (34: a vampire bat, 20% a round, the axe missing)
+- **A foe that keeps running away gets thrown weapons, spells or ranged attacks, not a chase** (the user, run 21):
+  `fight.py` throws the Putit In Amber at a target that kept its distance after one approach or moved away.
+- **The Swarm ability** (run 40, 50 platinum at Eligin): `fight.py` casts it in place of a swing by the table's row
+  (3+ hostiles within 3 cells, SP 40+), never beside an exploder or a slime (12 SP; a 0.9x melee blow on each: ActSwarm).
+- HP decides, not the count: weak foes in numbers are a normal fight while HP holds (04); the table's swarm row counts
+  far weaker hostiles half or not at all (runs 21, 43).
+- **The auto-combat net** (bridge 0.26.0, run 16): `fight.py` fights in the game's GoalAutoCombat: a lethal hit on anyone
+  healthy at its start leaves them at 0 HP once (Card.DamageHP); at 0 HP the next action is a teleport.
+- **A flee has to move** (Start Run 3: 56 -> -4 and 43 -> -4 HP on one cell): `leave.py --force` hands back after an
+  attempt that moved under 2 cells, and a teleport-less `fight.py` fights on while no foe is above my level and HP holds
+  40%: walking away from what I can kill is what killed.
+- Blind (a master yeek's darkness bolt): no Attack act, and a step into the unseen foe does nothing; delve.py stops on
+  ConBlind (14). Under paralysis an HP floor can't be trusted: leave at the first big hit (11).
+- Special mobs (a capitalized name) carry the best loot: fight and loot them first when at or below my level; never leave
+  a map with one alive (04). `fight.py` logs every fight itself (`fightlog.py`: knowledge/fights.csv, the tricks in
+  knowledge/specials.csv; `power.py fight ...` only for a fight fight.py didn't run).
+- **Butcher only after combat or when safe** (the user, run 15: "trying to butcher while in combat is high risk and we
+  keep getting stuck"): a butchering task with a foe just out of sight got me hit and stuck. **But don't leave the meat
+  behind** (the user, same run): between fights the corpses are picked up, not butchered (`loot.py --no-butcher`; at most
+  5 wait in the pack), and every stop of delve butchers them when nothing hostile is in view; loot.py won't butcher with a
+  hostile in view and butcher.py stops when one appears. On an ambush map, `loot.py 20` before leaving.
+
+### Exploders (suicide attackers)
+
+Kamikaze yeek, hot guy, **bomb rock**, any ActSuicide: threat.py's exploder flag. The distance is the table's row and the
+code's `kamikaze_dist`: **5 cells** (3 until run 40, 4 until run 41).
+
+- Never adjacent. Soak first: a thrown potion makes it Wet, and Wet stops the blast (`delve.SOAK`, which falls back to a
+  thrown cure minor wound: any thrown potion wets). Then throw from the table's distance: `delve.py` steps back to it
+  first, and `cast.py` stops on an exploder inside it. A kill at 2 cells still cost 30 HP (run 12), run 40's throw a
+  blast took 49%, and run 41's took 77%, 46% and 47% through ranged throws at 4 cells: **bomb rocks blink in**.
+- **A named exploder halts delve: its death blast is past any HP** (run 33: **death**, 214 -> -342; run 37: **death**
+  again, 216 -> -478: the state lists a named one as plain 'Hot guy', the 『』 only in the log, so the check never fired
+  until `common.named` read the capital). Kill it from the table's distance or more, at x1: `namedexploder.py` when the
+  spell can kill it. **A named exploder I can't out-damage from range is a reason to leave the floor** (run 41, Mossy
+  Grassland B5: a named Kamikaze yeek adjacent twice in 30 turns, arrows ~1% a cast at Casting 11): the stairs.
+- **Read the game's table, not an id** (run 41): `samurai_kamikaze` has no ActSuicide (knowledge/game/charas.json):
+  'kamikaze' in its id cost teleports for 7 runs. A real exploder has ActSuicide: yeek_kamikaze, hardgay, bombrock.
+  Run 24's bomb rock took 145 -> 0 in melee when delve read names only.
+
+## 7. The escape reserve, and leaving a floor
+
+- **The reserve: 2 teleports + 3 heals untouched** (`escape_teleports`, `escape_heals`). After a bad fight, heal to the
+  table's heal-to with no foe in view and go on (the user, run 16: "you may be teleporting out too early"); **leave the
+  floor when going on would spend the reserve**, or when an "avoid" kind near my level holds the floor. When to read the
+  teleport is the table's row.
+- Never Rest, Wait, Pass Time or sleep in a dungeon: monsters keep coming (Kaberg was knocked out during a Rest). To
+  recover, leave and rest outside. (04)
+- **Evacuation (10-19 turns) or the stairs only with no foe in view**; the return scroll (19-36 turns in run 20) is for
+  going home from a safe spot, never an escape (read at 12 HP, it never fired). (03, 07) `evac.py` reads one evacuation
+  and waits it out; `recall.py [Meadow]` reads ONE return and passes the turns (it fights an adjacent foe and steps off
+  stairways): **a second read cancels it and spends both** (runs 05, 10, 20; the bridge refuses it now). An evacuation
+  goes straight out of a conquered nefia. `stairs.py down` or `stairs.py up` steps into the known stairway from the cell
+  beside it (the user's tip: a walk onto it does nothing); `act Wait` on a stairway takes the stairs: step off first.
+- **Stuck on a floor** (the user, run 42: "looks like you may be stuck in the dirt, may need to mine to get a path"): one
+  soil block held a cave floor for 17 real minutes. `tunnel.py` digs the thinnest wall to open ground out of reach; a walk
+  that ends where it began stops exploring. **Boxed in** (runs 25, 28: delve's "no way down", explore.py's walks that go
+  nowhere: a wreck trap, a Machinarium's metal walls): **zap a rod of teleport** (the Teleport spell fizzles at Casting
+  3), then explore again; mining toward the known map (granite 18, copper blocks 34) is the slow way.
+- **A zone change at burden phase 3 can tumble you** (run 42: a return scroll at 161% with a wagon: 269 -> 57; Scene.cs
+  rolls 1 in 5, MaxHP x burden% / 200): recall, leave, stairs and evac refuse (`common.overweight_stop`); a boss chest's
+  furniture goes by `purge.py --heavy`. Furniture worth taking: `valuables.py` (elin-pack 4).
+- **An ether disease is weighed, not assumed bad** (the user's rule, 2026-11-02): the Single Ether Wing takes the back
+  slot (the cloak falls into a bag) for speed: PV 88 -> 80, speed 132 -> 151 at Lv37, so it stays; `ladder.ether_check`
+  allows Gravity Point, Hunger for Slaughter and the Wing. The next disease strikes at corruption 200: an antibody
+  (Miral, 10 medals) before then.
+- Quick-save after a conquest or a big haul (elin-play); every death or near-death gets its cause in the run log and a
+  line here or in the table.
+
+## 8. Food, sleep and weight on floors
+
+- **Every unattended loop has a hunger stop on every branch and an eat step tested by hand on the food actually in the
+  pack** (run 18 starved in a home loop with food in the bag; run 44: a ladder stopped at hunger 67 "no meal" with 11
+  travel rations in the Cooler Box, because eat_one refused every ration under hunger 80: it keeps 5 back as fares now
+  and eats the rest). A tool's "no meal" is a stop for me too: never start the next long job on it (41).
+- **Real meals** (run 44: 24 mini salads, ~2-6 hunger each, lasted about an hour): inn food or cooked dishes in the
+  Cooler Box (elin-travel 1); `leave.py` refuses home under 6 meals carried.
+- The ladder stops Sleepy and naps outside; with no bed carried `sleep.py` uses the Rest ability (run 44).
+- **Weight ends circuits early** (run 44: four stops at burden phase 2 or 42 stacks: 214 garbages in the pouch, ☆ gear
+  and spent rods in the bags; delve won't loot at phase 2). `purge.py` runs every floor; the unload is section 3.
+
+## 9. Watching an unattended circuit
+
+- Run the circuit in the background with its output in a log, and **put a Monitor on that log at once** (run 42: a silent
+  wait on a loop is how 17 stuck minutes went unseen; run 43: with watchers on every circuit each stop was read within
+  seconds). The command is elin-play's watchlog rule: `python -I tools/watchlog.py LOG --match 'RE' --until 'done:' --max
+  1790`; `--match` must catch the failures too (`stop:|Traceback|refused|go home`), and watchlog's `--idle` line (a log
+  that hasn't grown) is a finding, not quiet: run 45's hang was a loop of steps that did nothing (the review of 2026-11-11).
+- **And `python -I tools/pulse.py` in the background beside it** (the review of 2026-11-11): it reads the game's own
+  turn counter and clock every few seconds and ends, calling the session back, when nothing has moved for five minutes
+  (exit 3) or the bridge has stopped answering (exit 2); at `--max` it ends "still moving": re-arm it. A log can be
+  quiet for a long step or a hang; the turn counter tells them apart. It only reads the state.
+- **One client that acts at a time** (elin-play): nothing else touches the game while the circuit runs, `journal.py`
+  included. **A loop's stop line isn't its end** (run 44): act only after the task's completion notice.
+- Unattended means `--unattended` (the gate minus 1), no client-based instance jobs (deliveries and kill-count jobs are
+  fine), and never a loop that waits.
+- To end it: `--until HH:MM` at the start, or `runs/jobs/circuit.stop` (it ends between nefias).
+- The ladder and the circuit mark themselves in `runs/activity.csv`; mark a hand-run stretch with `activity.py TAG
+  start|end` (the review of 2026-11-11: about half of a run sat outside any marked loop).
+
+## What this skill changed
+
+New at the review of 2026-11-11 (plan D): the circuit had no skill, and its procedure was three cells of tool-notes that
+still said gate 8/10 and an unload every two. Measure: errors.csv repeats in the dungeon and combat domains, exp and orens
+per real hour of circuit time (stats.csv), and the loop minutes of each window (activity.csv).

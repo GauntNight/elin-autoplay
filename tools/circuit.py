@@ -37,6 +37,30 @@ UNLOAD_EVERY = 4  # run 40: was 2; three bags carry 3-4 conquests, and a full ba
 BAG_FULL = 2  # run 36: a bag this close to its slots counts as full (common.bag_slots: 35, the wrenched loot bag 48)
 
 
+CONQUESTS = TOOLS.parent / "runs" / "conquests.csv"
+
+
+def log_conquest(ladder_text):
+    """One row a conquest in runs/conquests.csv: where, the floor's danger, the gate in force and the lowest HP the
+    ladder printed on the way. The review of 2026-11-11: the floor gate stood at 16 at Lv40 and nothing recorded
+    what the floors cost (runs/nefias.csv was kept by hand and stops at run 40). The user, 2026-11-12: the gate
+    rises a step at a time on this evidence (elin-delve). Never breaks a circuit."""
+    try:
+        import csv
+        s = state()
+        z, p = s.get("zone") or {}, s.get("pc") or {}
+        low = min((int(a) * 100 // max(int(b), 1) for a, b in re.findall(r"HP (\d+)/(\d+)", ladder_text)), default="")
+        new = not CONQUESTS.exists()
+        with CONQUESTS.open("a", encoding="utf-8", newline="") as f:
+            out = csv.writer(f)
+            if new:
+                out.writerow(["at", "game_date", "name", "zone", "danger", "gate", "lv", "lowest_hp_pct", "unattended"])
+            out.writerow([time.strftime("%Y-%m-%d %H:%M"), p.get("date"), z.get("name"), z.get("full"), z.get("danger"),
+                          THRESHOLDS["max_danger"], p.get("lv"), low, int("--unattended" in sys.argv)])
+    except Exception as e:  # noqa: BLE001
+        print(f"  conquest not logged: {e}", flush=True)
+
+
 def clear_weak(max_fights=4):
     """Run 39 (Tangled Ruin B3): after the conquest evac.py refused over a Lv1 putit, a Lv2 yeek and a Lv7 wasp in
     view, and the circuit stopped for a hand-run evacuation. Before the evacuation, fight hostiles 10+ levels under
@@ -242,6 +266,7 @@ def main():
             if "conquered:" not in text:
                 stop(f"ladder rc {lad.rc} without a conquest: {last(lad)[:140]}")
             done += 1
+            log_conquest(text)
             # run 34: the boss chest's loot filled the grid after the last floor's purge, and the next nefia's ladder refused
             # at its room check (-2 free cards): free 3 before leaving the conquered floor
             run("purge.py", "--free", "3", timeout=600)

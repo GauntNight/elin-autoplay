@@ -51,6 +51,14 @@ and never installs or copies a mod into the game folder: that step belongs to th
   refuses ambiguity, and the exit codes 0 done / 1 refused / 2 bridge / 3 stopped for a decision.
   `tools/home.py` holds the home's coordinates. The graph: `kb.py facts` hides superseded facts
   (`--all` shows them; `add --supersedes N` marks one).
+- **What is carried** (the review of 2026-11-11): `tools/items.py` reads the bridge's `items` listing (0.40.0):
+  every carried thing at any depth by category, kind and container, never by a word in its name. Tools that
+  eat, read, drop, ship or sell ask it (`meals()`, `find()`, `protected()`); `item.py`, `bag.py` and `box.py`
+  take `uid:N` for the thing itself.
+- **Chains and watching** (the same review): several tool calls in one line go through
+  `python -I tools/seq.py "TOOL ARGS" "TOOL ARGS"`, which ends at the first refusal or stop, never through `;`
+  (broken in runs 21, 28, 29, 42, 43, 45). Beside every unattended loop, `python -I tools/pulse.py` in the
+  background: it ends when the game's turn counter hasn't moved for five minutes or the bridge stops answering.
 - **Focus mode is gone** (the user, 2026-10-19: "I'll never use it the way I do things"). The
   real-keystroke tool (`elin_hand.py`, SendInput to the foreground window) was deleted after run
   12; every input goes through the bridge's own layer (`EInput`), which never touches the user's
@@ -124,9 +132,11 @@ the current player can change any of them in `player.md`.
 The user's aim (2026-10-15): see how good Claude can get at Elin. Improvement has to show in
 the numbers below, not just in the prose.
 
-1. **Before playing**, read `knowledge/lessons.md`, `knowledge/wiki-primer.md`, the last run
-   log in `runs/`, and the skills in `.claude/skills/` (start with `elin-play`; load the others
-   when their task comes up). During play, ask the knowledge graph (`tools/kb.py`: the game's
+1. **Before playing**, read the Live section of `knowledge/lessons.md`, the last run's summary in `runs/`,
+   the goal register's Next and Active, and `elin-play`; load the other skills when their task comes up
+   (`elin-delve` before any nefia, `elin-travel`, `elin-guilds`, `elin-home`, `elin-pack`, `elin-gear`).
+   `knowledge/wiki-primer.md`, `knowledge/tool-notes.md` and the lessons' Promoted section are reference:
+   search them, don't read them through (the review of 2026-11-11: 19k of 48k tokens at session start). During play, ask the knowledge graph (`tools/kb.py`: the game's
    own data tables joined with observed facts) before guessing or reading game code.
 2. **Play** in cycles: read the state, decide, act once, then read again to check the action
    did what was intended. When the state is unclear, open the relevant menu before acting.

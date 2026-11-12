@@ -67,6 +67,8 @@ Immunities and resistances (`gearcompare.py` prints the key lines only one piece
 
 A rule per slot beats a sum: every slot filled with the best piece in hand, except the second hand beside a lone melee weapon. Re-check after a level-up, a cure (an ether disease can pull a neck or back piece off: run 42's Thick Neck left a necklace in a bag until `gear slots` was read by hand), acid, a curse or a death.
 
+**One weapon, the other hand empty** (the user, after run 37: "our damage per hit has gone way down"): anything else in a hand, a shield or a second weapon, switches off the game's two-hand style (x1.5 damage, +25 to-hit): the axe alone 22.8 a turn vs Lv33, 9.5 beside the Dreadbane Small Shield (fact #1137); worn from run 21 (a second weapon) and run 30 (the shield), unseen because the power card's melee column summed the party. `item.py` refuses an off-hand Equip beside a lone weapon (`--offhand-ok`), `common.empty_slots` counts a lone weapon as a full hand, and the card logs `my_melee`: judge any hand change on it. (37)
+
 ## For other players
 
 Nothing here is specific to one character: the tools read your own sheet, and the formulas are the game's. Without this repo, the same comparison works by hand: wear each piece in a safe place, note the Attack Evaluation line (dice, multiplier, Hit, Pen) and PV, DV, speed from the sheet, then work the penetration line above for armour 50, 100 and 200.

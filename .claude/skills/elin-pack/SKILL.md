@@ -1,6 +1,6 @@
 ---
 name: elin-pack
-description: Inventory management in Elin (run 08, the user's request) - the fixed delving kit, what never rides in the pack (coins, bars, collectibles, books, materials, spares), the triage before every trip and after every return (identify, equip, sell or ship, trash can, store), carrying unidentified items for identification, taking dungeon furniture to sell, bags and containers as the top equipment priority, and buying and selling by name. Use before leaving home, on every return, whenever the pack fills, and in any shop.
+description: Inventory management in Elin (run 08, the user's request) - the fixed delving kit and its minimums, the resupply rule for fireproof blankets and lockpicks (where to get them when under the minimum), what never rides in the pack (coins, bars, collectibles, books, materials, spares), the triage before every trip and after every return (identify, equip, sell or ship, trash can, store), carrying unidentified items for identification, taking dungeon furniture to sell, bags and containers as the top equipment priority, and buying and selling by name. Use before leaving home, on every return, whenever the pack fills, and in any shop.
 ---
 
 # The pack: carry the kit, not the house
@@ -18,14 +18,27 @@ gear. The user's rule (run 08): **the pack is for the trip; everything else live
 | pack | scrolls of teleport | 2+ for a dungeon, 4 is comfortable (road ambushes used 2 in run 08) |
 | pack | scroll of evacuation, scroll of return | 1 each |
 | pack | cure minor wound, plus one cure major | 5+ potions |
-| pack | the makeshift bed (road sleep with `sleep.py`; the bag burned in run 12) | 1 |
-| pack | lockpick (locked boss and map chests: about 3 charges a chest in run 42) | 5+ charges (the user, 2026-11-06): leave.py refuses under 5 while storage holds a pick, else warns. No station makes one, needles included (fact #1329): shops only, stock at random, 330-780 (Sayig or Sesa in Aquli Teola, Gizbird in Mysilia, Tarraf in Palmia, Alecgan in Noyel, Kerona in Derphy). **Kerona is the surest** (Derphy B1 ~64,66: one on both visits of run 43, none at Gizbird, Sesa or Tarraf), and **a run spends about 15 charges**: the ladder's boss chests took 5 in 2.5 real hours, Poppy's yard chests 5 more |
-| pack | fireproof blankets with charges left (each charge saves the pack's items from one fire, fact #862) | 3 (the user, 2026-10-26 and 2026-10-30): leave.py refuses under 3 while storage holds one. None left: the loom first (5 textures + 4 carbon logs from the kiln), since shops stock them at random (Sesa or Sayig in Aquli Teola, Gizbird in Mysilia, ~360) |
+| pack | the sleeping bag (road sleep with `sleep.py`; Quick Craft makes one; with none carried sleep.py falls back to the Rest ability, run 44) | 1: leave.py refuses home without a bed (`--bed-ok`; run 44: it left the pack at a home sort) |
+| pack | lockpick (locked boss and map chests: about 3 charges a chest in run 42) | 5+ charges (the user, 2026-11-06): leave.py refuses under 5 while storage holds a pick, else warns. No station makes one, needles included (fact #1329): shops only (the resupply rule below). **A run spends about 15 charges**: the ladder's boss chests took 5 in 2.5 real hours, Poppy's yard chests 5 more |
+| pack | fireproof blankets with charges left (each charge saves the pack's items from one fire, fact #862) | 3 (the user, 2026-10-26 and 2026-10-30): leave.py refuses under 3 while storage holds one. None left: the resupply rule below |
 | waivers | `--blanket-ok 'why'`, `--pick-ok 'why'`, ladder's `--kit-ok 'why'` | a reason is required, and each use or short departure writes a row to `runs/waivers.csv` for the close-out (the user, 2026-11-06: run 42 waived the blankets on every circuit: 21 ladder starts on one, 14 on none, and said so only at the end) |
 | pack | one throwable status potion (silence, slow): soaks kamikaze yeeks | 1-2 |
 | pack | rods that save a fight: slow, holy shield, magic map | optional, light |
-| pack | scroll of incognito when a law town is on the route (karma below 0) | 1 |
-| Cooler Box | food for the trip: preserved food (melons 11 each, Kerona 10 orens), corpses to cook | 3+ days |
+| home | scroll of incognito: not kit. packcheck sends it home with the other home-only kinds (`HOME_ONLY`, run 38: buff potions and scrolls, attack rods, rare scrolls); for a trip to a law town at karma below 0 it is a deliberate carry (`leave.py --pack-ok`) | 0 |
+| Cooler Box | food for the trip: real meals (inn food, cooked dishes: elin-travel 1), preserved food (melons 11 each, Kerona 10 orens), corpses to cook | 6+ meals carried (leave.py refuses under 6, run 32; `--food-ok`), 3+ days |
+
+**The resupply rule** (the review of 2026-11-11: the two minimums were waived 62 times in runs 43-45, 33 for the
+lockpick and 29 for the blankets, because resupply was unplanned). **At every home arrival** count the charged fireproof
+blankets and the lockpick charges in the pack, the bags and the boxes (`stock.py --find blanket`, `stock.py --find
+lockpick`). **Under a minimum (3 blankets; a lockpick with 5+ charges), the next trip's first stop is the source**,
+before any circuit:
+- **Blankets:** the loom first (5 textures + 4 carbon logs from the kiln); else a shop that has stocked them, at random,
+  ~360: Gizbird in Mysilia, Sesa or Sayig in Aquli Teola (`shop.py NAME` shows the stock).
+- **Lockpicks:** Kerona on Derphy B1 (~64,66: the surest, one on both visits of run 43, restocks every ~5 days); else
+  the shops that have had one, at random, 330-780: Gizbird, Sesa or Sayig, Tarraf in Palmia, Alecgan in Noyel. A run
+  spends about 15 charges: buy for the run, not for the minimum.
+- A waiver (`--blanket-ok 'why'`, `--pick-ok 'why'`) then names that trip as its reason; it is not a way to run a night
+  of circuits short (run 42: 21 ladder starts on one blanket, 14 on none).
 
 Target at departure: **the kit and nothing else** (about 29-32 stacks; `packcheck.py` prints the
 count), so a boss chest and a floor of loot fit before loot.py's 42-stack bag routing starts.
@@ -46,14 +59,14 @@ count), so a boss chest and a floor of loot fit before loot.py's 42-stack bag ro
 bars, furniture tickets, figures, coins, books and Ecopo, and the pack filled in the dungeon (a
 treasure map and a recipe couldn't be taken). Now `leave.py` runs `packcheck.py` on the home map and
 refuses to leave while the pack, the backpack or the Cooler Box holds anything off the kit;
-`packcheck.py --move` carries each item to its zone box (elin-home 2a). Run it on every arrival home
+`packcheck.py --move` carries each item to its box (elin-home 2). Run it on every arrival home
 too. Its KIT list in the script is the kit of section 1: change both together.
 
 **Fire-safe storage (the user, run 12):** scrolls, potions and rods ride in the backpack, not the
 open pack: a hot guy's blast burned a rod, the sleeping bag and two scrolls carried loose. Only
 the teleport scrolls and cure potions stay in the main pack (an escape must be one action);
 packcheck accepts any potion, scroll or rod inside the backpack. The kit also holds the Edible
-Necklace (worn), the makeshift bed (road sleep: `sleep.py`, 0.72 weight; the pine bed weighs 28
+Necklace (worn), the sleeping bag (road sleep: `sleep.py`; the pine bed weighs 28
 and caused Burden), the copper hammer, a potion of silence, the rod of holy light and the
 butcher's tool (run 13: butcher corpses where they fall with `butcher.py`).
 
@@ -178,9 +191,8 @@ backpack doesn't keep it fresh (run 10: `bag.py` sent stews and tomatoes into it
 ## What this skill changed
 
 New in run 08; enforced by packcheck.py and leave.py since run 11. Measure: errors.csv repeats in
-the elin-pack domain and orens lost to the pack (shipped by mistake, burned, identified to ship).
-Baseline runs 12-20: 8 errors, 0 repeats, ~1,100 orens lost (the Forest Necklace 193, the identify
-459 net, the evacuation scrolls 176, a shirt, a skin). Run 24: 2 errors, 1 repeat (the medals carried back).
-Latest, run 25: 3 errors, 1 repeat (the identify items carried back to Spares 3: run 24's medals again),
-~0 orens lost (the purse dropped inside a chest on B3 was recovered) but ~50 real minutes to the carried
-chests' hidden windows; bag.py closes chests before a take and runs/carry.txt names craft materials.
+the pack domain, orens lost to the pack (shipped by mistake, burned, identified to ship), and the kit waivers in
+`runs/waivers.csv` (62 in runs 43-45: the resupply rule above answers them). The review of 2026-11-11: across all
+runs the two largest error classes were a name or identity match (34) and a nested container unseen (16).
+Enforced by tools: bag.py closes chests before a take (run 25), runs/carry.txt names craft materials (run 24), leave.py
+and ladder.py refuse a short kit, and a waiver needs its reason (run 42).

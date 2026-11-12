@@ -20,7 +20,7 @@ Everything below is the reasoning; for a new game these tools do it. The first g
    **A foe above my level at home:** keep throwing the boomerang (5 throws took a crab Lv6 from 70% to 25%, Throwing 7); running lets it heal, and leaving the map brings me back beside it. Fiama kills what reaches her.
 9. `feat.py` for each point (Tough, then Stone, Iron and Steel Defense: PV 1 -> 23 with step 4). `tools/ability.py Rest` heals fast, free on the world map (3 -> 28 HP in seconds), and sleeps under 20% SP; `Pray` is free Faith.
 
-Don't: enter a field tile by hand; force a fight the tool refuses; take caves or nefias under Lv10 (`arena.py --any` refuses); melee kinds on elin-play's range list; sleep by hand at hunger 60+ (Starving costs HP fast); carry over 33 cards (meals fall to the ground). Before day 90 a death costs nothing but time: Crawl up (`common.crawl_up`). Past Lv7 the road can still kill in one exchange: a danger 6 field took a 62 HP character down in seconds.
+Don't: enter a field tile by hand; force a fight the tool refuses; take caves or nefias under Lv10 (`arena.py --any` refuses); melee kinds on elin-delve's range list (section 6); sleep by hand at hunger 60+ (Starving costs HP fast); carry over 33 cards (meals fall to the ground). Before day 90 a death costs nothing but time: Crawl up (`common.crawl_up`). Past Lv7 the road can still kill in one exchange: a danger 6 field took a 62 HP character down in seconds.
 
 **What this skill's fast path changed** (seven 2-hour Start Runs, 2026-11-04 and 05). Measure: minutes to Lv8. Baseline: 1,982 (Rolord). Latest: 96 (Start Run 2), 106 (Start Run 3), 111 (Start Run 5); the three others never reached it in two hours. Deaths in the seven: 4, 0, 5, 3, 5, 5, 0; Lv10 was not reached in any.
 

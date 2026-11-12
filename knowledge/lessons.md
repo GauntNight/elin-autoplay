@@ -29,18 +29,18 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 ## Promoted (where the older lessons live now)
 
-- run 45 triage (the run-42 lessons): nobody reading a long job's log -> elin-play's stuck-floor rule (a Monitor on every circuit's log); a mover written in the scratchpad -> elin-play's act-by-exact-text rule and pickup.py; two tools at once on the bridge (repeated in run 45: stock.py --ship broke when I walked beside it) -> elin-play's hard rule, one bridge client at a time; the player's question as a finding -> elin-gear and CLAUDE.md's tips rule; a bare waiver flag -> leave.py's --blanket-ok 'why' and runs/waivers.csv. Run 45's own: a time compared as a string -> circuit.py's deadline; two lockpicks under one name -> grab(prefer='charges') in ladder.py and lockpick.py; a picked-up wagon left behind -> pickup.py.
-- run 44 triage (the run-41 lessons): a tool's "no meal" is a stop for me too -> elin-play's long-walk rule and farmday.home_guard; a rule with no tool behind it isn't happening -> elin-closeout (a rule_existed row ends with a tool) and hygiene.py; a refusal is changed with its reason or obeyed -> leave.py's and bridge quit's reasoned waivers (runs/waivers.csv); a cut output hides what a check showed -> elin-play's "never pipe a mover through tail" (run 44 lost an antibody to a purge whose output was only counted: purge now never drops it); dropped as spent: "until a run tries it" (x5 is the rule now), shop prices as hints, and the two Start Run exp-rate lessons (Start Runs are parked)
+- run 45 triage (the run-42 lessons): nobody reading a long job's log -> elin-delve 7 and 9 (stuck on a floor; a Monitor on every circuit's log); a mover written in the scratchpad -> elin-play's act-by-exact-text rule and pickup.py; two tools at once on the bridge (repeated in run 45: stock.py --ship broke when I walked beside it) -> elin-play's hard rule, one bridge client at a time; the player's question as a finding -> elin-gear and CLAUDE.md's tips rule; a bare waiver flag -> leave.py's --blanket-ok 'why' and runs/waivers.csv. Run 45's own: a time compared as a string -> circuit.py's deadline; two lockpicks under one name -> grab(prefer='charges') in ladder.py and lockpick.py; a picked-up wagon left behind -> pickup.py.
+- run 44 triage (the run-41 lessons): a tool's "no meal" is a stop for me too -> elin-home 6's long-walk rule and farmday.home_guard; a rule with no tool behind it isn't happening -> elin-closeout (a rule_existed row ends with a tool) and hygiene.py; a refusal is changed with its reason or obeyed -> leave.py's and bridge quit's reasoned waivers (runs/waivers.csv); a cut output hides what a check showed -> elin-play's "never pipe a mover through tail" (run 44 lost an antibody to a purge whose output was only counted: purge now never drops it); dropped as spent: "until a run tries it" (x5 is the rule now), shop prices as hints, and the two Start Run exp-rate lessons (Start Runs are parked)
 - run 43 triage (the run-40 lessons): the largest gains sit unread in the boxes -> `stock.py --find` at session start, readskills/decode/readrecipes in every arrival, and yardchests.py for what lies loose (run 43: Poppy's seven chests); a claim about what I compared -> shipstar.py ships only what gearcheck.py has shown, gearcompare.py for anything that might beat the worn piece
 - run 42 triage (the run-39 lessons): trip food for a long night is bought or cooked dishes -> fact #1169; to Lumiest by Fast Travel, never a walk -> fact #1168
-- run 41 triage (the run-38 lessons): base 3-8 for unattended circuits -> circuit.py's --danger and a fact; a Short Teleport beside the exploder -> cast.py stops on an exploder inside 3 cells; the first Enter ignored after wgo.py -> a fact; look in every box before buying -> stock.py --find; chest furniture and stones -> purge.py's lists and Burden stops
+- run 41 triage (the run-38 lessons): base 3-8 for unattended circuits -> circuit.py's --danger and a fact; a Short Teleport beside the exploder -> cast.py stops on an exploder inside the throw distance (`kamikaze_dist`: 3 then, 5 since run 41; elin-delve 6); the first Enter ignored after wgo.py -> a fact; look in every box before buying -> stock.py --find; chest furniture and stones -> purge.py's lists and Burden stops
 - Start Runs 5-7: long trips before food and armor (the user) -> roam.road_ready; starving on the way to food -> earlyday RESERVE_MEALS; a scroll unread at 0 HP -> roam.escape; a demand paid unread -> roam.KEEP; jobs under Lv4 -> board.py's PV 15 and 2 scrolls; stale per-character lists -> trial.py start
 - the level 1 trials (Start Runs 1-4): armor before arenas and no caves under Lv10 -> board.py --take and arena.py --any refuse, elin-opening's fast path; a flee that doesn't move -> leave.py; a death prompt -> common.crawl_up and close.py; a demand paid unread -> roam.py KEEP; full pack -> earlyday.tidy JUNK_FULL; paid recipes re-crafted -> tickets.py
 - run 40 triage: a neutral master that steals (37) -> a fact, and The Fighting Bull ring protects from thieves
 - run 39 triage (the run-36 lessons): the named exploder by the down stairway -> fact #1174; grassland nefias run long
   -> fact #1175 (run 39 again: 40-70 real minutes each); Return needs a local map -> recall.py refuses on the world map
   ("enter a local map first"), and the circuit ends each conquest on the nefia's tile
-- run 38 triage: a hand-run ladder needs --no-wrecks (35) -> tool-notes' ladder row; party members can't be talked to on the world map (35) -> a fact (kb.py)
+- run 38 triage: a hand-run ladder needs --no-wrecks (35) -> elin-delve 3; party members can't be talked to on the world map (35) -> a fact (kb.py)
 - run 37's close: a gear choice that touches a hand is compared against the empty off hand too (run 30 chose the shield over the scimitar and never against the axe alone: 9.5 against 22.8 a turn for seven runs) -> item.py refuses an off-hand Equip beside a lone weapon (--offhand-ok), common.empty_slots counts a lone weapon as a full hand, power.py logs my_melee (the old column summed the party); fact #1137
 - run 37 triage: base 11-12 nefias under the gate (34; again run 37's Unknown Machinarium) -> fact #1136 and the circuit's --danger 3-10
 - run 34 triage: the harvest box (33) -> G3 M6, the harvest fridge (home.HARVEST_FRIDGE; cookdishes reads it); lifting a door (31), blessed and plain stack names (31), the crew's first nefias (31) -> facts #1086-#1088; the avoid kind far under my level (32) -> threat.avoid's 30% rule (run 33); unidentified gear filling the bags (32) -> facts #1083-#1084 (34 pieces identified, 9,782 orens and 5 bars shipped); sell fame once the near nefias run over the gate (32) -> circuit.py's no-nefia stop names the fame sale; run 34's own: trip food left in the pantry -> leave.py counts only meals eat_one reaches
@@ -53,9 +53,9 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
   ★Storage Chest's pages (28) -> box.py pages its category tabs; poison wakes a sleeper (28) -> fact #1000; the
   shipping chest's 40 stacks (28) -> fact #1001 and stock.py --ship N
 - run 30 triage: the stairs walk's late zone change (27, again in 30), the Cure Minor Wound stock on ladder days (27) and the missing ranged zap (27) -> facts (kb.py facts 'stairs=True', 'Cure Minor Wound', 'attack rods')
-- run 29 triage: the full pack within two nefias (26) -> elin-play's nefia row (unload every two nefias) and `stock.py --ship`; walking is where the rent goes (26) -> elin-play's rent rule
-- run 28 triage: the boxed-in floor (25) -> elin-play's nefia rules (a rod of teleport gets out; the Teleport spell fizzles at Casting 3); the exp engine (25) -> fact #935; the box Split slider (25) -> fact #936
-- review 2026-10-23 / run 24: rent runs whatever I do -> elin-play's rent rule and the loops' marks in
+- run 29 triage: the full pack within two nefias (26) -> elin-delve 3 (the unload: every two nefias then, every four since run 40) and `stock.py --ship`; walking is where the rent goes (26) -> elin-travel 1's rent rule
+- run 28 triage: the boxed-in floor (25) -> elin-delve 7 (a rod of teleport gets out; the Teleport spell fizzles at Casting 3); the exp engine (25) -> fact #935; the box Split slider (25) -> fact #936
+- review 2026-10-23 / run 24: rent runs whatever I do -> elin-travel 1's rent rule and the loops' marks in
   runs/activity.csv (stats.py's rent per hour).
 - Town people's sleep times (runs 21-22) -> fact #868; a supply job's "I have the requested stuff" board choice (run 22) -> fact #869. (promoted run 25)
 - run 24: the lost potions -> bridge 0.31.5 skills.ether/corruption and facts #845-#846 (buy one at a
@@ -66,16 +66,16 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
   rule at 178 HP -> fight.py's hit_pct and hit_pct_any.
 - run 23: a scroll of return read right after claiming land (the claim made Vernis the home: no Meadow
   in the list) -> recall.py's home check (bridge 0.31.3 zone.home); town mining and hammering ->
-  elin-play's crime rule and tools/sneakmine.py; world-map stalkers -> elin-play's World map line.
+  elin-travel 5's crime rule and tools/sneakmine.py; world-map stalkers -> elin-travel 2.
 - run 21: "You kick X" walking through a party member (18) -> fact #796; the tool changes of run 21
   (route danger, meal stops, burden stops, shrines, chests, the swarm count, pipefail) -> wgo.py,
   ladder.py, loot.py, craft.py, delve.py and elin-play's rows.
 - review 2026-10-23 (the Live triage): the isometric map deltas and the top-down world map (01, 03)
   -> elin-play's coordinates paragraph; a key into a cliff slides, no eating on the world map (06)
-  -> elin-play's World map line; blind: no reading, no targeting (06) -> delve.py's ConBlind stop and
+  -> elin-travel 2; blind: no reading, no targeting (06) -> delve.py's ConBlind stop and
   elin-play; "Move to Hearth Stone" stores a resident (15) -> elin-home 6; a sell-back refunds only in
-  the same window (11) -> elin-play's Buy row; quests +1 karma, boards refresh on entering, hunt jobs
-  complete in the field (05, 09, 11) -> elin-town-trip 3; read the number, never infer it (07),
+  the same window (11) -> tool-notes' Buy row; quests +1 karma, boards refresh on entering, hunt jobs
+  complete in the field (05, 09, 11) -> elin-travel 5; read the number, never infer it (07),
   count from the inventory not the log ring (13), the toolbelt's hidden stacks (11, 13, 16), no shell
   loops over game actions (19) -> elin-play's hard rules; crafted furniture Squashes (14) -> craft.py
   stops a batch at Burden; never merge stacks by drag (13) -> bridge 0.30.0 refuses a same-name drop;
@@ -84,53 +84,53 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
   power.kit() counts open bags and item.py prints the carried counts in a shop; identify a Godly item
   only to wear it (19) -> elin-pack 3 and errors.csv; the two-hand style (19) -> fact #707 and G19;
   known-spell books ship (14, 20) -> elin-pack 3 and fact #755; the restart keys (15) were already
-  Promoted; Nino and Casaneck by day (09, 12) -> elin-town-trip; residents claim unowned beds (03) ->
+  Promoted; Nino and Casaneck by day (09, 12) -> elin-travel's reference; residents claim unowned beds (03) ->
   elin-home 5; the Bed Options and Ride menus (03, 18) -> the review's open items (a `menu` op);
   heredoc backslashes (12, 13, 16) -> the user's working preferences, not a game lesson.
 - run 20: a second scroll of return during the countdown cancels both (05, 10, 20) -> tools/recall.py
   reads one and waits up to 60 turns (it took 19-36); supply jobs need the stock and one stack of the
-  whole count (14, 20) -> elin-town-trip's board-job rule; a healing rod zapped at an ally (20) ->
+  whole count (14, 20) -> elin-travel 5's board-job rule; a healing rod zapped at an ally (20) ->
   heal.py tries the rod first; nefia floors persist within a visit (14) and random nefias expire
-  within days (20) -> elin-play's Find nefias row; Wait on a stairway takes it (20) -> elin-play's
-  ladder row and recall.py; the CHA join rule (20) -> elin-home; gear corrodes (20) -> elin-pack 3.
+  within days (20) -> elin-delve 2; Wait on a stairway takes it (20) -> elin-delve 7
+  and recall.py; the CHA join rule (20) -> elin-home; gear corrodes (20) -> elin-pack 3.
 - goto onto a stairway takes the stairs (03) -> bridge walkto refuses a stairway unless stairs=true.
 - The stairway I arrive on in a nefia is the way back (05) -> explore.py reports "stairs (not the way in)".
 - Crafting SP adds up (12) -> craft.py --dry prints the stamina before a batch.
 - Residents eat real food only at home; away a stocked shared box is eaten down (18) -> elin-home 6;
   dishes.py, leave.py (private) and arrive.py (shared), run 19.
-- A harvest job is a race against its 180 minutes (19) -> elin-town-trip (daylight, no chasing, the
+- A harvest job is a race against its 180 minutes (19) -> elin-travel 5 (daylight, no chasing, the
   user's rule) and harvestjob.py --ends.
 - The party pets eat the residents' dishes too (19) -> elin-home 6.
-- Quick-save right after a big haul (19) -> elin-play's quick-save section.
+- Quick-save right after a big haul (19) -> elin-play's quick-save rule.
 - Deep water drowns, and the game's pathing swims: the death in Port Kapul (19) -> bridge 0.28.0
-  walkto refuses/stops before deep water, whereis.py, elin-play's rule.
+  walkto refuses/stops before deep water, whereis.py, elin-travel 5.
 - dangergrid printed the world-map wanderers' level, 5 above the ambush level (19) -> the tool
-  prints the ambush level; elin-play's Route danger row.
+  prints the ambush level; elin-travel 2.
 
 - run 18 (lessons): eat_one's meal words include roast and salad and the home loop never mines or sleeps
   hungry (elin-play's status row; the starvation death); the spoils bag carries the kit's overflow and
   place.py opens the carried bags (packcheck; runs 17-18: items landing in bags at the stack limit);
-  half the bill is fame x 2 (elin-town-trip 3, the Merchants Guild line; G9 is in goals-done.md); world-map bandits and paying a cheap demand to exploders
-  (elin-town-trip 2, fact #675).
+  half the bill is fame x 2 (elin-guilds, the Merchants Guild; fame sales: elin-delve 2; G9 is in goals-done.md); world-map bandits and paying a cheap demand to exploders
+  (elin-travel 3, fact #675).
 - run 18: the town's layout and building procedure (elin-home 2), boxes with contents moved through a
   bag (boxshift.py), the door cell's wall placed from outside (elin-home 2), harvest jobs by day in
-  ~35s loads (elin-town-trip 3, facts #667, #676), Mining practice on my own walls (minewalls.py), no
+  ~35s loads (elin-travel 5, facts #667, #676), Mining practice on my own walls (minewalls.py), no
   loop works or sleeps hungry (elin-play's status row), the Dishes box's priority (elin-home 2),
   walk_beside skips door cells, fight.py approaches by any free neighbour and matches camelCase ids.
 
-- run 17: no underwater dungeons (wgo.py, delve.py refuse; elin-play), no waiting (wait.py needs
-  --user-ok), a guard's "Do you know" line for job targets (whereis.py any; elin-town-trip),
+- run 17: no underwater dungeons (wgo.py, delve.py refuse; elin-delve 2), no waiting (wait.py needs
+  --user-ok), a guard's "Do you know" line for job targets (whereis.py any; elin-travel 5),
   resident dishes kept by springday, eat_one refuses with a dialog open, gather.py stops on
   hostiles, the avoid-kind refusal at 8 levels (fight.py, delve.py), leave.py answers No to an
   abandon prompt, vomit is never auto-junk, the lake is ice in winter (springday skips watering),
   unpack.py opens mail-post parcels, paytax.py finds a bill on the ground or in a bag, the menu keys'
   hotbar fallback (common.open_inventory); resident food (elin-home 6), escort clients, harvest
-  jobs and the Merchants Guild (elin-town-trip 3), boss chests, shrines and cursed items (elin-pack 4); potions thrown at allies, never gifted
+  jobs (elin-travel 5) and the Merchants Guild (elin-guilds), boss chests, shrines and cursed items (elin-pack 4); potions thrown at allies, never gifted
   (heal.py, runs 16-17), kamikazes soaked Wet with a thrown potion (delve.py, runs 04, 17).
 
-- run 16: escorts and tourists take an ally slot (elin-town-trip; Party Animal +1); carried orens
-  can't be boxed and a death drops 33-67% on the tile (elin-play's carried-gold row); nefias found
-  with `places 60` + dangergrid (elin-play's tool table); the toolbelt count (fish.py); Godly and
+- run 16: escorts and tourists take an ally slot (elin-travel 5; Party Animal +1); carried orens
+  can't be boxed and a death drops 33-67% on the tile (elin-delve 1); nefias found
+  with `places 60` + dangergrid (elin-delve 2); the toolbelt count (fish.py); Godly and
   Miracle identification prices (elin-pack's triage step 1).
 
 - run 15 cleanup: stale button listings (bridge 0.25.0 `click expect=`, craft.py re-lists its
@@ -145,16 +145,16 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
   them; scrap.py breaks them with the hammer); farm food goes to the harvest box, not the Cooler
   Box (springday); ☆ gear is a decide item, never the armory (packcheck); recipe names match
   case-insensitively and the craft window closes after crafting (craft.py).
-- elin-play rule zero: the deaths of runs 03 and 07 and the near-deaths of 11 and 12 (instance
+- elin-play rule zero (target order, exploders and the escape kit now in elin-delve): the deaths of runs 03 and 07 and the near-deaths of 11 and 12 (instance
   jobs, the Derphy sea, the danger-6 floor, the caster at the party, the hot guy), HP floors,
   the swarm rule, target order, suicide attackers, the escape kit, speed and sleep.
-- elin-play's tool table: dialogs one at a time, stale button indices, `act Cancel` opening the
+- elin-play's hard rules and knowledge/tool-notes.md (the tool table until the 2026-10-30 review; converters now elin-home 7, the return list elin-delve 7, the bed elin-travel 1): dialogs one at a time, stale button indices, `act Cancel` opening the
   System menu, pickers as drag grids, converters as tasks, the return list, the F-key bed.
 - elin-pack: the kit, what never rides along, identify-then-decide, ship ☆ gear from home, buy by
   the full name, the backpack as fire-safe storage, packcheck at the door.
 - elin-home: one theme a box, garbage to the trash can, mail, burden, shared boxes and residents,
   beds, home danger and spawns, the field and watering.
-- elin-town-trip: roads and ambush odds, step time, escorts against steps, guards' "Where is...",
+- elin-travel (the town-trip skill until the review of 2026-11-11; guild work now in elin-guilds): roads and ambush odds, step time, escorts against steps, guards' "Where is...",
   karma below zero and incognito, Derphy's pickpockets, scholars and plans.
 - elin-goals and elin-closeout: the goal ladder, the summary and its page; the exp rules (skill
   level-ups only; the dummy pays only low skills: run 14) are in elin-home 7.
@@ -207,9 +207,10 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 - Butchering needs livestock / shearing gives skins (12, the user's reading) -> a corpse through
   the butcher's tool gives a random body part, skin 20%; shearing gives fiber only (code, 12).
 - The sleeping bag is the road bed (05) -> it burned in run 12; any bed in the pack works with
-  the F-key slot (the makeshift bed rides in the kit).
+  the F-key slot (the makeshift bed rides in the kit) -> the sleeping bag
+  is the kit's bed again, and with no bed carried sleep.py uses the Rest ability (44).
 - Blind: bump attacks with `move` still work (06) -> a step into an unseen foe does nothing; walk
-  away until it clears (14; elin-play rule, delve.py stops on ConBlind).
+  away until it clears (14; elin-delve 6, delve.py stops on ConBlind).
 - Fast Travel starts only from a town or home tile, never mid-field (15) -> run 20: it started from the
   field tile where an expired nefia had stood (Meadow, 6 rations); a plain field tile offers none
   (fact #760).

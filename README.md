@@ -55,7 +55,7 @@ Four parts do the work:
 
 - **The bridge** (`mod/ElinBridge`): a small mod that runs inside the game and listens on 127.0.0.1:47323. It reports only what the player can see, and acts through the game's own input layer; it doesn't need window focus and never touches your keyboard or mouse.
 - **The tools** (`tools/`, listed in `tools/README.md`): about 120 Python scripts for fighting, looting, shopping, trips and upkeep. This is where rules go to stick: a game error that broke a rule already written down ends the same session with a tool enforcing it. A rule in a skill is a wish; a rule in a tool is a control (the same reason you qualify a process instead of inspecting every output).
-- **The skills** (`.claude/skills/`): 10 procedures Claude loads when the task comes up: `elin-setup`, `elin-play`, `elin-opening`, `elin-goals`, `elin-home`, `elin-pack`, `elin-build`, `elin-town-trip`, `elin-closeout` and `elin-summary`.
+- **The skills** (`.claude/skills/`): 13 procedures Claude loads when the task comes up: `elin-setup`, `elin-play`, `elin-opening`, `elin-goals`, `elin-delve`, `elin-travel`, `elin-guilds`, `elin-home`, `elin-pack`, `elin-gear`, `elin-build`, `elin-closeout` and `elin-summary`.
 - **The graph** (`tools/kb.py`): the game's own data tables joined with what was observed in play, so Claude can ask before it guesses.
 
 The distilling rule keeps it honest: a specific observation goes in the graph; a one-off mistake goes in `knowledge/lessons.md`; a procedure that recurs in two or more runs becomes a skill.
@@ -132,7 +132,7 @@ You talk to it the way you'd talk to someone playing while you watch. These are 
 |:---|:---|:---|
 | `player.md` (yours, gitignored) | Who's playing, which save, which goals | Every session |
 | `CLAUDE.md` | The rules: how a session runs, staying in bounds, the learning loop | Every session, automatically |
-| `.claude/skills/*/SKILL.md` | The 10 procedures (`elin-setup` is the first run) | When the task comes up |
+| `.claude/skills/*/SKILL.md` | The 13 procedures (`elin-setup` is the first run) | When the task comes up |
 | `knowledge/lessons.md`, `knowledge/wiki-primer.md` | Open lessons and a primer on the game | Before playing |
 | `knowledge/goals-catalog.md`, `knowledge/goals.md` (yours, gitignored) | The goal menu, and your register | At setup; each session |
 | `knowledge/tool-notes.md`, `risk.md`, `foods.md`, `power-model.md`, `farming-research.md`, `medals.md`, `story-guilds-research.md` | Deeper notes on one subject | When that subject comes up |

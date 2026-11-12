@@ -83,7 +83,7 @@ def meal_stop():
 
 def answer_demand(s):
     """Run 34: two road bandit demands ("Give me X, or your life is forfeit!") stopped --ambush for a hand-typed "Try me"
-    against Lv7-12 goblins and eyes at my Lv31 (elin-town-trip: weak bandits get "Try me"; exploders get paid). Clicks
+    against Lv7-12 goblins and eyes at my Lv31 (elin-travel: weak bandits get "Try me"; exploders get paid). Clicks
     "Try me." only when every creature that isn't mine is 12+ levels under me (swarm_weak_below) and none is an exploder;
     returns None when it answered, else the reason the dialog stays for a decision."""
     import json
@@ -97,7 +97,7 @@ def answer_demand(s):
             return f"a bandit demand with {c.get('name')} Lv{c.get('lv')} near my level: decide by hand (talk.py)"
         prof = threat.profile(c.get("id") or c.get("name"), c.get("lv")) or {}
         if "exploder" in (prof.get("flags") or []) or "kamikaze" in str(c.get("id") or "").lower().replace("samurai_kamikaze", ""):
-            return f"a bandit demand with an exploder ({c.get('name')}): pay it if cheap (elin-town-trip)"
+            return f"a bandit demand with an exploder ({c.get('name')}): pay it if cheap (elin-travel)"
     bs = call("buttons")["data"]["buttons"]
     tm = next((b for b in bs if (b.get("text") or "").strip().startswith("Try me")), None)
     if not tm:

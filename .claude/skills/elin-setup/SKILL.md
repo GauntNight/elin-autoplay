@@ -51,7 +51,7 @@ python -I tools/newgame.py          # shows what it would do
 python -I tools/newgame.py --yes    # makes the records, resets the character-tuned numbers
 ```
 
-For an existing character, set `max_danger` in `tools/common.py` and in `elin-play`'s table by level afterwards: the first game ran 7 at
+For an existing character, set `max_danger` in `tools/common.py` and in `elin-play`'s table (the steps so far: elin-delve 5) by level afterwards: the first game ran 7 at
 level 12, 8 at 16, 9 at 25, 14 at 35. Commit what changed (the numbers, not the records: git ignores those).
 
 Then copy `docs/player.template.md` to `player.md` and fill it in from the answers, with the run number `newgame.py` printed.

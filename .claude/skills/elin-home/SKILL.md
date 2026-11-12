@@ -1,88 +1,106 @@
 ---
 name: elin-home
-description: Keeping the home base in Elin organized, clean, nicer and safer (run 04, the user's request) - where everything lives (one category per container), the Meadow by zones and, since 2026-10-21, as a town (G12 - six themed houses: Workshop, Forge, Kitchen, Farmhouse, Storehouse, Residence; each station and its materials box inside its house; the game's room rules), what to keep, ship or sell, the cleaning routine (mail, garbage, dead furniture, weeds), carried storage (hotbar slots, bags), placing and mounting furniture (height), the improvement projects with their recipes, and home safety. Use on every return home and whenever storage, junk, furniture or base layout comes up.
+description: Keeping the home base in Elin organized, clean and safe (run 04, the user's request) - the routine on every return home (arrive.py, packcheck.py --move, the books, the box tally, stock.py --ship), where everything lives (the town's houses, the yard chest and the big wagons, from tools/home.py), the fewer-bigger-boxes rule (G54), what to keep, ship or sell and the stock caps, carried storage, placing furniture, the open projects, home safety and feeding the residents, craft pushes, and an old reference for the farm, spring and training day loops. Use on every return home, at session start for the box tally, and whenever storage, junk, furniture, residents or the base layout comes up.
 ---
 
 # Home: organized, clean, nicer, safer
 
-The day-to-day routine (the farm round, exp, food, first crafts) is section 7 below.
-skill is the place itself: where things live, what goes, what's being built. The user's aim (run
-04): less junk, organized stuff, clear rules for what to sell and what to keep, a nicer and safer
-place to live.
+This skill is the place itself: where things live, what goes, what's being built. The user's aim (run 04): less junk,
+organized stuff, clear rules for what to sell and what to keep, a nicer and safer place to live. Since run 45 (G54):
+**fewer, bigger boxes**. The kit and the triage of the pack are **elin-pack**; guild books and decoding **elin-guilds**.
 
-## 1. On every return home (10 minutes, in this order)
+## 1. On every return home (in this order)
 
-**`tools/arrive.py` runs steps 0-3 and the town check in one go (run 19):** the Dishes box shared,
-packcheck --move, the mail, trash.py, town.py, and a food line. A hostile in view stops it first.
+**`tools/arrive.py` runs the scripted part in one go (run 19):** a hostile in view or low HP stops it first; then the
+Dishes box shared, a drained attribute or harmful mutation cured (run 35), `packcheck.py --move`, the mail
+(`unpack.py --take --pickup`: each package emptied into the pack and grabbed, the spam packages shipped, run 45; a tax
+bill there is paid, run 35), `yardchests.py` (Poppy's chests lying loose, run 43), `trash.py`, `town.py`, and a food
+line. Every step runs `farmday.home_guard` first (section 6).
 
-**Books and recipes on every return:** `decode.py --fetch`, `readskills.py`, and `readrecipes.py [--known]` (run 41, the user: "Why don't you read the recipes you have available to you?": 101 lay in 12 boxes, 37 never learned, because a skill said to read them and no tool did; a new one opens a first craft worth an old ticket and skill exp, and every read frees a box slot). `chests.py` for any mystic chest in the pack. Read `gearcheck.py` before `shipstar.py`.
+0. **`packcheck.py --move` is the sort** (the user, run 11: "on entering base you organize your packs... when leaving
+   base you must clean your packs of useless inventory... it is a loss of treasure by not having those slots free"). It
+   checks the pack, the bags and the Cooler Box against the trip kit and carries every other item to its box by the
+   routes in section 2; junk goes to the trash can; **anything without a rule is reported and left in place, never
+   shipped** (run 12: the old ship-by-default sold the ☆Forest Necklace). Unidentified gear stays in the pack for
+   Appraising. **`leave.py` refuses to leave home** until `packcheck.py` reports 0 out of place (`--pack-ok` only for a
+   deliberate haul). Read its whole output: a refused move names a full chain (section 2, rule 2).
+1. `look.py`: hostiles wander in (home is danger 5 since run 15's Border Watch: a Lv12 killer squirrel came at danger 7
+   in run 14; run 41: an orc warrior Lv11 and a scorpion Lv7). Shoot or fight them first (`shoot.py`, `fight.py`), from
+   range for anything at or above my level.
+2. **Books and recipes on every return:** `decode.py --fetch`, `readskills.py`, and `readrecipes.py [--known]` (run 41,
+   the user: "Why don't you read the recipes you have available to you?": 101 lay in 12 boxes, 37 never learned, because
+   a skill said to read them and no tool did; a new one opens a first craft worth an old ticket and skill exp, and every
+   read frees a box slot). `chests.py` for any mystic chest in the pack. Read `gearcheck.py` before `shipstar.py`
+   (elin-pack 3, elin-gear).
+3. **Tally the boxes by kind before planning or buying** (the user, run 40; at session start too): `stock.py` prints the
+   caps table and what is over it across the pack, the bags and every home box; `stock.py --find TEXT` finds any stack
+   with its place. Then **`stock.py --ship [N]`** carries the excess to the shipping chest box by box (the chest takes 40
+   stacks a morning, fact #1001; it pays out each morning, more than a shop, and adds gold bars by volume). One bridge
+   client at a time: nothing else beside it (run 45: 4 of 36 shipped when I walked to the loom).
+4. **Garbage goes to the trash can, never the chest** (the user, run 08): `trash.py` (in arrive.py) walks every garbage
+   pile, then drags each garbage, rotten-food, bottle and can stack into the trash can 58,51 for Ecopo; the chest pays 0
+   for it. Residents drop garbage every day (run 08: ~50 piles after a month away).
+5. **What packcheck left:** a "no rule" item is a decision (wear it, read it, ship it by hand with
+   `box.py "shipping chest" ITEM`), and its kind gets a route in packcheck the same session. One item out of a box:
+   `box.py WHERE --take ITEM`. Loose things on the map: `find.py` (rule 3).
+6. Leave: sleep on the world-map tile (`sleep.py`), not at home (section 6: time at home costs the residents' food;
+   `sleep.py` refuses on the home map without `--home-ok`).
 
-0. **`packcheck.py --move` first** (the user, run 11: "on entering base you organize your packs...
-   when leaving base you must clean your packs of useless inventory... it is a loss of treasure by
-   not having those slots free"). It checks the pack, the backpack and the Cooler Box against the
-   trip kit and carries every other item to its zone box (valuables, library, wood, stone and ore,
-   bag parts, parts, pantry, farm, spares, the armory; junk to the trash can; **anything without a
-   rule is reported and left in place, never shipped** (run 12: the old ship-by-default sold the
-   ☆Forest Necklace).
-   Unidentified gear stays in the pack for Appraising. **`leave.py` refuses to leave home** until
-   `packcheck.py` reports 0 out of place (`--pack-ok` only for a deliberate haul).
-1. `look.py`: hostiles wander in (home is danger 5 since run 15's Border Watch: a Lv12 killer
-   squirrel came at danger 7 in run 14; goblins, gnomes, putits and a Lv7 kobold at danger 3). Shoot or fight them first (`shoot.py`, `fight.py`), from range for anything at
-   or above my level.
-2. **Mail:** `unpack.py` lists every package; `unpack.py --take --pickup` empties new ones and picks
-   them up (the library bin is skipped). Read and triage what came.
-3. **Garbage into the trash can (the user, run 08):** `trash.py` walks every garbage pile on the
-   map, picks it up, then drags each garbage, rotten-food, bottle and can stack into the trash can
-   58,51 for Ecopo. Never ship garbage: the chest pays 0 for it. Residents drop garbage every day;
-   run 08 found ~50 piles after a month away.
-4. **Ship the other junk** (section 3) with `box.py "shipping chest" ITEM ...`. The chest pays out
-   each morning, more than a shop, and adds gold bars by volume.
-5. **Put the haul away by category** (section 2) with `box.py WHERE ITEM ...`. Merge stacks: a
-   recipe slot takes one stack only. Then the detritus pass (section 2a, rule 3): `find.py` loose
-   things on the map (`bridge.py find` with an empty name lists everything; keep the not-installed
-   ones) and put each away; `trash.py` misses piles it can't reach (48,46 behind a tree, run 11).
-6. The farm round (`springday.py 1 UNTIL --once`, after 06:00), then leave: sleep on the world-map
-   tile (`sleep.py` with the kit's bed), not at home (section 6: time at home costs the residents'
-   food; `sleep.py` refuses on the home map without `--home-ok`, which the home loops pass on purpose).
+## 2. Where everything lives (world_4, Meadow; the town built in run 18, the big containers in runs 42-45)
 
-## 2. Where everything lives: the town (world_4, Meadow; built run 18, 487-02-15/19)
+Every coordinate lives in `tools/home.py`; the tools read it from there, and this table is written from it (last: after
+run 45's G54). `tools/town.py` checks the town against the game's own rooms (G12).
 
-Every coordinate below lives in `tools/home.py`; the tools read it from there. `tools/town.py`
-checks the town against the game's own rooms (G12's done-when, met 487-03-01).
-
-| House (walls, door) | Stations | Boxes (home.py name: what it holds) |
+| Place (walls, door) | Stations | Containers (home.py name, cell: what it holds) |
 |---|---|---|
-| **Workshop** (oak plank 46-56 x 55-61, door 51,55) | back row z=60: loom 47, wall workshop 48, spinner 49, drafting table 51, signboard workshop 52, mason's table 53, stonecutter 54, tinker's table 55; front row z=56: sawmill 47, workbench 49, carpenter's table 50; research equipment 55,57 (Kettle's); the home's iron big rock stands at 50,59 (G11: Mining 7 with the iron pickaxe) | WOOD_BOX 48,57: logs, planks, branches, sticks, bark, resin, spare walls and room boards; PARTS_BOX 53,56 (sturdy box 'Parts'): bones, nails, batteries, microchips, scrap, fangs; BAG_PARTS (threads, fiber, strings, ropes, skins, bolts): the second big wagon 58,35 since run 45 (the boss chest 54,56 retired, G54); MAPS_BOX 55,56 (**shared**, distribution off): treasure maps for Poppy; STORAGE_CHEST 47,58 (Ashland's ★Storage Chest, 100 slots, fireproof, no rename): the library's and the spares' overflow |
-| **Forge** (granite stone 58-62 x 55-61, door 60,55) | kiln 59,60, smelter 60,60 (auto-refuel on), blacksmith's table 61,60 | STONE_BOX 61,57 ('Stone and ore') and STONE_BOX_2 61,56 ('Stone 2', run 20): stones, cut stone, ores, ingots, glass, bricks, soil |
-| **Kitchen** (oak plank 64-69 x 55-60, door 66,55) | bonfire 65,59 (cook from 65,58), millstone 66,59, ration maker 67,59; the small fridge 68,59 | PANTRY 68,57 ('Pantry'), PANTRY_2 68,56, PANTRY_3 65,57: oils, herbs, drinks, condiments, organs for jobs; DISH_BOX = the fridge 68,59 (**shared at home, private away**, food, priority 1, nothing rots): the residents' dishes and the farm's fresh food (G15, runs 19-20) |
-| **Farmhouse** (cedar plank 57-61 x 40-45, door 57,43 facing the field) | (the farm sign 51,47 and the field outside) | FARM_BOX 58,44 (a 20-slot package: every seed, sickle, hoe, shovel, watering can, fishing rod, bait); FARM_BOX2 59,41 ('Farm box 2': seeds when the first is full); HARVEST_BOX 60,44 (shared, food: Delegated Farming's crops land here); FODDER_BOX 60,41 (shared sturdy box: grass, leaves, odd logs) |
-| **Storehouse** (rosewood plank 63-69 x 37-42, door 66,42) | | LIBRARY 66,38 (box) and 64,38 (package bin: Lutz journals, house plate, ancient books), overflow in the Storage Chest; BOOKSHELF 65,38; VALUABLES 64,39, 67,38, 68,38, the shelf 68,39, the stone chest 64,40, and 'Valuables 6' 66,39 (run 20): coins, gold bars, platinum, medals, tickets, genes, figures, cards, gems (**full in run 20: 62 platinum refused; a box is full at 14 of 16**); COLLECTIBLES 68,40 (shelf); SPARES 65,41 (boss chest), SPARES2 67,41 (package), SPARE_BOX 68,41: potions, scrolls, rods |
-| **Depot** (oak plank 41-46 x 45-52, door 46,49 facing the field; board 'Depot', Private; G28, run 30) | | six sturdy boxes (35 slots) along x=42, z 46-51: FARM_BOX 'Farm' (every seed and farm tool), SPARES2 'Spares 2', LIBRARY 'Library 3', VALUABLES 'Valuables 7', ARMORY3 'Armory 3', PANTRY_2 'Pantry 2'; they replaced the mail-package bins (the user, run 30: no cardboard boxes as storage) |
-| **Residence** (the grass rooms: my room 59-62 x 51-53, door 60,51; residents' room 62-68 x 49-53, door 65,49; board 'Residence', Only Resident) | | ARMORY 66,51 (shared, weapons and armour: residents take what beats theirs); beds: my pine bed 60,52 (full SP), a spare 61,52, the residents' 63-65,50-52 |
+| **Workshop** (oak plank 46-56 x 55-61, door 51,55) | back row z=60: loom 47, wall workshop 48, spinner 49, drafting table 51, signboard workshop 52, mason's table 53, stonecutter 54, tinker's table 55 (the newer one at 54,58 has a reachable side, run 37); front row z=56: sawmill 47, workbench 49, carpenter's table 50; the Gene Machine 54,59 | WOOD_BOX 48,57: logs, planks, branches, sticks, bark, resin, spare walls and room boards; PARTS_BOX 53,56 ('Parts'): bones, nails, batteries, microchips, scrap, fangs; MAPS_BOX 55,56 (**shared**, distribution off): treasure maps for Poppy, nothing else; STORAGE_CHEST 47,58 (Ashland's ★Storage Chest, fireproof, no rename): the library's and the spares' overflow; ARMORY2 48,59 ('Armory 2', private) |
+| **Forge** (granite 58-62 x 55-61, door 60,55) | kiln 59,60, smelter 60,60, blacksmith's table 61,60 | STONE_BOX 61,57 ('Stone and ore') and STONE_BOX_2 61,56 ('Stone 2'): stones, cut stone, ores, ingots, glass, bricks, soil |
+| **Kitchen** (oak plank 64-69 x 55-60, door 66,55) | bonfire 65,59 (cook from 65,58), millstone 66,59, ration maker 67,59 | PANTRY 68,57 and PANTRY_3 65,57: oils, herbs, drinks, condiments; DISH_BOX 68,59, the small fridge 'Dishes' (**shared at home, private away**, food, priority 1, nothing rots): the residents' dishes |
+| **Farmhouse** (cedar plank 57-61 x 40-45, door 57,43) | the farm sign 51,47 and the field outside | HARVEST_BOX 60,44 (shared, food, priority 10: grain and seasonings); HARVEST_FRIDGE 60,43 (shared, food, priority 20: Delegated Farming's crops land where they don't rot, run 33); FODDER_BOX 60,41 (shared: grass, leaves); FARM_BOX2 59,41 (seeds when the Farm box is full) |
+| **Storehouse** (rosewood plank 63-69 x 37-42, door 66,42) | | LIBRARY 67,40 ('Library 5') and the BOOKSHELF 65,38 (the library's tail); the valuables shelf 68,39; COLLECTIBLES 68,40 (display shelf: cards, figures) |
+| **Depot** (oak plank 41-46 x 45-52, door 46,49; Private; G28, run 30) | | sturdy boxes (35 slots) along x=42: FARM_BOX 42,46 'Farm' (every seed and farm tool), SPARES2 42,47, LIBRARY 42,48 'Library 3', VALUABLES 42,49 'Valuables 7' (decorations too), ARMORY3 42,50, PANTRY_2 42,51; along x=44: valuables 44,47 and 44,49, LIBRARY 44,48 'Library 6', SPARES4 44,50; STORAGE_CHEST_2 43,51 (the second ★Storage Chest: `rebalance.py`'s overflow) |
+| **The east yard** (north of the Storehouse; G47, run 42) | | Nino's wagons (60 slots, 2x2): 66,46 and 69,46 (valuables: coins, bars, platinum, medals, tickets, genes, gems), 70,44 (ARMORY5: gear when the armory boxes are full); **the yard chest 68,44** (the third ★Storage Chest, Miral's, 9 wrenches since run 44: 280 slots by its window): spares (potions, scrolls, rods), the library's tail, and the last stop of every chain |
+| **The big wagons** (south-west of the Storehouse; G54, run 45; 96 slots each on 4x4 cells) | | BIG_WAGONS[0] 54,38 (cells x 51-54, z 38-41): the overflow and valuables of the five retired mystic chests, books; BIG_WAGONS[1] 58,35 (cells x 55-58, z 35-38): the armory overflow, the bag parts (threads, fiber, strings, ropes, skins, bolts), the valuables overflow, and the second-last stop of every chain |
+| **Residence** (grass rooms: mine 59-62 x 51-53, door 60,51; the residents' 62-68 x 49-53, door 65,49) | | ARMORY 66,51 (shared, priority 5, weapons and armour: residents take what beats theirs); my pine bed 60,52 |
 
-Outside on purpose (the office): mail post 61,50 (bills and salary parcels; pay at the **tax
-chest 62,49**), the labelled mail package 60,50 (no Grab), shipping chest 56,52 (empties every
-morning), trash can 58,51 (garbage, rotten food, bottles, cans: `trash.py`; never ship garbage),
-the home, quest and resident boards 54,50-52, the hearth stone 55,50, Fiama's lock-50 quest chest
-54,50, the dummy 60,46 and practice chest 61,46. The field 48-54 x 43-49 and the lake 43-47 x
-38-41 stay unroofed. The Mining strip for `tools/minewalls.py` is 47-50 x 52-53.
+Outside on purpose (the office): mail post 61,50 (bills and salary parcels land on 59,49 and 60,49; pay at the **tax
+chest 62,49**), the labelled mail package 60,50 (no Grab), shipping chest 56,52 (empties every morning), trash can 58,51,
+the home, quest and resident boards 54,50-52, the hearth stone 55,50, Fiama's lock-50 quest chest 54,50, the dummy 60,46
+and practice chest 61,46. The field 48-54 x 43-49 and the lake (stand at 48,41) stay unroofed. The Mining strip for
+`tools/minewalls.py` is 47-50 x 52-53.
+
+**Where a kind goes** (packcheck's ROUTES, first match wins; each chain is tried in order): seeds and farm tools -> the
+Farm box, Farm box 2; wood and building parts -> the wood box; stone, ore, ingots, glass -> the two stone boxes; treasure
+maps -> the Maps box only; threads, fiber, skins, bolts -> the second big wagon, the wagon 70,44, the yard chest; bones,
+nails, scrap, parts -> the Parts box, 70,44, the big wagons, the yard chest; leaves and grass -> the fodder box; potions,
+scrolls, rods -> the yard chest, Spares 2, Spares 4, the Storage Chest, the first big wagon; coins, bars, medals, tickets,
+figures, cards, genes, gems -> the valuables boxes, the Storage Chest, the big wagons, the yard chest; books, recipes,
+letters -> the library chain; condiments and drinks -> the pantries, then the yard's wagons; ration grain -> the harvest
+box; organs, fresh corpses, graves and listed odd loot -> the shipping chest; plans -> read now; garbage -> the trash
+can. **Since run 45 every box chain ends at the second big wagon and the yard chest** (`packcheck._with_big_tail`).
 
 **Rules**
-1. **One theme a container, inside its house.** Rename each box by its theme (`bridge.py boxcfg
-   name=...` with it open). A new box for a full theme goes in the same house.
-2. **A box is full at 14 of 16 slots:** build the next one before it fills (sturdy box: 4 planks +
-   2 ingots + 2 nails; wooden box: 2 planks + 2 strings; carpenter's table).
-3. **Nothing lies loose.** Every return: `trash.py` (residents drop ~2 garbage a day), Kaberg's logs
-   and bark to the wood box, dropped seeds boxed.
-4. **No trees or bushes on field cells.** No harvestable tree is left inside the home's bounds
-   40-70 x 35-65: wood comes from field maps (the forest tile south of home).
-5. **The pack is a carrier, not a store** (springday stops at 37 loose stacks). The spoils bag
-   carries the kit's overflow; the loot bag is the haul.
-6. **Moving a box or station:** `tools/move.py FX,FZ TX,TZ [NAME]` for an empty one;
-   `tools/boxshift.py FX,FZ TX,TZ` for one with contents (empties it into the loot bag by Shift+click,
-   moves it, refills it; `--contents` into a box already at the target, in light trips). Then
-   update `tools/home.py` in the same session; packcheck, springday, farmday, water and town.py
-   read it.
+1. **One theme a container, inside its house.** Rename each box by its theme (`bridge.py boxcfg name=...` with it open).
+2. **Fewer, bigger boxes (G54, the user, 2026-11-08):** a theme that fills gets a bigger container behind it, not
+   another small box. Retire the small ones (mystic chests 15 slots, packages 20, wooden boxes 24) into ★Storage Chests
+   with wrenches or a big wagon (section 7), and repoint every route in `home.py` and packcheck **before** the box goes
+   (run 44: a route of full boxes left four items unmoved while the big chest sat off it). Keep the fridges, the Dishes
+   box, the armory, the office boxes and the collectibles shelf. `rebalance.py [--dry]` moves the last stacks of every
+   box at 90%+ into the second ★Storage Chest (run 31).
+3. **Nothing lies loose.** Every return: `trash.py` (residents drop ~2 garbage a day), then the detritus pass: `find.py`
+   loose things on the map (`bridge.py find` with an empty name lists everything; keep the not-installed ones) and put
+   each away; `trash.py` misses piles it can't reach (48,46 behind a tree, run 11).
+4. **No trees or bushes on field cells.** No harvestable tree is left inside the home's bounds 40-70 x 35-65: wood
+   comes from field maps (`woodrun.py` on a forest tile).
+5. **The pack is a carrier, not a store.** The spoils bag carries the kit's overflow; the loot bag is the haul.
+6. **Moving a box or station:** `tools/move.py FX,FZ TX,TZ [NAME]` for an empty one; `tools/boxshift.py FX,FZ TX,TZ`
+   for one with contents (empties it into the loot bag by Shift+click, moves it, refills it; `--contents` into a box
+   already at the target, in light trips). Then update `tools/home.py` in the same session; packcheck, stock, town.py
+   and the home loops read it. `move.grab` takes the first thing on a cell: check a cell with two things first (run 42
+   shipped a wall torch).
+7. **A count that includes what no route can reach flatters it** (run 45: 26 spam packages were 520 of the home's 861
+   "free" slots): `boxcount.py` walks the ★Storage Chests and reads each window's "USED / SIZE" (the stock op reports
+   one as 96 slots whatever its wrenches, fact #1014); report the slots a route can use.
 
 **Building a house** (run 18; elin-build has the facing rules): wall workshop (Loytel's recipe):
 plank wall = 1 plank, stone wall = 1 stone, both 0 SP; a sawmill makes 2 planks from a log for
@@ -167,6 +185,12 @@ then up with `--height` (the torch at 62,50 sits at +4; +7 was too high, +0 on t
 
 ## 6. Safety
 
+- **A long walk at home has stops too** (run 41: **two deaths at home in one night**: arrive.py's box walk from hunger
+  70 to 93 and HP -3 with meals in the Cooler Box, then an orc warrior Lv11 and a scorpion Lv7 taking 263 -> -1 while
+  the mover went box to box without a swing): `farmday.home_guard` runs before every step of arrive.py,
+  `packcheck --move`, the trash sweep and boxcount.py, by the numbers in elin-play's table (a meal, a stop when no meal
+  landed, a fight with what's at or under my level, the walk's HP floor). A tool's "no meal" is a stop for me as well:
+  never start the next long job on it. (41)
 - Monsters wander onto the home map. Check `look.py` on arrival and after every long task; never
   leave time passing unwatched (`springday.py` stops on threats and never waits with `--once`).
 - Valuables in private boxes; the pack light (a death drops carried items and gold).
@@ -212,7 +236,44 @@ then up with `--height` (the torch at 62,50 sits at +4; +7 was too high, +0 on t
     3 Small Medals, a Godly breastplate). The chest drops by Poppy (no shared box takes it);
     `yardchests.py` (in arrive.py since run 43: seven lay in the yard, because this line claimed a pick-up no tool did) opens and empties each. **She locks them too** (16-31): keep the lockpick stocked.
 
-## 7. Days at home (elin-home-loop, folded in after run 12)
+## 7. Crafting, containers and income at home
+
+**The home board** carries story quests (☆) and residents' jobs, +1 karma each, with the next
+story quest a day later; check it on every return. A reward drops on my cell; on the board's cell
+(54,50) step off and back on to pick it up.
+
+**Platinum before a craft push** (the user, 2026-11-06: "you should enhance the skills so they level easier"; fact #1296): a trainer's +10 potential is
+temporary and wears down with each level-up of that skill, so train it right before the crafts, not months ahead: under skill 10, +200 costs 30 platinum and
+cuts the SP to a level by about 40% at first. Ceroyon (Olvina) and Frealord (Palmia) train the craft skills; the coins must be carried. `bridge.py skills` prints `pot`. `trainpot.py NAME=POT ...` clicks a trainer's open list up to a potential.
+
+**A craft push (G48, run 42):** `craftrun.py STATION:RECIPE[:USE] ...` crafts a list one by one and carries each made thing to the shipping chest (the yard's wagon when it's full); `craftcycle.py` repeats the cheapest recipes with meals and sleeps until Blacksmith and Carpentry reach their targets. Materials bind, not SP: the sawmill pays 18 exp a SP at Carpentry 6 and a desk ~10 at 8, but all 277 planks and ~120 logs went on Carpentry 6 -> 10; bolts from scrap pay 12 a SP at Blacksmith 4. The carpenter's Scrap (1 log, 4 SP) pays Carpentry and makes the Blacksmith's scrap. A recipe's variants each count as a first craft (a second Signpost pays its own ticket): `firstcraft.py STATION --craft`, standing by the station. The smelter stops with "not enough fuel" unless logs ride in the pack. Wood: `woodrun.py` on a forest tile (a log and two branches a tree, 44 logs in 7 real minutes beside home); scrap: a Machinarium's metal walls by `wallmine.py`, or runs/jobs/wood.txt and scrap.txt with a target make the ladder gather on its floors. The carpenter's Scrap (1 log, 4 SP) then pays most Carpentry a log.
+
+**Big containers (G47, run 42):** `freecells.py` maps the free floor. A wagon is 2x2 and stands outdoors; carrying one is what's dangerous: a zone change at burden phase 3 can tumble you for MaxHP x burden% / 200 (269 -> 57 at 161%), so stay under 150% (a wagon's 80 weight with the bags left home) and let the tools refuse. `boxshift.py FX,FZ TX,TZ --contents` empties a box into a big one in about a minute; then repoint `tools/home.py` and ship the empty box. `move.grab` takes the first thing on a cell: check a cell with two things first (run 42 shipped a wall torch).
+
+**Fewer, bigger boxes (G54, the user 2026-11-08):** "Worth selling off more of the cardboard boxes and other random containers and consolidating them down." **Count by hand** (the user: "you may need to hand count the boxes and do a full sweep to check inventory"): the bridge's stock op reports a ★Storage Chest as 96 slots whatever its wrenches (fact #1014; the yard chest holds 276), so the real count walks and opens each container once and writes down its kind, size and contents (`tools/boxcount.py`, run 45: only a ★Storage Chest's window shows "USED / SIZE"; every other kind's size is fixed and the stock op reads it right, so the tool walks only the Storage Chests unless `--walk-all`). **Mail-spam packages** pile up around the office (run 45: 26 of the 72 containers, one junk item each): arrive.py empties, grabs and ships them now. Retire the small ones (mystic chests 15, packages 20, wooden boxes 24) into ★Storage Chests with wrenches (Miral: 20 + 4 medals each) or a big wagon (Nino, 79 bars), `boxshift.py` for the contents, then update every route in home.py and packcheck before the box goes (run 44: a route of full boxes left four items unmoved while the big chest sat off it). Keep the fridges, the Dishes box, the armory, the office boxes and the collectibles shelf.
+
+**Income at home:** first-time crafts pay old tickets (`firstcraft.py STATION [--craft]`; 114 orens
+each in Mysilia); ☆ gear and valuables ship for more than a shop pays and each one also feeds the
+hearth (level 2); home board supply jobs.
+
+**Stations draw from every box** on the map, one stack per slot, the first big enough: keep each
+material in one stack in one box (`box.py` moves it), and never leave a reserved stack within
+reach of a recipe that could spend it. `gather.py OBJ ITEM N` holds the right tool, skips edges
+and unripe crops, stops on "too difficult"; rocks outside the zone's bounds can't be mined.
+
+**Converter grids run the whole stack as one task** (the butcher's tool, the spinner, the kiln: run 25): a dragged stack
+of 124 fibers spins thread after thread until the stack or the stamina is gone, and item pickups show nothing until it
+ends. Drag what the SP covers (~1 SP a thread, 6 a texture), watch SP not the AI state, and never close the grid early
+(the open grid restarts the crafter; the bridge's stamina floor cancels it each time). `convert.py DX DZ ACT [--max N]
+STACK...` checks each stack against SP. (25, 28)
+
+## Reference: the day loops (old, check before trusting)
+
+The farm, spring and training day loops carried runs 10-25; the run logs last name springday in run 31 and trainday in
+run 37 (the circuit is the engine now, and under the run score a training day at home is a loss: lessons, Superseded). The tools still exist (`springday.py`, `farmday.py`, `trainday.py`, `train.py`, `minewalls.py`,
+`cookdishes.py`, `ration.py`, `farm.py`, `water.py`, `reap.py`, `fish.py`, `lockpick.py`); their notes are in
+knowledge/tool-notes.md. Before using one again, test its hunger stop and eat step by hand (run 18), and stop one
+with `stopjob.py springday` only.
 
 **A day:** `springday.py 1 UNTIL --once` after 06:00: mushrooms reaped and cut, ripe crops reaped
 (seeds) or harvested (food), stubs cut, every bare cell replanted from the Farm box, the field
@@ -241,39 +302,17 @@ arrows, and **lockpicking at the practice chest** (61,46; the user's tip) betwee
 Every level gives a feat point (I pick: Lonely Soul at Lv11, Lv12; Party Animal at Lv17 for the
 follower plan).
 
-**The home board** carries story quests (☆) and residents' jobs, +1 karma each, with the next
-story quest a day later; check it on every return. A reward drops on my cell; on the board's cell
-(54,50) step off and back on to pick it up.
-
 **Food:** the farm (section 2's field; tomatoes and imo for food, mushrooms for seeds and food),
 the bonfire 65,59 in the Kitchen (weed stew from 5 grass, meat on the bone from corpses, roasted
 fruit; it burns a branch from the pack), fishing from 48,41 (bait from offal or mushrooms), animals beside home
 (pigs, ducks, goats: corpses, and skins 1 in 10). Keep 3+ days in the Cooler Box; buy in Mysilia
 only when the farm can't cover a trip.
 
-**Platinum before a craft push** (the user, 2026-11-06: "you should enhance the skills so they level easier"; fact #1296): a trainer's +10 potential is
-temporary and wears down with each level-up of that skill, so train it right before the crafts, not months ahead: under skill 10, +200 costs 30 platinum and
-cuts the SP to a level by about 40% at first. Ceroyon (Olvina) and Frealord (Palmia) train the craft skills; the coins must be carried. `bridge.py skills` prints `pot`. `trainpot.py NAME=POT ...` clicks a trainer's open list up to a potential.
-
-**A craft push (G48, run 42):** `craftrun.py STATION:RECIPE[:USE] ...` crafts a list one by one and carries each made thing to the shipping chest (the yard's wagon when it's full); `craftcycle.py` repeats the cheapest recipes with meals and sleeps until Blacksmith and Carpentry reach their targets. Materials bind, not SP: the sawmill pays 18 exp a SP at Carpentry 6 and a desk ~10 at 8, but all 277 planks and ~120 logs went on Carpentry 6 -> 10; bolts from scrap pay 12 a SP at Blacksmith 4. The carpenter's Scrap (1 log, 4 SP) pays Carpentry and makes the Blacksmith's scrap. A recipe's variants each count as a first craft (a second Signpost pays its own ticket): `firstcraft.py STATION --craft`, standing by the station. The smelter stops with "not enough fuel" unless logs ride in the pack. Wood: `woodrun.py` on a forest tile (a log and two branches a tree, 44 logs in 7 real minutes beside home); scrap: a Machinarium's metal walls by `wallmine.py`, or runs/jobs/wood.txt and scrap.txt with a target make the ladder gather on its floors. The carpenter's Scrap (1 log, 4 SP) then pays most Carpentry a log.
-
-**Big containers (G47, run 42):** `freecells.py` maps the free floor. A wagon is 2x2 and stands outdoors; carrying one is what's dangerous: a zone change at burden phase 3 can tumble you for MaxHP x burden% / 200 (269 -> 57 at 161%), so stay under 150% (a wagon's 80 weight with the bags left home) and let the tools refuse. `boxshift.py FX,FZ TX,TZ --contents` empties a box into a big one in about a minute; then repoint `tools/home.py` and ship the empty box. `move.grab` takes the first thing on a cell: check a cell with two things first (run 42 shipped a wall torch).
-
-**Fewer, bigger boxes (G54, the user 2026-11-08):** "Worth selling off more of the cardboard boxes and other random containers and consolidating them down." **Count by hand** (the user: "you may need to hand count the boxes and do a full sweep to check inventory"): the bridge's stock op reports a ★Storage Chest as 96 slots whatever its wrenches (fact #1014; the yard chest holds 276), so the real count walks and opens each container once and writes down its kind, size and contents (`tools/boxcount.py`, run 45: only a ★Storage Chest's window shows "USED / SIZE"; every other kind's size is fixed and the stock op reads it right, so the tool walks only the Storage Chests unless `--walk-all`). **Mail-spam packages** pile up around the office (run 45: 26 of the 72 containers, one junk item each): arrive.py empties, grabs and ships them now. Retire the small ones (mystic chests 15, packages 20, wooden boxes 24) into ★Storage Chests with wrenches (Miral: 20 + 4 medals each) or a big wagon (Nino, 79 bars), `boxshift.py` for the contents, then update every route in home.py and packcheck before the box goes (run 44: a route of full boxes left four items unmoved while the big chest sat off it). Keep the fridges, the Dishes box, the armory, the office boxes and the collectibles shelf.
-
-**Income at home:** first-time crafts pay old tickets (`firstcraft.py STATION [--craft]`; 114 orens
-each in Mysilia); ☆ gear and valuables ship for more than a shop pays and each one also feeds the
-hearth (level 2); home board supply jobs.
-
-**Stations draw from every box** on the map, one stack per slot, the first big enough: keep each
-material in one stack in one box (`box.py` moves it), and never leave a reserved stack within
-reach of a recipe that could spend it. `gather.py OBJ ITEM N` holds the right tool, skips edges
-and unripe crops, stops on "too difficult"; rocks outside the zone's bounds can't be mined.
-
 ## What this skill changed
 
-New in run 04; the town in runs 11-18 (G12). Measure: errors.csv repeats in the elin-home domain
-and the orens per real hour of home time (stats.csv). Baseline runs 12-20: 7 errors, 3 repeats
-(a kitten, a substring dump, two containers open), one resident starved, one death in a home loop;
-home time earned ~0 orens an hour. Latest: the loops stop at Hungry 70 and on a failed meal
-(`common.ready`), sleep.py refuses at home without `--home-ok`, the dishes go private when I leave.
+New in run 04; the town in runs 11-18 (G12); the big containers in runs 42-45 (G47, G54). Measure: errors.csv repeats
+in the home domain, the orens per real hour of home time (stats.csv), and the free slots a route can reach
+(`boxcount.py`). Enforced by tools: `common.ready` stops a loop at Hungry and on a failed meal, sleep.py refuses at
+home without `--home-ok`, the dishes go private when I leave, `farmday.home_guard` guards every long walk (run 41),
+and every packcheck chain ends at a big container (run 45). The review of 2026-11-11 rewrote sections 1 and 2 from
+`tools/home.py` and moved the day loops to the reference tail.
