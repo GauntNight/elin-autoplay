@@ -60,7 +60,7 @@ def show(r, every, steel=False):
 
 
 def creatures():
-    return {c["uid"]: c for c in data("state").get("creatures") or [] if c.get("uid")}
+    return {c["uid"]: c for c in data("state").get("nearby") or [] if c.get("uid")}
 
 
 def witnesses(max_lv):

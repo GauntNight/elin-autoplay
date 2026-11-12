@@ -32,7 +32,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import THRESHOLDS, Output, call, data, last, log_waiver, named, pc, refuse, run, setup, state, stop, wait_idle, wait_until, waiver_reason, walk, walk_beside  # noqa: E402
+from common import THRESHOLDS, Output, call, data, last, log_waiver, named, pc, refuse, run, run_live, setup, state, stop, wait_idle, wait_until, waiver_reason, walk, walk_beside  # noqa: E402
 from activity import mark  # noqa: E402
 from job import register, stop_requested  # noqa: E402
 import delve  # noqa: E402
@@ -317,7 +317,7 @@ def explore_floor(solo):
     for _ in range(8):
         asked()
         args = ["25"] + (["--solo"] if solo else []) + (["--expendable"] if "--expendable" in sys.argv else []) + GATE
-        out = run("delve.py", *args, timeout=1500)
+        out = run_live("delve.py", *args, timeout=1500, prefix="    ")  # run 45: 15 silent minutes inside run()
         why = next((ln.split("stop:", 1)[1].strip() for ln in reversed(out.splitlines()) if "stop:" in ln), "")
         print(f"  delve: {why or last(out)[:100]}", flush=True)
         # run 42: 20-odd step limits on one cell, a game day and a half and 17 real minutes, a soil block away from the rest of the floor: a walk that ends where it began is over

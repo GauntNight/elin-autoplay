@@ -28,7 +28,7 @@ TOOLS = Path(__file__).resolve().parent
 from home import FIELD  # noqa: E402  (the 38-cell field since run 12; one definition for every tool)
 import home  # noqa: E402
 from home import BOX_STR  # noqa: E402
-from common import THRESHOLDS, last, ready, state, wait_idle, wait_until  # noqa: E402,F401  (state: re-exported to springday and water)
+from common import THRESHOLDS, last, ready, state, stop, wait_idle, wait_until  # noqa: E402,F401  (state: re-exported to springday and water)
 from common import run as _run, walk as common_walk  # noqa: E402
 from packcheck import has_word, split_listing  # noqa: E402
 
@@ -230,26 +230,26 @@ def home_guard(what, limit=65, hard=80):
         print("  a dialog during " + what + ": " + last(run("talk.py", "4")))
         s = state()
         if s.get("drama") or (s.get("layers") or {}).get("top") == "LayerDrama":
-            sys.exit(f"stop: a dialog is open during {what}: talk.py")
+            stop(f"a dialog is open during {what}: talk.py")
     feed_or_stop(what, limit, hard)
     for _ in range(6):
         s = state()
         p = s.get("pc") or {}
         foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
         if p.get("hp", 0) < 0.6 * (p.get("maxHp") or 1):
-            sys.exit(f"stop: HP {p.get('hp')}/{p.get('maxHp')} during {what}: heal first")
+            stop(f"HP {p.get('hp')}/{p.get('maxHp')} during {what}: heal first")
         if not foes:
             return
         f = min(foes, key=lambda c: c.get("dist", 99))
         if "cat" in str(f.get("id")) or (f.get("lv") or 99) > p.get("lv", 0):
-            sys.exit(f"stop: {f.get('name')} Lv{f.get('lv')} at {f.get('dist')} during {what}: my decision")
+            stop(f"{f.get('name')} Lv{f.get('lv')} at {f.get('dist')} during {what}: my decision")
         print(f"  {f.get('name')} Lv{f.get('lv')} during {what}: fighting it")
         # a slime's melee splash eats the gear's enchants (fight.py refuses): the Putit
         tool = ("throw.py", f.get("name", "").split()[-1], "Putit In Amber", "8") if "slime" in str(f.get("id")) else ("fight.py", f.get("id") or f["name"])
         r = run(*tool, timeout=300)
         if getattr(r, "rc", 0) == 3:
-            sys.exit(f"stop: {tool[0]} stopped during {what}")
-    sys.exit(f"stop: still hostiles in view during {what}")
+            stop(f"{tool[0]} stopped during {what}")
+    stop(f"still hostiles in view during {what}")
 
 
 def feed_or_stop(what, limit=65, hard=80):
@@ -264,7 +264,7 @@ def feed_or_stop(what, limit=65, hard=80):
     print(f"  hunger {h} during {what}: ate {meal}")
     h = state()["pc"].get("hunger", 0)
     if not meal and h >= hard:
-        sys.exit(f"stop: hunger {h} during {what} and no meal landed: get food before anything else")
+        stop(f"hunger {h} during {what} and no meal landed: get food before anything else")
 
 
 def eat_one():

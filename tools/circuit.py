@@ -3,7 +3,7 @@ done by hand. From the world map: `places` -> the nearest unconquered nefia of b
 tiles (no underwater ones) -> wgo.py there -> Enter -> ladder.py (the gate, FLOORS floors) -> on "conquered"
 evac.py out -> repeat, until N nefias, or a ladder stop that isn't a conquest, or the unload is due.
 
-The home unload every two nefias (elin-play: the bags fill) is NOT done here: the loop stops with
+The home unload every UNLOAD_EVERY nefias (four since run 40: the bags fill) is NOT done here: the loop stops with
 "go home: ..." and recall.py + arrive.py are the next steps by hand (an unload is ten minutes of box moves
 that arrive.py already does). A ladder stop for a decision (rc 3) stops the circuit too: it is a decision.
 Marks itself as one activity ("circuit") on top of the ladder's own marks.
@@ -30,42 +30,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from activity import mark  # noqa: E402
 import bridge  # noqa: E402
-from common import bag_slots, TOOLS, THRESHOLDS, Output, call, data, last, refuse, run, state, stop, wait_until, waiver_reason  # noqa: E402
+from common import bag_slots, TOOLS, THRESHOLDS, Output, call, data, last, refuse, run, run_live, state, stop, wait_until, waiver_reason  # noqa: E402
 from job import register, stop_requested  # noqa: E402
 
 UNLOAD_EVERY = 4  # run 40: was 2; three bags carry 3-4 conquests, and a full bag stops the circuit by itself (below)
 BAG_FULL = 2  # run 36: a bag this close to its slots counts as full (common.bag_slots: 35, the wrenched loot bag 48)
-
-
-def run_live(tool, *args, timeout=7200):
-    """common.run, but each line is printed as it comes (run 34: the ladder ran up to an hour inside run() and the
-    circuit's log showed nothing until it ended, so nobody could watch a stop happen). -u: a piped child Python
-    block-buffers its prints otherwise. Run the circuit with its stdout to a file, never through `head`: a closed
-    pipe stops the printing thread and the ladder then blocks on a full pipe (run 34)."""
-    bridge.close()
-    proc = subprocess.Popen([sys.executable, "-I", "-u", "-X", "utf8", str(TOOLS / tool), *map(str, args)],
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
-                            errors="replace")
-    lines = []
-
-    def pump():
-        for line in proc.stdout:
-            lines.append(line)
-            print("  | " + line.rstrip(), flush=True)
-
-    t = threading.Thread(target=pump, daemon=True)
-    t.start()
-    try:
-        proc.wait(timeout=timeout)
-        rc = proc.returncode
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        lines.append(f"\nstop: {tool} timed out after {timeout}s")
-        rc = 3
-    t.join(timeout=10)
-    out = Output("".join(lines).strip())
-    out.rc = rc
-    return out
 
 
 def clear_weak(max_fights=4):

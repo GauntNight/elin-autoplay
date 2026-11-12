@@ -549,6 +549,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/publishcheck.py --history   also every commit reachable from HEAD: its messages,
                                                        the lines it added, and its author and committer
     Exit: 0 clean, 1 something found.
+- **`pulse.py`**: Watch the game itself while a loop runs: exit when nothing has happened for too long (the review of 2026-11-11).
+    usage: python -I tools/pulse.py [--idle 300] [--dead 90] [--max 1790] [--every 10]
 - **`purge.py`**: Drop the junk out of the pack and its carried bags, by rule, on a dungeon or field map (run 28: the pack and all three bags were full after two nefias, and a boss chest's treasure map and tomes stayed in the chest; lessons run 26: "the ladder's loot fills the 35-card pack and every bag within one or two nefias").
     usage: python -I tools/purge.py [--dry] [--free N] [--heavy]
       --heavy  only the pack's furniture over 5 kg, at burden phase 3 (the ladder calls it after a boss chest)
@@ -605,6 +607,12 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/scrap.py [--dry] [NAME ...]
       NAME  break these pack items too, by name (e.g. "strange silver coin": a gacha coin, ['scrap'],
             silver 27; not broken by default because the coins are currency)
+- **`seq.py`**: Run tool calls one after another and stop at the first that doesn't exit 0 (the review of 2026-11-11).
+    usage: python -I tools/seq.py "TOOL ARGS" "TOOL ARGS" ...
+      each argument is one call without the `python -I tools/` prefix, quoted as one string:
+          python -I tools/seq.py "act.py 0 0 'Pick all'" "leave.py" "wgo.py 12 34"
+      --dry   print the calls and run nothing
+    exit codes: 0 every step done; else the first failing step's own code (1 refused, 2 bridge, 3 stopped).
 - **`session_end.py`**: The end of the user's play window (run 22: run 21 quit two hours before the five the user had asked for). When the user gives a duration or an end time, write it here at once; `bridge.py quit` refuses before it unless --early-ok.
     usage: python -I tools/session_end.py 5h | 90m | 03:00   set the end (a clock time rolls to tomorrow)
            python -I tools/session_end.py                     print it and the minutes left

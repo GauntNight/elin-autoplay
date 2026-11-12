@@ -239,6 +239,7 @@ def _fight(trk):
     rounds = int(args[2]) if len(args) > 2 else 40
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     s0 = call("state")["data"]
+    turn0 = s0["pc"].get("turn")
     # Run 15: on the world map there is no Attack act, and the walk toward an adjacent cell is a
     # world-map step (2.6 game hours each): a Lv3 goblin was chased for 8 hours. Bumping into it
     # with `bridge.py move DIR` starts the encounter map, where fight.py works.
@@ -376,8 +377,16 @@ def _fight(trk):
         if tt and tt[0]["hpPct"] < t["hpPct"]:
             hits.append(t["hpPct"] - tt[0]["hpPct"])
         print(f"HP {s2['pc']['hp']}/{s2['pc']['maxHp']}  {t['name']} {tt[0]['hpPct'] if tt else 0}%")
-    log = call("state")["data"].get("log") or []
+    end = call("state")["data"]
+    log = end.get("log") or []
     print("log:", " / ".join(log[-5:]))
+    # run 45 (Ancient Ruin B3): delve counted 25 fight steps that never swung as fought, 15 silent minutes with
+    # two weak hostiles idle beside me. A call that leaves the target in view and the turn counter where it was
+    # did nothing: that is a decision, not a round
+    left = [c for c in end.get("nearby") or [] if match(c, name, force)]
+    if left and turn0 is not None and end["pc"].get("turn") == turn0:
+        stop(f"no round landed on {left[0]['name']} (d{left[0]['dist']}, {left[0]['hpPct']}%): the turn counter "
+             f"is still at {turn0}; look.py, then by hand")
 
 
 def fight_speed():

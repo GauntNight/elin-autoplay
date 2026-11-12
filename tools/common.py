@@ -5,9 +5,12 @@ Import with `from common import ...` (every tool adds its own folder to sys.path
 
 Exit-code contract for the tools (parents branch on rc, not on the text):
   0  done            1  refused (a rule, a bad argument: `refuse`)
-  2  bridge error    3  stopped for a decision (`stop`: HP, a hostile, a window, a limit)
+  2  bridge error (setup() maps an uncaught OSError / BridgeError / missing reply data to it)
+  3  stopped for a decision (`stop`: HP, a hostile, a window, a limit)
 
     setup()                     utf-8 on stdout and stderr (-I ignores PYTHONIOENCODING)
+    run_live(tool, *args)       run(), printing each line as it comes (a long child: the ladder, delve)
+    hostiles(s, r, min_lv, max_lv)  the hostiles in view, nearest first
     run(tool, *args, timeout)   a tool as a subprocess: closes the bridge first, returns its
                                 output (str) with .rc; never raises on a non-zero exit
     data(op, **kw)              call() that raises BridgeError on ok=false
@@ -29,6 +32,7 @@ Exit-code contract for the tools (parents branch on rc, not on the text):
 import re
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -54,6 +58,30 @@ BAG_SLOTS = {"a loot bag": 48}
 
 def bag_slots(name):
     return BAG_SLOTS.get(name, 35)
+
+
+def _bridge_exit(kind, err, tb):
+    """Exit 2 for a bridge failure (the review of 2026-11-11: no tool exited 2; an OSError, a BridgeError or a
+    call(...)["data"] on ok=false was a traceback at rc 1, which every parent read as a refusal). The traceback
+    still prints; exit handlers (fight.py's speed) still run."""
+    import atexit
+    import os
+    import traceback
+    traceback.print_exception(kind, err, tb)
+    is_bridge = issubclass(kind, (BridgeError, OSError)) or (issubclass(kind, KeyError) and err.args == ("data",))
+    if not is_bridge:
+        return  # the interpreter exits 1 as before
+    print("bridge error: " + (str(err) or kind.__name__) + " (exit 2: not a refusal; bridge.py ping)", file=sys.stderr)
+    try:
+        atexit._run_exitfuncs()
+    except Exception:  # noqa: BLE001
+        pass
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(2)
+
+
+sys.excepthook = _bridge_exit  # every tool that imports common, whether or not it calls setup()
 
 
 def setup():
@@ -122,6 +150,51 @@ def run(tool, *args, timeout=300):
                      + f"\nstop: {tool} timed out after {timeout}s")
         out.rc = 3
     return out
+
+
+def run_live(tool, *args, timeout=7200, prefix="  | "):
+    """run(), but each line is printed as it comes (run 34: the ladder ran up to an hour inside run() and the
+    circuit's log showed nothing until it ended; run 45: delve ran 15 silent minutes inside the ladder the same
+    way). -u: a piped child Python block-buffers its prints otherwise. Send the caller's stdout to a file, never
+    through `head`: a closed pipe stops the printing thread and the child then blocks on a full pipe (run 34)."""
+    bridge.close()
+    proc = subprocess.Popen([sys.executable, "-I", "-u", "-X", "utf8", str(TOOLS / tool), *map(str, args)],
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+                            errors="replace")
+    lines = []
+
+    def pump():
+        for line in proc.stdout:
+            lines.append(line)
+            print(prefix + line.rstrip(), flush=True)
+
+    t = threading.Thread(target=pump, daemon=True)
+    t.start()
+    try:
+        proc.wait(timeout=timeout)
+        rc = proc.returncode
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        lines.append(f"\nstop: {tool} timed out after {timeout}s")
+        rc = 3
+    t.join(timeout=10)
+    out = Output("".join(lines).strip())
+    out.rc = rc
+    return out
+
+
+def hostiles(s=None, r=None, min_lv=None, max_lv=None):
+    """The hostiles in view, nearest first (the review of 2026-11-11: 34 inline copies, and cure.py's read a key
+    the state never had, so its stop never fired). r: within this many cells; min_lv / max_lv: level bounds."""
+    s = s or state()
+    out = [c for c in s.get("nearby") or [] if c.get("hostile") and not c.get("party")]
+    if r is not None:
+        out = [c for c in out if c.get("dist", 99) <= r]
+    if min_lv is not None:
+        out = [c for c in out if (c.get("lv") or 0) >= min_lv]
+    if max_lv is not None:
+        out = [c for c in out if (c.get("lv") or 0) <= max_lv]
+    return sorted(out, key=lambda c: c.get("dist", 99))
 
 
 def data(op, **kw):

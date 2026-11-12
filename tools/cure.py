@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, pc, refuse, setup, state, stop  # noqa: E402
+from common import call, hostiles as common_hostiles, pc, refuse, setup, state, stop  # noqa: E402
 
 SPELL = "Cure Minor Wound"
 ALIAS = "SpHealLight"  # run 34: the bridge's cast op (0.33.0) needs no hotbar button
@@ -29,7 +29,7 @@ def button():
 
 
 def hostiles():
-    return [c for c in (state().get("creatures") or []) if c.get("hostility") == "HOSTILE" or c.get("hostile")]
+    return common_hostiles()
 
 
 def main():

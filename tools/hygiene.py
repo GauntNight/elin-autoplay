@@ -280,10 +280,20 @@ def main():
             if bad:
                 findings.append(f"{name}:{i}: control character {', '.join(bad)} (a backslash lost in a heredoc?)")
         if name in ("common.py", "hygiene.py", "stopjob.py", "summary_page.py", "kb.py", "elin_eye.py",
-                    "stats.py", "offcheck.py", "ollama_stop.py", "publishcheck.py", "newgame.py"):
+                    "stats.py", "offcheck.py", "ollama_stop.py", "publishcheck.py", "newgame.py", "seq.py"):
             continue  # stopjob's and ollama_stop's taskkill are the user's rules; the others never talk to the game (stats.py and publishcheck: git log; offcheck: the process list)
         if "subprocess.run(" in s:
             findings.append(f"{name}: spawns a subprocess itself; use common.run")
+        # the review of 2026-11-11: four cheap patterns behind recorded errors
+        if "subprocess.Popen(" in s:
+            findings.append(f"{name}: spawns a subprocess itself (Popen); use common.run_live")
+        for m in re.finditer(r'(?:state\(\)|data\("state"\)|call\("state"\)\["data"\])\.get\("creatures"\)', s):
+            findings.append(f"{name}:{s[:m.start()].count(chr(10)) + 1}: the state has no 'creatures' key (it is 'nearby'): "
+                            "the check never fires; use common.hostiles")
+        for m in re.finditer(r"""sys\.exit\(f?["']stop""", s):
+            findings.append(f"{name}:{s[:m.start()].count(chr(10)) + 1}: a stop through sys.exit(str) exits 1, a refusal; use common.stop (exit 3)")
+        if (TOOLS / "attic" / name).exists():
+            findings.append(f"{name}: the same name is in tools/attic: the dead-name check can't tell them apart; rename the attic copy")
         for m in re.finditer(r'call\("goto"[^\n]*\n(?:[^\n]*\n){0,2}[^\n]*time\.sleep\(', s):
             line = s[:m.start()].count("\n") + 1
             findings.append(f"{name}:{line}: a goto followed by a fixed sleep; use common.walk")

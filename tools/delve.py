@@ -173,6 +173,9 @@ def floor_gate():
         stop(f"this floor is danger {z.get('danger')}, over the limit {limit} (--max-danger N or --force to go on; the rule: go back up)")
 
 
+STALL = {"turn": 0, "hp": 0, "uid": None}  # run 45: fight steps that changed nothing
+
+
 def halt(msg):
     """A decision stop (exit 3): nothing is looted after it."""
     global SAFE_TO_LOOT
@@ -319,8 +322,27 @@ def main():
                 tool = "shoot.py" if ammo else "throw.py"
                 out = run("shoot.py", tname, str(HP_FLOOR), "12") if ammo else run("throw.py", tname, "Putit In Amber", "10", "55")
             else:
-                tool, out = "fight.py", run("fight.py", tname, str(HP_FLOOR))
+                # the review of 2026-11-11: a neutral Evolved at or under my level was listed as a foe above, but
+                # fight.py only matches hostiles: "target not in view" at rc 0, 25 times, and the floor read as explored
+                force = [] if t.get("hostile") else ["--force"]
+                tool, out = "fight.py", run("fight.py", tname, str(HP_FLOOR), *force)
+            before = (p.get("turn"), t.get("uid"), t.get("hpPct"))
             s, p, foes2, kab, kab_seen = status()
+            # run 45: 15 silent minutes of fight steps that changed nothing. Two steps in a row with the turn
+            # counter still, or four on one target without a point of damage, is a stop
+            now = next((c for c in s.get("nearby") or [] if c.get("uid") == before[1]), None)
+            if now and before[0] is not None and p.get("turn") == before[0]:
+                STALL["turn"] += 1
+            else:
+                STALL["turn"] = 0
+            if now and now.get("hpPct") == before[2] and STALL["uid"] == before[1]:
+                STALL["hp"] += 1
+            else:
+                STALL["hp"], STALL["uid"] = 0, before[1]
+            if STALL["turn"] >= 2 or STALL["hp"] >= 4:
+                halt(f"no progress on {t['name']} Lv{t['lv']} d{now.get('dist')} ({now.get('hpPct')}%): "
+                     + ("the turn counter hasn't moved in two fight steps" if STALL["turn"] >= 2
+                        else "four fight steps without damage") + f"; last: {tool}: {last(out)[:80]}")
             print(f"[{k}] fought {t['name']} Lv{t['lv']}: {last(out)[:110]}  | HP {p['hp']}/{p['maxHp']}"
                   + "".join(f", {m['name']} {m['hp']}/{m['maxHp']}" for m in kab))
             # the fight tool stopped for a decision (HP, a hit over 15% in one round, a window) or
