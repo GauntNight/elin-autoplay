@@ -44,24 +44,18 @@ def main():
     else:
         if any(c.get("hostile") for c in s.get("nearby") or []):
             refuse("a hostile is in view: elin-play reads evacuation only with no foe in view (fight or step away first)")
-        names = [i["name"] for i in data("inv")["items"] if re.search(r"scrolls? of evacuation", i["name"].lower())]
-        if not names:
-            # run 44: 8 blessed scrolls rode in the spoils bag, the spell failed twice with a foe near, and the floor
-            # was left by a return scroll: a scroll comes out of a carried bag before the spell is tried
-            for bag in data("stock").get("pack") or []:
-                hit = [x["name"] for x in bag.get("items") or [] if re.search(r"scrolls? of evacuation", x["name"].lower())
-                       and "cursed" not in x["name"].lower()]
-                if hit and "cooler" not in bag["name"].lower():
-                    run("bag.py", bag["name"], "--take", hit[0])
-                    run("close.py")
-                    names = [i["name"] for i in data("inv")["items"] if re.search(r"scrolls? of evacuation", i["name"].lower())]
-                    break
-        if not names:
+        # runs 40, 41, 44: scrolls in the spoils bag, then in a pouch inside the loot bag, were "not found" and
+        # the floor was left by a failed spell or a return scroll. The review of 2026-11-11: the scroll is found by
+        # what it is (items.py: the reference element SpEvac), at any depth, never a cursed one
+        import items as inv
+        carried = inv.inventory()
+        scrolls = sorted(inv.find("scroll:SpEvac", items=carried), key=lambda i: i["depth"])
+        if not scrolls:
             # run 34: the conquests' exits spent the last scroll while the Evacuation spell held 31 casts (read from
             # books on 489-12-01); the bridge's cast op (cure.py's path) casts it with no hotbar button
             stock = spell_stock("SpEvac")
             if not stock:
-                refuse("no scroll of evacuation in the pack and no Evacuation casts (the bags don't count: take one out)")
+                refuse("no usable scroll of evacuation carried (the pack and every bag were read) and no Evacuation casts")
             # the first test (Ominous Forest B1, 490-02-25): "You fail to cast" once, then the countdown; 20 MP a cast.
             # A failed cast spends the turn and the MP only, so try again while MP lasts and no foe is in view
             for attempt in range(1, 4):
@@ -83,10 +77,11 @@ def main():
                 if any(c.get("hostile") for c in s2.get("nearby") or []):
                     stop("the Evacuation cast failed and a hostile is in view: fight or teleport, then try again")
         else:
-            good = [n for n in names if not re.search(r"\b(cursed|doomed)\b", n.lower())]
-            out = run("item.py", (good or names)[0], "Read")
+            out = inv.use(scrolls[0], "Read", carried)
             if "Read -" not in out:
-                refuse("couldn't read it: " + last(out)[-120:])
+                refuse(f"couldn't read {scrolls[0]['name']} ({inv.where(scrolls[0], carried)}): " + last(out)[-120:])
+            if scrolls[0]["depth"]:
+                run("close.py")  # the bag it was read from
         wait_until("frames", n=10, timeout=2000)
         if pending(state()["pc"]) is None:
             stop("no countdown after the read or cast (a cast can fail): look.py, and don't read another before checking")

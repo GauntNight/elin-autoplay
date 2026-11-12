@@ -26,7 +26,7 @@ namespace ElinAutoplay
     [BepInPlugin("elin.autoplay.bridge", "ElinBridge", Version)]
     public class Bridge : BaseUnityPlugin
     {
-        public const string Version = "0.39.0";
+        public const string Version = "0.40.0";
         public const int Port = 47323;
 
         class Request
@@ -387,6 +387,8 @@ namespace ElinAutoplay
                     return Ok(Rooms());
                 case "stock":  // 0.33.0 (run 28, the user's stock caps): read-only
                     return Ok(Stock((int?)cmd["r"] ?? 999));
+                case "items":  // 0.40.0 (the review of 2026-11-11): the carried things as one flat list, read-only
+                    return Ok(Items());
                 case "genes":  // 0.37.0 (run 36, G38 M1): the allies' gene slots and feat points, read-only
                     return Ok(Genes());
                 case "cast":  // 0.33.0 (run 28, G22: the user's tip, attack spells for exp)
@@ -1075,6 +1077,86 @@ namespace ElinAutoplay
                 ["boxes"] = boxes,
                 ["shipping"] = ship == null ? null : Items(ship, 1),
             };
+        }
+
+        // 0.40.0 (the review of 2026-11-11): everything the player carries as one flat list, at any depth, with
+        // what the tools used to guess from names (50 of 241 recorded errors: a meal that matched no word, scrolls
+        // in a bag nobody opened, the player's own blanket sold as a stolen one): category, trait, the reference
+        // element (which scroll, rod, potion or book), the creature a food is made of, blessed state, charges, lock,
+        // weight, rot, and the chain of containers it sits in. Read-only.
+        // Honest play: id, ref, refCard and bless stay unknown until the item is identified (PlayerId's rule);
+        // category and trait are what the icon and the name already show. A locked container lists no contents.
+        static JObject Items()
+        {
+            var pc = EClass.pc;
+            if (pc == null) throw new InvalidOperationException("not in game");
+            var arr = new JArray();
+            void Walk(Card owner, JArray path, int depth)
+            {
+                foreach (var t in owner.things)
+                {
+                    bool known = t.IsIdentified;
+                    var o = new JObject
+                    {
+                        ["uid"] = t.uid, ["id"] = PlayerId(t), ["name"] = Clean(t.Name), ["num"] = t.Num,
+                        ["cat"] = Safe(() => t.sourceCard.category),
+                        ["trait"] = t.trait?.GetType().Name,
+                        ["identified"] = known,
+                        ["weight"] = Safe(() => t.ChildrenAndSelfWeight),
+                        ["depth"] = depth,
+                    };
+                    if (path.Count > 0) { o["parent"] = path[path.Count - 1]; o["path"] = new JArray(path); }
+                    if (t.isEquipped) o["equipped"] = true;
+                    if (t.c_charges != 0) o["charges"] = t.c_charges;
+                    if (t.c_lockLv > 0) o["lockLv"] = t.c_lockLv;
+                    if (t.isLostProperty) o["lostProperty"] = true;
+                    if (known)
+                    {
+                        o["bless"] = (int)t.blessedState;
+                        try
+                        {
+                            int v = t.refVal;
+                            if (v != 0)
+                            {
+                                o["refVal"] = v;
+                                if (EClass.sources.elements.map.TryGetValue(v, out var row) && row != null) o["ref"] = row.alias;
+                            }
+                        }
+                        catch { }
+                        try { if (!string.IsNullOrEmpty(t.c_idRefCard)) o["refCard"] = t.c_idRefCard; } catch { }
+                    }
+                    try { if (t.IsDecayed) o["rotten"] = true; } catch { }
+                    try { if (t.isStolen) o["stolen"] = true; } catch { }
+                    try
+                    {
+                        var can = new JArray();
+                        if (t.trait != null)
+                        {
+                            if (t.trait.CanEat(pc)) can.Add("eat");
+                            if (t.trait.CanDrink(pc)) can.Add("drink");
+                            if (t.trait.CanRead(pc)) can.Add("read");
+                        }
+                        if (can.Count > 0) o["can"] = can;
+                    }
+                    catch { }
+                    if (t.trait is TraitContainer || t.things.Count > 0)
+                    {
+                        o["container"] = true;
+                        o["slots"] = Safe(() => t.things.width * t.things.height);
+                        o["count"] = t.things.Count;
+                        if (t.c_lockLv > 0) o["locked"] = true;
+                    }
+                    arr.Add(o);
+                    if (t.things.Count > 0 && t.c_lockLv <= 0 && depth < 6)
+                    {
+                        var deeper = new JArray(path);
+                        deeper.Add(t.uid);
+                        Walk(t, deeper, depth + 1);
+                    }
+                }
+            }
+            Walk(pc, new JArray(), 0);
+            return new JObject { ["items"] = arr, ["count"] = arr.Count };
         }
 
         // 0.37.0 (run 36, G38 M1): a gene's contents as its note shows them (DNA.WriteNote): type, cost in feat
@@ -1898,6 +1980,7 @@ namespace ElinAutoplay
                 if (b is ButtonGrid g && g.card != null)
                 {
                     o["card"] = Clean(g.card.Name);
+                    o["uid"] = g.card.uid;  // 0.40.0: a slot is found by the item, not by its name
                     // My pack vs an open container or shop: both grids share a UI path.
                     o["mine"] = g.card.GetRootCard() == EClass.pc;
                     // which container the slot shows: the pack and a bag carried in it share UI

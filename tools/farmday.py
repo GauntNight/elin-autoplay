@@ -267,6 +267,44 @@ def feed_or_stop(what, limit=65, hard=80):
         stop(f"hunger {h} during {what} and no meal landed: get food before anything else")
 
 
+def _eat_by_kind(inv, grid_full):
+    """eat_one's meal through tools/items.py: the first of meals() that lands. A refusal by item.py (a harmful
+    food, foods.md) moves on to the next; a meal that started and didn't land ends it, as before."""
+    tried = set()
+    for _ in range(8):
+        carried = inv.inventory()
+        h0 = state()["pc"]["hunger"]
+        cands = [c for c in inv.meals(h0, carried) if c["uid"] not in tried]
+        if grid_full:
+            # run 27: with 35 cards a meal split from a stack falls to the floor: a single thing in the pack first
+            cands.sort(key=lambda i: not (i["depth"] == 0 and (i.get("num") or 1) == 1))
+        if not cands:
+            break
+        it = cands[0]
+        tried.add(it["uid"])
+        verb = "Drink" if it["kind"] == "milk" else "Eat"
+        out = inv.use(it, verb, carried)
+        if f"{verb} -" not in out:
+            print(f"  {it['name']} ({inv.where(it, carried)}): not eaten: {last(out)[:100]}")
+            continue
+        wait_idle(timeout=30000)  # let the meal finish: closing windows early cancelled it
+        run("close.py")
+        h1 = state()["pc"]["hunger"]
+        for _ in range(10):  # the meal can register a few seconds after wait_idle returns
+            if h1 < h0:
+                break
+            time.sleep(0.6)
+            h1 = state()["pc"]["hunger"]
+        if h1 >= h0:
+            print(f"  {it['name']}: hunger {h0} -> {h1}: the meal didn't land")
+            return None
+        return f"{it['name']} (hunger {h0} -> {h1})"
+    run("close.py")
+    print(f"  no meal eaten: nothing edible is carried ({len(tried)} tried; `items.py --meals` lists what counts): "
+          "cook or buy food")
+    return None
+
+
 def eat_one():
     # run 17 (the user: "I don't think you can eat and ignore the popup can you"): a bandit's
     # demand dialog was open on an ambush map and the meal silently did nothing (hunger 65 -> 65);
@@ -320,6 +358,17 @@ def eat_one():
     if foes:
         print(f"  not eating: {foes[0].get('name')} is in view (a hostile cancels the meal)")
         return None
+    # the review of 2026-11-11: the MEALS words missed food six times (runs 18, 24, 26, 29, 38, 41) and food in
+    # the bags was never looked at (runs 30, 32, 39). With bridge 0.40.0 the food is found by its category
+    # (tools/items.py: meals()), wherever it rides; the word path below stays for an older mod
+    try:
+        import items as inv
+        carried_all = inv.inventory()
+    except Exception as e:  # noqa: BLE001
+        carried_all = None
+        print(f"  items op not available ({e}): the word lists")
+    if carried_all is not None:
+        return _eat_by_kind(inv, len(carried) >= 35)
     if pack_meals:
         foods = pack_meals  # the Cooler Box stays closed: item.py sees only the pack's stacks
     else:

@@ -21,8 +21,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Exit: 0 done, 1 refused (not at home), 3 stopped (a threat, or the Dishes box couldn't be shared).
 - **`bag.py`**: Move items between the pack and a container carried in it (Cooler Box, purse, bag) with the game's own Shift+click quick move (bridge 0.13.0 `shiftclick`, InvOwner.OnShiftClick). A carried container holds many items in one pack slot (the user, run 04: carry bags so the pack stops overflowing; keep food in the cooler box).
     usage: python -I tools/bag.py BAG [--take] [ITEM ...]
-      BAG     part of the container's name ("Cooler Box")
-      ITEM    part of an item's name; each moves one stack
+      BAG     part of the container's name ("Cooler Box"), or uid:N (tools/items.py)
+      ITEM    part of an item's name, or uid:N; each moves one stack
       --take  move from the bag to the pack (to eat or use it)
       no ITEM lists what the bag holds
     Exit: 0 every item moved, 1 any item not moved (run 38: a full pack exited 0).
@@ -277,9 +277,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/feat.py                 list what's on offer
            python -I tools/feat.py NAME [NAME ...]  buy the first one on offer, per point, in that order
     Exit 0 done (or listed), 1 refused (no point or none of them on offer), 2 the bridge.
-- **`fence.py`**: Sell the stolen goods at a black market (run 33: done by hand at Minwer and Siyun with a scratch loop). steal.py appends every stolen item's name to runs/stolen.txt; this opens the fence's wares (shop.py --keep-open), sells each listed stack with its "Sell N" act, closes the shop (the Thieves Guild books the contribution when the window closes: elin-play) and prints the guild line from the journal. Only Derphy (Siyun), Port Kapul (Minwer) and my own land buy stolen goods below rank 4 (G27's notes).
+- **`fence.py`**: Sell the stolen goods at a black market (run 33: done by hand at Minwer and Siyun with a scratch loop).
     usage: python -I tools/fence.py SHOPKEEPER [--dry]
-    Exit 0, 1 refused (nothing listed, the shopkeeper not in view), 3 stopped (a window).
+      --dry  list what would be sold and what is held back, and sell nothing (no shopkeeper needed)
+    Exit 0, 1 refused (nothing stolen is carried, the shopkeeper not in view), 3 stopped (the gold didn't move).
 - **`fight.py`**: Melee a visible creature by name until it dies, using the game's own Attack act (the act walks into range). Stops (exit 3) when my HP drops below a floor, when one round costs more than 15% of my max HP (THRESHOLDS hit_pct: teleport), when a window opens; exit 0 when the target is gone, not in view or unreachable, or after a turn limit.
     usage: python -I tools/fight.py NAME [min_hp_pct] [max_rounds] [--force] [--single]
 - **`fightlog.py`**: The fight log (the user, run 29: "per monster in the graph is perfect", with a column for specials such as "destroys equipment with fire", "weakens stats (slime)", "invisible", "runs away").
@@ -401,6 +402,11 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       (no override) Read of a scroll of return or evacuation while one is counting down (pc.return)
       --force        a food listed as harmful, with a harmful trait in its tooltip, or rotten (run 27)
     Before a Buy with a shop open it prints what is carried already (the pack, and each open bag).
+- **`items.py`**: What the player carries, by what each thing is rather than what it is called (the review of 2026-11-11).
+    usage: python -I tools/items.py            a summary by kind
+           python -I tools/items.py KIND       the things of one kind ("meal", "scroll:SpEvac", "rod", "container")
+           python -I tools/items.py --meals    what eat.py would eat now, in order
+           python -I tools/items.py --protected  what the drop/ship/sell tools must leave alone, and why
 - **`job.py`**: A long loop's registration, so it can be stopped (2026-10-19, after run 10's runaway loop).
 - **`journal.py`**: Read the journal (run 33: opened by hand five times for the guild ranks and Gold Beneath's step). The injected MenuJournal key does nothing after a restart (run 15); the hotbar's own Journal button (a HotItemLayer whose hover tip reads "Journal") opens LayerJournal. The Quests tab lists the main quests and the four guild entries; an entry's text shows under "Quests in progress".
     usage: python -I tools/journal.py guilds          the four guilds: rank, contribution, salary

@@ -764,6 +764,10 @@ def stack_hits(want, candidates, key="card"):
     def nm(c):  # a slot's widget is "name"; the item is `key` ("card")
         return c if isinstance(c, str) else (c.get(key) or c.get("name") or "")
     w = (want or "").strip().lower()
+    if w.startswith("uid:"):
+        # the review of 2026-11-11: the thing itself, whatever it is called now (a rename on identification, two
+        # stacks of one name, a blessed and a plain one); tools/items.py hands these out
+        return [c for c in candidates if not isinstance(c, str) and str(c.get("uid")) == w[4:]], False
     exact = [c for c in candidates if nm(c).strip().lower() == w]
     hits = exact or matches(want, candidates, key)
     return hits, len({_key(nm(c)) for c in hits}) > 1

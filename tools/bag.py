@@ -4,8 +4,8 @@ carried container holds many items in one pack slot (the user, run 04: carry bag
 stops overflowing; keep food in the cooler box).
 
 usage: python -I tools/bag.py BAG [--take] [ITEM ...]
-  BAG     part of the container's name ("Cooler Box")
-  ITEM    part of an item's name; each moves one stack
+  BAG     part of the container's name ("Cooler Box"), or uid:N (tools/items.py)
+  ITEM    part of an item's name, or uid:N; each moves one stack
   --take  move from the bag to the pack (to eat or use it)
   no ITEM lists what the bag holds
 Exit: 0 every item moved, 1 any item not moved (run 38: a full pack exited 0).
@@ -63,7 +63,11 @@ def main():
                     and "ButtonGrid" in (b.get("name") or "")})
     if other:
         sys.exit(f"another container is open ({', '.join(other)}): a quick move would go into it; close.py first")
-    mine = [b for b in bs if bag.lower() in (b.get("card") or "").lower() and b.get("in") == "pack"]
+    def is_bag(b):  # part of the name, or the container itself (uid:N, tools/items.py)
+        if bag.lower().startswith("uid:"):
+            return str(b.get("uid")) == bag[4:] and b.get("in") == "pack"
+        return bag.lower() in (b.get("card") or "").lower() and b.get("in") == "pack"
+    mine = [b for b in bs if is_bag(b)]
     if not mine:
         sys.exit(f"no {bag!r} in the pack")
     # Shift+click moves to the other open container, so close every other carried container first
@@ -85,7 +89,7 @@ def main():
             call("invdo", i=other["Close"])
             wait_until("frames", n=10, timeout=1500)
             bs = slots()
-            mine = [m for m in bs if bag.lower() in (m.get("card") or "").lower() and m.get("in") == "pack"]
+            mine = [m for m in bs if is_bag(m)]
     acts = {a["text"]: a["i"] for a in acts_of(mine[0]["i"])}
     if "Open" in acts:  # "Close" means it's open already
         call("invdo", i=acts["Open"])

@@ -1,87 +1,94 @@
 """Sell the stolen goods at a black market (run 33: done by hand at Minwer and Siyun with a scratch loop).
-steal.py appends every stolen item's name to runs/stolen.txt; this opens the fence's wares (shop.py
---keep-open), sells each listed stack with its "Sell N" act, closes the shop (the Thieves Guild books the
-contribution when the window closes: elin-play) and prints the guild line from the journal. Only Derphy
-(Siyun), Port Kapul (Minwer) and my own land buy stolen goods below rank 4 (G27's notes).
+
+What is sold is what the game itself marks stolen (bridge 0.40.0 `items`: the flag Sleight of Hand sets), wherever
+it rides, minus anything tools/items.py protects (worn things, the kit, the carry list, unidentified things). The
+review of 2026-11-11: runs/stolen.txt, a list of names written by steal.py, sold my own fireproof blanket for a
+stolen "blanket" (run 44), went stale when identification renamed things (run 44), and missed goods in the bags
+(run 43). The file is no longer read.
+
+Each stack is moved into the pack's own grid (a shop lists only that), the fence's wares are opened (shop.py
+--keep-open), each is sold with its "Sell N" act by its uid, and the shop is closed (the Thieves Guild books the
+contribution when the window closes: elin-guilds). Only Derphy (Siyun), Port Kapul (Minwer) and my own land buy
+stolen goods below rank 4.
 
 usage: python -I tools/fence.py SHOPKEEPER [--dry]
-Exit 0, 1 refused (nothing listed, the shopkeeper not in view), 3 stopped (a window).
+  --dry  list what would be sold and what is held back, and sell nothing (no shopkeeper needed)
+Exit 0, 1 refused (nothing stolen is carried, the shopkeeper not in view), 3 stopped (the gold didn't move).
 """
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, last, refuse, run, stop  # noqa: E402
-
-STOLEN = Path(__file__).resolve().parent.parent / "runs" / "stolen.txt"
-KIT = ("fireproof blanket", "lockpick", "scroll of teleport", "scroll of evacuation", "scroll of return", "potion of cure",
-       "rod of", "cooler box", "putit in amber", "sleeping bag", "travel ration", "pickaxe", "shovel")
+from common import call, data, last, refuse, run, setup, stop  # noqa: E402
+import items as inv  # noqa: E402
 
 
-def listed():
-    return [ln.strip() for ln in STOLEN.read_text(encoding="utf-8").splitlines() if ln.strip()] if STOLEN.exists() else []
-
-
-def base(name):
-    """'2 tapestries' and 'a tapestry' share a base: the count and article dropped, a trailing s tolerated."""
-    w = name.lower().split()
-    if w and (w[0].isdigit() or w[0] in ("a", "an")):
-        w = w[1:]
-    return " ".join(w).rstrip("s")
+def goods(carried):
+    """(to sell, [(item, why held back)]) among the carried things the game marks stolen."""
+    sell, held = [], []
+    for it in carried:
+        if not it.get("stolen"):
+            continue
+        why = inv.protected(it, carried)
+        if why:
+            held.append((it, why))
+        else:
+            sell.append(it)
+    return sell, held
 
 
 def main():
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    setup()
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    if not args:
-        refuse("usage: fence.py SHOPKEEPER")
-    names = listed()
-    if not names:
-        refuse("runs/stolen.txt lists nothing: steal.py records what it takes")
-    if "--dry" in sys.argv:
-        print("\n".join(names))
+    dry = "--dry" in sys.argv
+    if not args and not dry:
+        refuse("usage: fence.py SHOPKEEPER [--dry]")
+    carried = inv.inventory()
+    sell, held = goods(carried)
+    for it, why in held:
+        print(f"  kept: {it['name']} ({inv.where(it, carried)}): {why}")
+    if dry:
+        for it in sell:
+            print(f"  would sell: {it['name']} ({inv.where(it, carried)})")
+        print(f"{len(sell)} stolen stacks to sell, {len(held)} held back")
         return
-    # run 43: purge's unclutter and a full grid put thefts in the bags, and the shop's list shows only the pack: 15 of 27 "not sold"
-    wanted = {base(n) for n in names}
-    for bag in data("stock", r=0)["pack"]:
-        hits = [x["name"] for x in bag.get("items") or [] if base(x["name"]) in wanted]
-        if hits:
-            run("bag.py", bag["name"], "--take", *hits[:8])
-            run("close.py")
+    if not sell:
+        refuse("nothing stolen is carried (the game's own flag; `items.py` shows what is)")
+    # run 43: thefts in the bags weren't on the shop's list (it shows only the pack's grid): 15 of 27 "not sold"
+    stuck = []
+    for it in sell:
+        if it.get("path"):
+            ok, why = inv.to_pack(it, inv.inventory())
+            if not ok:
+                stuck.append(f"{it['name']} ({why})")
     out = run("shop.py", args[0], "--keep-open", timeout=300)
     if out.rc != 0:
         refuse(f"shop.py: {last(out) or out.rc}")
     sold, left = [], []
     gold0 = data("state")["pc"].get("gold")
-    for name in names:
-        # run 44: my own fireproof blanket was on the list (steal.py's loose name match) and sold; the kit never goes
-        if any(k in name.lower() for k in KIT):
-            print(f"  kept: {name} (a kit item, never fenced)")
-            continue
+    for it in sell:
         bs = call("buttons", all=True)["data"]["buttons"]
         hit = [b for b in bs if "inventory grid" in (b.get("name") or "") and b.get("mine") is not False
-               and base(b.get("card") or "") == base(name)]
+               and b.get("uid") == it["uid"]]
         if not hit:
-            left.append(name)
+            left.append(it["name"])
             continue
         acts = call("invacts", i=hit[0]["i"]).get("data", {}).get("acts", [])
         sells = [a for a in acts if a["text"].startswith("Sell")]
         if not sells:
-            left.append(name)
+            left.append(it["name"])
             continue
         a = sells[-1]  # "Sell N" for the whole stack
         call("invdo", i=a["i"])
-        sold.append(f"{name} ({a['text']})")
+        sold.append(f"{it['name']} ({a['text']})")
     run("close.py")
     run("talk.py")
-    STOLEN.write_text("\n".join(left) + ("\n" if left else ""), encoding="utf-8")
     # run 43: 14 "sold" with the gold, the guild total and the pack unchanged: a sale counts only when the purse moved
     if sold and data("state")["pc"].get("gold") == gold0:
-        STOLEN.write_text("\n".join(left + [s.split(" (Sell")[0] for s in sold]) + "\n", encoding="utf-8")
         stop(f"{len(sold)} Sell acts and the gold didn't move: the shopkeeper asleep or out of money? Nothing sold")
     print(f"sold {len(sold)}: " + "; ".join(sold))
-    if left:
-        print(f"not sold (not in the pack grid? bagged?): {', '.join(left)}")
+    if left or stuck:
+        print(f"not sold: {', '.join(left + stuck)} (not in the pack's grid: a full pack?)")
     if sold:
         print([ln for ln in run("journal.py", "guilds").splitlines() if "Thieves" in ln][-1:] or "")
 

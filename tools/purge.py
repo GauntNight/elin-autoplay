@@ -101,6 +101,19 @@ def drop_in_open(name):
     hit = [b for b in bs if "ButtonGrid inventory" in b["name"] and (b.get("card") or "") == name]
     if not hit:
         return False
+    # the review of 2026-11-11: the last gate before anything leaves the pack for the floor (run 41: the
+    # woodcutter's axe; run 44: the antibody on the carry list). Worn things, the carry list, unidentified things
+    # and containers that aren't empty never drop, whatever the lists above said; the kit's own caps still apply
+    try:
+        import items as inv
+        carried = inv.inventory()
+        mine = [i for i in carried if i.get("uid") == hit[0].get("uid")] or [i for i in carried if i.get("name") == name]
+        why = next((w for w in (inv.protected(i, carried, kit=False) for i in mine) if w), None)
+        if why:
+            print(f"  not dropped: {name}: {why}")
+            return False
+    except Exception as e:  # noqa: BLE001 (an older mod: the lists above decide, as before)
+        print(f"  items op not available ({e}): dropping by the lists")
     r = call("invacts", i=hit[0]["i"])
     acts = r["data"]["acts"] if r.get("ok") else []
     drop = [a for a in acts if a.get("text") == "Drop"]
