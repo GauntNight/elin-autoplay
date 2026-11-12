@@ -518,6 +518,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       e.g. python -I tools/picker.py "scroll of identify" Read "Paper Decorative Ring"
            python -I tools/picker.py "acidproof liquid" Blend "Rigid Hand Axe"
            python -I tools/picker.py "rod of identify" Zap "stone bejeweled amulet"   (a rod is held, then zapped)
+           python -I tools/picker.py SpIdentify Cast "Silver Robe"   (a spell from the stock: run 45, Aliyun asleep)
 - **`pickup.py`**: Pick up a named thing lying on my cell (or a cell beside me) and check it reached the pack (run 45: the act on a cell with two big wagons is "Pick all", with one "Pick (a big wagon)"; act.py "Pick all" found nothing, and the walk home that followed in the same shell line left the wagon behind: a wasted 25-game-hour leg). Whatever the game calls the act ("Pick all", "Pick (NAME)", "Grab (NAME)"), this takes the thing and counts it in the pack and the bags before and after.
     usage: python -I tools/pickup.py NAME [DX DZ]       NAME: part of the thing's name ("big wagon"); DX DZ: a cell beside me
     Exit 0 picked up (the pack holds one more), 1 refused (nothing by that name on the cell), 3 stopped (the act ran, the count didn't

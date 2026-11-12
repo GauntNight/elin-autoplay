@@ -216,7 +216,8 @@ def main():
                 for dist, danger, p in cands:
                     print(f"[{done + 1}/{n}] {p['name']} at {dist} tiles", flush=True)
                     w = run("wgo.py", p["name"], "--ambush", "--weak-ok", *dok, timeout=900)
-                    if w.rc == 1 and "the route crosses ambush level" in w:
+                    # run 45: "no place 'Rustic Forest (Danger Lv.11)' listed" twice: it expired between this list and wgo's own
+                    if w.rc == 1 and ("the route crosses ambush level" in w or "no place" in w and "listed" in w):
                         print(f"  skipped: {last(w)[:110]}", flush=True)
                         skip.append(p["name"])
                         continue

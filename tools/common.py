@@ -274,7 +274,9 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 15,       # run 43: raised one step at Lv38 / HP 277, unattended limit 13 -> 14: Traditional Cave B4, danger 13 (the
+    "max_danger": 16,       # run 45: raised one step at Lv39 / HP 286, unattended limit 14 -> 15: Ruined Grassland B2, Mossy Grassland B3
+                            # and Warped Machinarium B3, all danger 14 (the unattended limit), cleared at full HP with no drink or teleport.
+                            # run 43: raised one step at Lv38 / HP 277, unattended limit 13 -> 14: Traditional Cave B4, danger 13 (the
                             # unattended limit), cleared without a drink or a teleport, 12 HP lost on the floor.
                             # run 40: raised one step at Lv35 / HP 237, unattended limit 12 -> 13: Forgotten Ruin B5 and Isolated
                             # Machinarium B3, both danger 12 (the unattended limit), cleared without a drink or a teleport

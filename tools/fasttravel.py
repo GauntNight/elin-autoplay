@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, matches, refuse, setup, state, stop, wait_until  # noqa: E402
+from common import call, data, matches, refuse, run, setup, state, stop, wait_until  # noqa: E402
 
 
 def rations():
@@ -79,6 +79,12 @@ def main():
     print(f"travelled to {h['name']} for {h['rations']} rations ({h['time']}): {before} -> {zone}; {pc.get('date')}; rations left {rations()}")
     if zone == before:
         stop("the zone did not change: read the log (look.py) before trying again")
+    # run 45: a trip passes the 05:00 shipping pickup, and its report sat open over Olvina twice: every walk and talk after it
+    # was refused ("no guard found", "Gizon is not in view") until close.py ran
+    wait_until("frames", n=30, timeout=3000)
+    if (state().get("layers") or {}).get("top") == "LayerShippingResult":
+        run("close.py", timeout=60)
+        print("  closed the shipping report the trip brought")
 
 
 if __name__ == "__main__":

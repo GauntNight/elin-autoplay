@@ -93,7 +93,7 @@ ROUTES = [
     (("treasure map",), BOX_STR(home.MAPS_BOX), "the shared Maps box (the Workshop)"),
     (("thread", "fiber", "string", "rope", "skin", "big leaf", "big leaves", "needle", "texture", "bolt"),
      "|".join(BOX_STR(b) for b in home.BAG_PARTS) + "|" + BOX_STR(home.ARMORY5) + "|" + BOX_STR(home.SPARES), "Bag parts box (the Workshop; the yard's wagon when full, run 42; the yard's chest last, run 44)"),
-    (("bone", "nail", "battery", "batteries", "microchip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5), "Parts box (the Workshop; the yard's wagon when full, run 42)"),  # run 30: queen bees (a beehive part)
+    (("bone", "nail", "battery", "batteries", "microchip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5) + "|" + "|".join(BOX_STR(w) for w in home.BIG_WAGONS) + "|" + BOX_STR(home.SPARES), "Parts box (the Workshop; the yard's wagon, then the big wagons and the yard chest when full: run 45, a bone charm refused by the two full boxes)"),  # run 30: queen bees (a beehive part)
     (("leaf", "leaves", "tuft of", "tufts of", "grass wall"), BOX_STR(home.FODDER_BOX), "the fodder box (the Farmhouse)"),
     (("corpse",), "ship", "the shipping chest (a fresh corpse; cook it first if food is short)"),
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
@@ -118,6 +118,24 @@ ROUTES = [
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),
     (("offal", "heart", "liver", "kidney", "eyeball"), "ship", "the shipping chest (organs: the pantry is full, run 41)"),
 ]
+
+
+def _with_big_tail(routes):
+    """Run 45 (G47's done-when broken a third run): a bone charm met its route's two boxes full while the yard chest had 100
+    free; the stone, leaf, wood, wheat, seed and tool routes had no big box behind them either (61,57 and 60,41 were full).
+    Every box chain now ends at the second big wagon and the yard chest; the Maps box stays alone (Poppy reads only it)."""
+    tail = [home.BIG_WAGONS[1], home.SPARES]
+    out = []
+    for keys, where, label in routes:
+        cells = where.split("|")
+        if all(re.fullmatch(r"\d+,\d+", c) for c in cells) and where != BOX_STR(home.MAPS_BOX):
+            cells += [BOX_STR(t) for t in tail if BOX_STR(t) not in cells]
+            where = "|".join(cells)
+        out.append((keys, where, label))
+    return out
+
+
+ROUTES = _with_big_tail(ROUTES)
 
 
 from common import run as _run  # noqa: E402

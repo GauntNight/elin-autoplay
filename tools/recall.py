@@ -49,7 +49,21 @@ def main():
     min_hp = nums[1] if len(nums) > 1 else 50
     s = state()
     if on_world(s.get("zone") or {}):
-        refuse("a scroll of return can't be read on the world map: enter a local map first")
+        # run 45: the circuit's "go home: recall.py" met this refusal on the world map, and I walked 85,158 -> home instead:
+        # about nine game days of rent for one day's scroll. Step into the local map under me (as wgo.meal_stop does), then read
+        acts = call("acts", dx=0, dz=0, mode="all").get("data", {}).get("acts") or []
+        enter = [a for a in acts if a["text"] == "Enter"]
+        if not enter:
+            refuse("a scroll of return can't be read on the world map, and this tile has no plain Enter (a town or nefia): walk off it first")
+        call("do", i=enter[0]["i"])
+        wait_until("zone", timeout=10000)
+        wait_until("frames", n=30, timeout=3000)
+        s = state()
+        if on_world(s.get("zone") or {}):
+            refuse("still on the world map after Enter: read it by hand from a local map")
+        if any(c.get("hostile") for c in s.get("nearby") or []):
+            refuse("a hostile on the local map I stepped into: fight or leave first")
+        print(f"  stepped into {(s.get('zone') or {}).get('full')} to read the scroll")
     # run 23: after claiming Vernis it was the home zone, and the scroll's list had no Meadow: the scroll
     # was spent for nothing. The list holds the home zone (never the zone I stand in) and each visited
     # dungeon's deepest floor (SpatialManager.ListReturnLocations). Bridge 0.31.3 reports the home.
