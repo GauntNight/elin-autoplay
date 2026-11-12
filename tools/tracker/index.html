@@ -234,17 +234,25 @@ function draw(c, rows) {
     .attr('x', ml + 4).attr('y', (t) => y(t)).attr('dy', '0.32em').attr('text-anchor', 'end')
     .attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((t) => fmt(t));
   g.append('line').attr('x1', ml + 10).attr('x2', W - mr).attr('y1', y(0)).attr('y2', y(0)).attr('stroke', 'var(--cds-chart-axis)');
-  // x ticks: every run, or every other one when narrow; the review slot carries its marker instead
+  // x ticks: as many runs as fit with a label's width between them (45 runs made "every other one" overlap); the last run
+  // always shows, and the one before it drops when the two would touch; the review slot carries its marker instead
   const runPts = pts.filter((p) => /^\d+$/.test(p));
-  const step = x.bandwidth() < 14 ? 2 : 1;
-  g.selectAll('text.xt').data(runPts.filter((p, i) => i % step === 0 || i === runPts.length - 1)).join('text').attr('class', 'xt')
+  const gap = 24;
+  const step = Math.max(1, Math.ceil(gap / x.step()));
+  const shown = runPts.filter((p, i) => i % step === 0);
+  const lastRun = runPts[runPts.length - 1];
+  if (lastRun !== undefined && shown[shown.length - 1] !== lastRun) {
+    if (shown.length && cxOf(lastRun) - cxOf(shown[shown.length - 1]) < gap) shown.pop();
+    shown.push(lastRun);
+  }
+  g.selectAll('text.xt').data(shown).join('text').attr('class', 'xt')
     .attr('x', cxOf).attr('y', H - 6).attr('text-anchor', 'middle')
     .attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((p) => p);
   for (const ev of rows.filter((r) => r.kind !== 'run')) {
     g.append('line').attr('x1', cxOf(ev.point)).attr('x2', cxOf(ev.point)).attr('y1', 12).attr('y2', H - 22)
       .attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
     g.append('text').attr('x', cxOf(ev.point)).attr('y', 7).attr('text-anchor', 'middle').attr('font-size', 10)
-      .attr('fill', 'var(--color-fg-muted)').text(ev.kind === 'review' ? 'refactor' : 'new metric');
+      .attr('fill', 'var(--color-fg-muted)').text('refactor');  // only reviews reach here: the metrics rows are filtered out
   }
   const mk = g.append('g').attr('class', 'mk');
   if (c.kind === 'bar') {
@@ -298,7 +306,8 @@ function draw(c, rows) {
 dash.onData(() => {
   const st = dash.data('stats');
   for (const s of SECTIONS) for (const c of s.charts) {
-    if (st.status === 'ok') { c.box.classList.remove('dash-skeleton'); draw(c, st.data); }
+    // the user, 2026-11-11: no "new metric" slot in the charts (it made them hard to read); the table keeps those rows
+    if (st.status === 'ok') { c.box.classList.remove('dash-skeleton'); draw(c, st.data.filter((r) => r.kind !== 'metrics')); }
     else if (st.status === 'loading') { c.box.innerHTML = ''; c.box.classList.add('dash-skeleton'); }
     else { c.box.classList.remove('dash-skeleton'); message(c.box, 'Failed to load', true); }
   }

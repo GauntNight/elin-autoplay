@@ -39,7 +39,8 @@ fantastic"). Nothing is pushed. Work through the steps in order; the first two n
   (the last summary's Next list against this run), **`gold_bars_end`** and **`platinum_end`**: all
   from the log's own numbers, typed, never guessed (blank when unknown). A change to the system
   between runs (a review or refactor: kind `review`, the chart's "refactor" line; a change to how a charted
-  measure is counted, so its line can jump for that reason alone: kind `metrics`, "new metric" (the run score, R3); a
+  measure is counted, so its line can jump for that reason alone: kind `metrics` (the run score, R3; the table lists it, the
+  charts leave it out: the user, 2026-11-11, "it makes it hard to read"); a
   new model) gets a row in `runs/events.csv` with its commit range and model, so the chart marks it. A tool or log that
   changes no charted measure (fights.csv, R4) is kind `tooling`: a record only, no marker, its commits go with the next commit
   that names a run (the user, 2026-10-29: "I didn't change the metrics then").
