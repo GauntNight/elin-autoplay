@@ -74,8 +74,10 @@ def rows(name):
 
 def show_runs(last):
     runs = [r for r in rows("stats.csv") if r["kind"] == "run" and num(r["minutes"])][-last:]
+    # minutes inside any marked loop, counted once (stats.py; the review of 2026-11-11: about half of a run was outside one)
+    loop = {r["point"]: num(r.get("loop_minutes")) for r in runs if num(r.get("loop_minutes")) is not None}
     hdr = (f"{'run':>4} {'hrs':>5} {'days':>4} {'rent/d':>6} | {'goals':>6} {'nefias':>6} {'exp':>6} {'gold':>6} "
-           f"{'days':>6} {'deaths':>6} | {'points':>6} {'/hour':>6} {'/day':>6}")
+           f"{'days':>6} {'deaths':>6} | {'points':>6} {'/hour':>6} {'/day':>6} | {'loop min':>9}")
     print(hdr)
     print("-" * len(hdr))
     for r in runs:
@@ -84,10 +86,13 @@ def show_runs(last):
         gold = "?" if p["gold"] is None else f"{p['gold']:.0f}"
         print(f"{r['point']:>4} {num(r['minutes']) / 60:5.1f} {num(r['game_days']) or 0:4.0f} {rent:>6} | "
               f"{p['goals']:6.0f} {p['nefias']:6.0f} {p['exp']:6.0f} {gold:>6} {p['days']:6.0f} {p['deaths']:6.0f} | "
-              f"{r['points']:>6} {r['points_per_hour']:>6} {r['points_per_game_day']:>6}"
+              f"{r['points']:>6} {r['points_per_hour']:>6} {r['points_per_game_day']:>6} | "
+              f"{f'{loop[r['point']]:.0f}/{num(r['minutes']):.0f}' if r['point'] in loop else '-':>9}"
               + ("  (gold unknown: counted as 0)" if p["gold"] is None else ""))
     print("\npoints: " + ", ".join(f"{k} {v:g}" for k, v in SCORE.items())
           + "; gold = orens / (bill / 30) x rent_day; a game day = -rent_day")
+    print("loop min: minutes inside a marked loop (activity.py) of the run's minutes; reported, not scored. The rest "
+          "is stops, hand steps and fixes.")
 
 
 def show_activities():

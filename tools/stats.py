@@ -295,7 +295,7 @@ def activity_rates(power, metrics):
     """Pair activity.csv's starts and ends per run and tag -> ([row dicts], {run: unpaired starts})."""
     marks = [r for r in rows("activity.csv") if r.get("logged_at") and r.get("tag")]
     if not marks:
-        return [], {}
+        return [], {}, {}
     windows = {}
     for run, prs in power.items():
         ts = sorted(r["logged_at"] for r in prs if r.get("logged_at"))
@@ -314,6 +314,7 @@ def activity_rates(power, metrics):
         return dt.datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
 
     pending, agg, unpaired = {}, defaultdict(lambda: defaultdict(float)), defaultdict(int)
+    spans = defaultdict(list)  # every paired mark's real-time span, a run: their union is the run's loop minutes
     for r in sorted(marks, key=lambda r: r["logged_at"]):
         key = (run_of(r["logged_at"]), r["tag"])
         if r.get("phase") == "start":
@@ -324,6 +325,7 @@ def activity_rates(power, metrics):
         if r.get("phase") != "end" or key not in pending:
             continue
         s, a = pending.pop(key), agg[key]
+        spans[key[0]].append((clock(s["logged_at"]), clock(r["logged_at"])))
         a["minutes"] += (clock(r["logged_at"]) - clock(s["logged_at"])).total_seconds() / 60
         if all(num(x.get(k)) is not None for x in (s, r) for k in ("lv", "exp")):
             a["exp"] += (exp_total(int(num(r["lv"])), int(num(r["exp"])))
@@ -341,7 +343,16 @@ def activity_rates(power, metrics):
                     "exp_gained": int(a["exp"]), "exp_per_hour": round(a["exp"] / hours) if hours else "",
                     "gold_delta": int(a["gold"]), "orens_per_hour": round(a["gold"] / hours) if hours else "",
                     "game_days": round(a["days"], 1)})
-    return out, unpaired
+    loop = {}
+    for run, ss in spans.items():  # marks nest (a thief round inside a travel leg): count each minute once
+        total, end = 0.0, None
+        for a, b in sorted(ss):
+            if end is None or a > end:
+                total, end = total + (b - a).total_seconds() / 60, b
+            elif b > end:
+                total, end = total + (b - end).total_seconds() / 60, b
+        loop[run] = round(total)
+    return out, unpaired, loop
 
 
 def main():
@@ -366,7 +377,7 @@ def main():
         if line.strip():
             facts_by_run[json.loads(line)["run"]] += 1
     git = git_buckets(events)
-    rates, unpaired = activity_rates(power, metrics)
+    rates, unpaired, loop = activity_rates(power, metrics)
     by_run_tag = defaultdict(list)
     for r in rates:
         by_run_tag[r["run"]].append(r)
@@ -477,6 +488,8 @@ def main():
             "planned_done": int(done) if done is not None else "",
             "planned_partly": int(partly) if partly is not None else "",
             "planned_pct": planned_pct if planned_pct is not None else "",
+            # the review of 2026-11-11 (the user: yes, 2026-11-12): minutes inside any marked loop, reported, not scored
+            "loop_minutes": loop.get(p, ""),
         })
         bill = monthly_bill(start, end, bill_table)
         row["bill"] = round(bill) if bill else ""
