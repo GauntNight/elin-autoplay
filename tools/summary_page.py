@@ -151,7 +151,18 @@ def goals(head, body):
     return "\n".join(out)
 
 
+# run 46 (the user: "open goal chains doesn't render"): a node named `call` broke the whole diagram; these are words the
+# flowchart grammar reads as keywords, so none may be a node id
+MERMAID_RESERVED = {"call", "end", "click", "class", "classDef", "style", "linkStyle", "subgraph", "graph", "flowchart",
+                    "direction", "href", "callback", "default", "interpolate"}
+
+
 def mermaid(src):
+    bad = sorted({m for m in re.findall(r"^\s*(\w+)\s*[\[\(\{>]", src, re.M) if m in MERMAID_RESERVED}
+                 | {w for line in re.findall(r"^\s*(\w+\s*-->.*)$", src, re.M)
+                    for w in re.findall(r"\b(\w+)\b", line) if w in MERMAID_RESERVED})
+    if bad:
+        sys.exit(f"refused: a Mermaid keyword used as a node id ({', '.join(bad)}): rename the node (run 46)")
     fills = {n: (f, s) for n, f, s in re.findall(r"classDef (\w+) fill:(#[0-9a-fA-F]+),stroke:(#[0-9a-fA-F]+)", src)}
     keys = []
     for line in re.findall(r"^\s*%%\s*legend:\s*(.+)$", src, re.M):

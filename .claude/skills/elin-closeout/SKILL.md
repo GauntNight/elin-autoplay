@@ -103,6 +103,8 @@ fantastic"). Nothing is pushed. Work through the steps in order; the first two n
 Mermaid rules (each one cost a re-render on 2026-10-17):
 - `flowchart TB` for anything over four steps deep: an `RL` chain six deep shrank to tiny text.
 - Two labelled edges into one node overlap their labels; put the number in the node instead.
+- **No Mermaid keyword as a node id** (run 46, the user: "open goal chains doesn't render": a node named `call`
+  broke the whole diagram): `call`, `end`, `class`, `click`, `style`, `graph`... summary_page.py refuses them now.
 - Colors by `classDef NAME fill:#...,stroke:#...,color:#1f2937` (readable on both themes), and
   the page's legend from comment lines: `%% legend: done=done; todo=binding: none in hand` and
   `%% note: Dotted lines: derived or indexed from`.
