@@ -19,7 +19,7 @@ low skills only (Martial 14 well, a skill past ~25 little); the LV35 sand bag wo
 | The dummy, riding Kaberg, unarmed (Martial 14 -> 27), the practice chest between bars | ~945 | ~9 | ~105 game days an hour, a meal each |
 | The dummy, riding Kaberg, a long spear after Guroot's +200 Polearm potential (38 platinum) | **~1,107** | **~14** | ~78 game days an hour; the potential is spent in ~5 level-ups |
 | Music (a flute) in a town | ~490 | ~6.7 | ~73 game days an hour; ~2,000 orens of tips an hour; **~100 karma lost with the party along** |
-| Quick Craft (bait) | ~0.06 exp a SP | | the normal window pays the station formula, not TaskCraft's +200 an item (that needs the game's altCraft option: the user's call) |
+| Quick Craft (bait) | ~0.06 exp a SP | | the normal window pays the station formula, not TaskCraft's +200 an item (that needs the game's altCraft option: the user's yes 2026-11-13, on from run 47; `craft.py` waits for LayerCraft, the floating window is LayerCraftFloat: facts #1400, #1409) |
 
 **The cost side** (the user decides the trade; asked at run 46's close-out): at x5 a training stretch burns game days 4-6x
 faster than a circuit. Each game day is a meal (~55 nutrition), a day's rent (~210 orens at 6,292 a month), corruption
