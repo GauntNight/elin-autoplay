@@ -126,8 +126,8 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **16**, run 46's step up and step back); `ladder.py` takes
-the same number for every floor and **15** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **17** at Lv42, the user's call after run 46); `ladder.py` takes
+the same number for every floor and **16** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
 
@@ -147,7 +147,8 @@ danger-12 floors at the unattended limit cleared without a drink), 15 at Lv38 (r
 14, cleared at full HP with no drink), 17 at Lv41 (run 46: Warped Ruin B3 at danger 15, the unattended limit, lowest HP
 86%, no drink; the first raise read from runs/conquests.csv), **back to 16 at Lv42** the same run (Guiding Cave B4 at
 danger 13: HP 354 -> 42 on a mine its master, a mine dog, had laid; the rule's step down, though the mine and not the
-floor's danger was the cause: the user may overrule). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
+floor's danger was the cause), and **17 again** by the user's call after the run (2026-11-13: "we can try 16+ again"; a
+mine is a threat flag now, not a reason to lower the gate). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
 most floors sit far under the gate.
 
 ## 6. Fights on a floor

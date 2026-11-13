@@ -347,7 +347,9 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 16,       # run 46: lowered one step again at Lv42 (the rule: a near-death at or under the limit): Guiding Cave B4,
+    "max_danger": 17,       # 2026-11-13, the user overruled run 46's step back ("we can try 16+ again"): the near-death
+                            # came from a laid mine, not the floor's danger. 17 at Lv42 / HP 354, unattended limit 16.
+                            # run 46: lowered one step again at Lv42 (the rule: a near-death at or under the limit): Guiding Cave B4,
                             # danger 13, HP 354 -> 42 (12%) on a mine its master (a mine dog) had laid; the cause was the mine, not
                             # the floor's danger, so the user may overrule. Earlier the same run: raised 16 -> 17 at Lv41 / HP 352
                             # on Warped Ruin B3, danger 15 (the unattended limit), no drink, lowest 86%; runs/conquests.csv.
