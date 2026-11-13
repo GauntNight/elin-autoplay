@@ -191,6 +191,11 @@ def main():
         # what it does, and a cure trait ("Cure Poison", the blue herb: the user's tip) is fine.
         traits = [t for t in (tip.get("data") or {}).get("texts", []) if "【" in t]
         risky = [t for t in traits if re.search(r"(?<!cure )(poison|paraly|confus|blind|hallucin|insan|fear|nause|sleep)", t, re.I)]
+        # run 46: 【Waking】 Anti Sleep keeps me awake; it harms only a loop that sleeps next (trainday, music, a road nap),
+        # and a nefia floor is never slept on: there it's food (a Hungry stop on Capricious Ruin with nine such dishes)
+        zone = (call("state").get("data") or {}).get("zone") or {}
+        if zone.get("nefia") or str(zone.get("full") or "").startswith("Zone_dungeon"):
+            risky = [t for t in risky if not re.search(r"anti sleep|waking", t, re.I)]
         if risky and "--force" not in sys.argv:
             sys.exit(f"refusing: a harmful trait in the tooltip: {risky}")
     # An exact name wins over a longer one: "Grab" must not pick "Grab as furniture", which holds

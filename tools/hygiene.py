@@ -337,6 +337,33 @@ def main():
         for m in re.finditer(r'run\("box\.py"[^\n]*\n(?:[^\n]*\n){0,2}[^\n]*run\("close\.py"', s):
             advisories.append(f"{name}:{s[:m.start()].count(chr(10)) + 1}: run(\"close.py\") right after box.py, which closes itself")
 
+    # run 46: steal.py's `from fence import base` outlived base() (removed with the review's inventory layer), and every
+    # theft crashed: a name imported from another tool must still be defined there
+    import ast
+    defined = {}
+    for name, s in sources.items():
+        try:
+            tree = ast.parse(s)
+        except SyntaxError as e:
+            findings.append(f"{name}: does not parse ({e.msg}, line {e.lineno})")
+            continue
+        top = set()
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.col_offset == 0:
+                top.add(node.name)
+            elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                top.update((a.asname or a.name).split(".")[0] for a in node.names)
+            elif isinstance(node, (ast.Assign, ast.AnnAssign)) and node.col_offset == 0:
+                for t in node.targets if isinstance(node, ast.Assign) else [node.target]:
+                    top.update(n.id for n in ast.walk(t) if isinstance(n, ast.Name))
+        defined[name[:-3]] = (top, tree)
+    for stem, (_, tree) in defined.items():
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module in defined:
+                for a in node.names:
+                    if a.name != "*" and a.name not in defined[node.module][0]:
+                        findings.append(f"{stem}.py:{node.lineno}: imports {a.name} from {node.module}.py, which no longer defines it")
+
     # the review of 2026-10-30: the tool index is generated from the docstrings (tools/README.md) and the tool notes moved
     # out of elin-play into knowledge/tool-notes.md: both are checked for dead tool names; the index for staleness
     try:

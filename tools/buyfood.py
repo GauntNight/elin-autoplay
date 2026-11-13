@@ -1,7 +1,8 @@
 """Turn gold into food at an open or named shop in one step (Start Run 3: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from
 its tooltip, and buy by food per oren until the budget is gone. Meals earlyday.py doesn't know yet go in runs/foods.txt, one word a line, for it to eat.
 
-usage: python -I tools/buyfood.py [--keep N] [--shop ROLE_ID]   stand by the shopkeeper (default merchant_inn); N orens are kept
+usage: python -I tools/buyfood.py [--keep N] [--shop ROLE_ID] [--min-ratio R=0.55]   stand by the shopkeeper (default merchant_inn); N orens are kept
+  --min-ratio R  skip food under R nutrition an oren (0 buys every dish: a stock-up for a long stay)
 Exit 0 done, 1 refused (no shopkeeper near).
 """
 import re
@@ -14,6 +15,9 @@ from bridge import call  # noqa: E402
 from common import data, run, setup  # noqa: E402
 
 FOODS = Path(__file__).resolve().parent.parent / "runs" / "foods.txt"
+# run 46 (G55): a dummy stretch eats a meal a game day, ~100 in 45 real minutes, and the cheap food sold out at once;
+# --min-ratio 0 buys every dish while the budget lasts
+MIN_RATIO = float(sys.argv[sys.argv.index("--min-ratio") + 1]) if "--min-ratio" in sys.argv else 0.55
 
 
 def gold():
@@ -76,7 +80,7 @@ def main():
     words = set(FOODS.read_text(encoding="utf-8").split("\n")) if FOODS.exists() else set()
     bought = 0
     for ratio, n, p, card in offers:
-        if ratio < 0.55:  # a stew at 119 for 63: not while bread exists
+        if ratio < MIN_RATIO:  # a stew at 119 for 63: not while bread exists (run 46: --min-ratio 0 for a stock-up)
             continue
         base = re.sub(r"^(\d+|an?) ", "", card)
         while gold() - p >= keep:

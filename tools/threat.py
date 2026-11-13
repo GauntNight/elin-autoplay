@@ -46,6 +46,9 @@ OUT = ROOT / "knowledge" / "threat.csv"
 ATTACK_SPELL = re.compile(r"^(bolt|arrow|ball|breathe|hand|funnel|miasma|missile|sword|weapon|bit|comet|flare|puddle)_")
 FLAGS = [
     ("exploder", re.compile(r"^ActSuicide$")),
+    # run 46: a mine dog (Guiding Cave's master, ActDropMine) laid mines; after the kill the ladder's walk stepped on
+    # one: HP 354 -> 42 in one step. A mine outlives the layer: its floor's cells are unsafe until it's cleared
+    ("minelayer", re.compile(r"^ActDropMine")),
     ("summoner", re.compile(r"^(SpSummon|ActSummon|ActSwarm)")),
     ("blinder", re.compile(r"(Darkness$|^SpDarkness$|^ActGazeDim$)")),
     ("paralyser", re.compile(r"(Nerve$|^ActTouchSleep$|^SongSleep$|^ActRestrain$|^ActEntangle$|^SpWeb$)")),
@@ -57,7 +60,7 @@ FLAGS = [
     ("blinks", re.compile(r"^SpTeleport")),
     ("steals", re.compile(r"^(ActSteal|ActStealMoney|ActStealFood)$")),  # run 16: Aldnord the thief trailed me with 2,030 orens carried
 ]
-PRIORITY_FLAGS = ("caster", "summoner", "blinder", "paralyser", "healer", "thrower", "steals")
+PRIORITY_FLAGS = ("caster", "summoner", "blinder", "paralyser", "healer", "thrower", "steals", "minelayer")
 
 
 def _rows(name):

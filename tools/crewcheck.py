@@ -53,7 +53,7 @@ def activities(only):
     for r in rows:
         if r["tag"] not in ("nefia", "circuit"):
             continue
-        m = re.search(r"\[party (\d+)\]", r.get("note") or "")
+        m = re.search(r"\[party (\d+)[\],]", r.get("note") or "")  # run 46: "[party 0, karma 12]" too
         if r["phase"] == "start":
             open_[r["tag"]] = (r, m)
             continue

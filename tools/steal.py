@@ -41,6 +41,15 @@ UNIQUE_LV = 15  # a named NPC: PER x 2.5 x 2 against Pickpocket + DEX; 6 until t
                 # were skipped, and the bridge sneak guard now cancels a theft the moment a witness comes within 5): run 34 tests 15
 
 
+def base(name):
+    """'2 tapestries' and 'a tapestry' share a base: the count and article dropped, a trailing s tolerated (run 46: was
+    fence.base, removed with the review's inventory layer while this import stayed, so every theft crashed)."""
+    w = name.lower().split()
+    if w and (w[0].isdigit() or w[0] in ("a", "an")):
+        w = w[1:]
+    return " ".join(w).rstrip("s")
+
+
 def props(r):
     return data("props", r=r)
 
@@ -129,7 +138,6 @@ def take(uid, max_lv):
     print(f"{p['name']} (+{p['contribution']} if sold): " + " / ".join(lines[-4:]))
     # run 44: "blanket" was found inside "a fireproof blanket (7 Charges)", my own kit, which went to stolen.txt and
     # fence.py sold it (bought back for 528). Only a stack whose base name is the mark's own counts.
-    from fence import base
     got = [i for i in call("inv")["data"]["items"] if base(i["name"]) == base(p["name"])]
     if any("you steal" in l.lower() for l in lines):
         global TAKEN

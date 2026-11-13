@@ -14,7 +14,8 @@ under 80% (THRESHOLDS["loop_hp"]), Hungry (70+), no food, a window it doesn't kn
 or a training that stopped for a decision, or `python -I tools/stopjob.py trainday`. Never waits:
 SP goes to work, then sleep.
 
-usage: python -I tools/trainday.py [DAYS=3] [--min-sp 6] [--throw "Putit In Amber" | --shoot "forest long bow"]
+usage: python -I tools/trainday.py [DAYS=3] [--min-sp 6] [--no-farm] [--throw "Putit In Amber" | --shoot "forest long bow"]
+  --no-farm  skip the daily farm round (run 46, G55: the dummy measured on its own)
   --shoot needs arrows: Quick Craft "makeshift arrow" makes 40 from a leaf and a branch for 3 SP (run 16)
 The weapon is whatever is equipped: equip the low-skill weapon first (and the Rigid Hand Axe
 and the buckler again before any trip).
@@ -44,6 +45,7 @@ def hour(p):
 
 
 HARVEST_BOX = "%d,%d" % __import__("home").HARVEST_BOX
+HARVEST_FRIDGE = "%d,%d" % __import__("home").HARVEST_FRIDGE
 FARM_FOOD = ("tomato", "imo", "truffle")  # whole words (packcheck.has_word); farm mushrooms are the "+N" stacks below
 FARM_MUSHROOM = re.compile(r"\bmushrooms? \+\d")
 
@@ -64,35 +66,43 @@ def borrow():
     white/red mushrooms stay put. Run 17: the residents eat from this box too, and run 16's
     restock kept every stack (52 mushrooms) in the Cooler Box until Kettle starved, so the rest
     goes back right after the meal (give_back). Returns the stack's name without its count."""
-    food = [x for x in split_listing(run("box.py", HARVEST_BOX)) if farm_food(x)]
+    # run 46: Delegated Farming's crops sit in the harvest fridge (805 mushrooms) while the harvest box was empty, and the
+    # dummy stretch stopped "no meal": the fridge is the second source
+    for where in (HARVEST_BOX, HARVEST_FRIDGE):
+        food = [x for x in split_listing(run("box.py", where)) if farm_food(x)]
+        if food:
+            break
     if not food:
-        print("  borrowed: nothing in the harvest box")
+        print("  borrowed: nothing in the harvest box or the fridge")
         return None
 
     def qty(x):
         m = re.match(r"(\d+) ", x)
         return int(m.group(1)) if m else 1
     x = max(food, key=qty)
-    run("box.py", HARVEST_BOX, "--take", x)  # box.py closes its window itself
+    # take a day's worth of a small food (a plain mushroom is 13 nutrition), not the whole stack
+    run("box.py", where, "--take", x)  # box.py closes its window itself
     run("bag.py", "Cooler Box", x)
     # this close is bag.py's, not a second one for box.py: bag.py leaves the Cooler Box open on
     # purpose (eat_one reads the food through the open bag), as give_back() below closes it too
     run("close.py")
     print(f"  borrowed: {x}")
-    return base_name(x)
+    return base_name(x), where
 
 
-def give_back(name):
-    """What is left of the borrowed stack back into the harvest box (by its full name now)."""
-    if not name:
+def give_back(borrowed):
+    """What is left of the borrowed stack back into the box it came from (by its full name now). Run 46: 877 mushrooms
+    borrowed from the powered fridge went back to the unpowered harvest box and rotted there within the stretch."""
+    if not borrowed:
         return
+    name, where = borrowed
     listing = run("bag.py", "Cooler Box")
     run("close.py")
     left = [x for x in split_listing(listing) if base_name(x) == name]
     if left:
         run("bag.py", "Cooler Box", "--take", left[0])
         run("close.py")
-        print("  gave back: " + last_line(run("box.py", HARVEST_BOX, left[0])))
+        print("  gave back: " + last_line(run("box.py", where, left[0])) + f" [{where}]")
 
 
 def sleep():
@@ -131,7 +141,22 @@ def day_gate(hunger=THRESHOLDS["hungry"]):
     return ready(s, hp=THRESHOLDS["loop_hp"], hunger=hunger)
 
 
+def clear_weak():
+    """run 46: a crab (Lv~5 at Lv40) in view cancelled every meal and the loop stopped "no meal" with food carried;
+    a hostile WEAK_BELOW levels under mine is fought first (fight.py), as day_gate already ignores it."""
+    me = pc()["lv"]
+    for _ in range(3):
+        foes = [c for c in call("state")["data"].get("nearby") or [] if c.get("hostile")]
+        weak = [c for c in foes if (c.get("lv") or 99) <= me - WEAK_BELOW]
+        if not weak or len(weak) < len(foes):
+            return
+        f = min(weak, key=lambda c: c.get("dist", 99))
+        out = run("fight.py", f.get("id") or f.get("name", ""), "--melee", timeout=300)
+        print(f"  cleared {f.get('name')} Lv{f.get('lv')} before the meal (rc {out.rc})")
+
+
 def eat():
+    clear_weak()
     ate = eat_one()
     if not ate:
         name = borrow()
@@ -169,7 +194,8 @@ def main():
                 stop(why)
             p = pc()
             day = p["date"].split()[0]
-            if hour(p) >= 6 and farmed != day:
+            # run 46 (G55): --no-farm measures the dummy alone; the farm loop is old (elin-home's reference tail)
+            if hour(p) >= 6 and farmed != day and "--no-farm" not in sys.argv:
                 out = run("springday.py", "1", "999-12-30", "--once", timeout=900)  # run 17: a fixed 486 date stopped every farm round in 487
                 farmed = day
                 print("  farm: " + " | ".join(ln.strip()[:90] for ln in out.splitlines() if ln.strip().startswith(("mushrooms", "tax", "ate", "stop")))[:300])
@@ -206,6 +232,13 @@ def main():
                         print("  arrows: " + last_line(out))
                         run("close.py")
                 out = run("train.py", str(min_sp), "12", *extra, timeout=900)
+                for _ in range(3):
+                    # run 46: the 05:00 shipping report stopped the first bar; it's only a report (the ladder closes it too)
+                    if out.rc != 3 or "LayerShippingResult" not in str(out):
+                        break
+                    from farmday import close_report
+                    close_report()
+                    out = run("train.py", str(min_sp), "12", *extra, timeout=900)
                 print("  " + last_line(out)[:160])
                 if out.rc == 3:  # train.py stopped for a decision: a hostile, HP or hunger, a window
                     stop("training stopped: " + last_line(out))

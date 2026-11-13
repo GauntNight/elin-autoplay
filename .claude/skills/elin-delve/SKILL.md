@@ -65,8 +65,9 @@ From the world map: `python -I tools/circuit.py [N=4] [--danger LO-HI] [--r TILE
 [--danger-ok N] [--skip NAME ...] [--until HH:MM] [--wrecks] [--blanket-ok 'why']`. It takes the nearest unconquered
 nefia of that base danger within R tiles, `wgo.py` there, Enter, `ladder.py`, on "conquered" `evac.py` out, and repeats.
 
-- **The line in use** (runs 43-45, the notes in `runs/activity.csv`): `circuit.py 8 --danger 3-12 --r 30 --unattended`
-  for most starts; a narrower band and radius (`--danger 3-10 --r 20` or `--r 25`) at other times. `--danger-ok 30` rides
+- **The line in use** (runs 43-46, the notes in `runs/activity.csv`): `circuit.py 8 --danger 3-12 --r 30 --unattended
+  --solo` for most starts (run 46: without `--solo` and with no pet along, delve stopped B1 on "Kaberg is not in the
+  party"; an empty party counts as solo now); a narrower band and radius (`--danger 3-10 --r 20` or `--r 25`) at other times. `--danger-ok 30` rides
   on the circuits since run 43 (two near nefias were skipped past level 22 fields; run 42's crossings up to 44 cost no
   potion: elin-travel's far-maps rule). The tool's own defaults (3-7, r 15) date from run 30.
 - `--skip NAME` leaves out a nefia whose master lies below the gate; `--until HH:MM` starts no new nefia after that clock
@@ -125,7 +126,7 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **16** since run 45, at Lv39); `ladder.py` takes
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **16**, run 46's step up and step back); `ladder.py` takes
 the same number for every floor and **15** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
@@ -143,7 +144,10 @@ to 14 by run 34 (Vernis Mine B5-B7 at 10-12 in run 33; Chilly Cave B3 at 13), **
 near-death, 218 -> 0 in one round on Dark Ruin B5 at danger 12 under the unattended 13), 14 at Lv35 (run 40: two
 danger-12 floors at the unattended limit cleared without a drink), 15 at Lv38 (run 43: Traditional Cave B4 at danger 13,
 12 HP lost, no drink), 16 at Lv39 (run 45: Ruined Grassland B2, Mossy Grassland B3 and Warped Machinarium B3, all danger
-14, cleared at full HP with no drink). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
+14, cleared at full HP with no drink), 17 at Lv41 (run 46: Warped Ruin B3 at danger 15, the unattended limit, lowest HP
+86%, no drink; the first raise read from runs/conquests.csv), **back to 16 at Lv42** the same run (Guiding Cave B4 at
+danger 13: HP 354 -> 42 on a mine its master, a mine dog, had laid; the rule's step down, though the mine and not the
+floor's danger was the cause: the user may overrule). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
 most floors sit far under the gate.
 
 ## 6. Fights on a floor

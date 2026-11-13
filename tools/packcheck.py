@@ -108,17 +108,24 @@ ROUTES = [
     (("book", "spellbook", "recipe", "journal", "letter", "parchment"), "|".join(BOX_STR(b) for b in home.LIBRARY), "the library (the Storehouse)"),
     (("oil", "ale", "butter", "chili", "ketchup", "salt", "sugar", "mayo", "mayonnaise", "spice", "beer", "wine",
       "sake", "sauce", "sesame", "flour", "vinegar", "tea", "cappuccino",
-      "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
+      "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin",
+      "glutamine", "honeycomb", "honey", "yeast"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
     (("grave of",), "ship", "the shipping chest (a boss's grave: junk, value 0-ish)"),
     (("Scrubber", "charm ("), "ship", "the shipping chest (☆The Scrubber, a boss-chest regular, and plain charms: run 30)"),
     # run 34: four "decide" stacks held up leave.py twice (loot from Rustic Forest and run 33's chests)
-    (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a dish", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
+    (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a dish", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern",
+      # run 46: boss-chest and floor odds with no rule (a plate, hanging pots, sea pants, the rest)
+      "tableware", "trash bin", "pot of water", "gamble chest", "a plate", "hanging pots", "sea pants", "cobweb", "moon chakram",
+      "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu", "ragged cloth"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
     # organs: board supply and gift jobs ask for them (a heart, grotesque offal; run 08, run 12)
     # run 15 (G14): ration grain waits by the millstone's stock: the harvest box keeps it (never shipped)
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),
     (("offal", "heart", "liver", "kidney", "eyeball"), "ship", "the shipping chest (organs: the pantry is full, run 41)"),
 ]
 
+
+# the quality tags an unidentified piece shows; run 46: "A Cocky Wakizashi (Special)" had no rule and blocked leave.py
+UNID_TAGS = ("(godly)", "(miracle)", "(good)", "(great)", "(excellent)", "(special)")
 
 def _with_big_tail(routes):
     """Run 45 (G47's done-when broken a third run): a bone charm met its route's two boxes full while the yard chest had 100
@@ -249,7 +256,10 @@ def route(name):
         return "ship", "the shipping chest (an empty rod: the user, run 33)"
     # gear before the material rules (run 12: a glass staff went to the stone box, bone boots to
     # the parts box); identified spare gear and jewelry arm the residents (G12 M8)
-    is_gear = GEAR.search(name) or has_word(low, ("amulet", "necklace", "ring", "girdle", "cloak"))
+    # run 46: "charm" wasn't here, so ☆The Glittering Charm (kept for run 45's open trial) fell through to ROUTES' odd-loot
+    # "charm" and shipped; a ☆/★ charm is neck gear and goes to "decide" like the rest
+    is_gear = (GEAR.search(name) or has_word(low, ("amulet", "necklace", "ring", "girdle", "cloak"))
+               or (has_word(low, ("charm",)) and ("☆" in name or "★" in name)))  # plain charms still ship (run 30)
     if is_gear and ("☆" in name or "★" in name):
         # run 13: an identified ☆ shirt went to the armory and a resident wore it within the hour,
         # before it could be shipped (☆ gear ships for hundreds plus hearth exp); decide by hand
@@ -316,7 +326,7 @@ def check():
         # them (a hot guy's blast destroyed a rod, the sleeping bag and two scrolls in the open pack)
         if has_word(low, ("potion", "scroll", "rod of", "jar of")):
             continue
-        if "(miracle)" in low or "(good)" in low or "godly" in low or "(godly)" in low:
+        if any(q in low for q in UNID_TAGS) or "godly" in low:
             unid.append(n)
             continue
         bad.append(("backpack", n, *route(n)))
@@ -331,7 +341,7 @@ def check():
                 continue
             if errand(low):  # run 44: carry.txt's Small Medals went back to the valuables twice from the loot bag
                 continue
-            if any(q in low for q in ("(godly)", "(miracle)", "(good)", "(great)", "(excellent)")):
+            if any(q in low for q in UNID_TAGS):
                 unid.append(n)
                 continue
             if has_word(low, HOME_ONLY) or has_word(low, ("torch",)):
@@ -357,7 +367,7 @@ def check():
         low = norm_name(n)
         # run 11: the godly Raw Food Necklace (made of food, kept cool to slow its rot) was routed
         # to the shipping chest; quality-marked gear is never shipped from any bag
-        if any(q in low for q in ("(godly)", "(miracle)", "(good)", "(great)", "(excellent)")):
+        if any(q in low for q in UNID_TAGS):
             unid.append(n)
             continue
         if not is_food(low):
@@ -412,6 +422,14 @@ def main():
                     else:
                         left.append(nm)
                 names = left
+            if names and where == "ship" and "organs" in label:
+                # run 46: the shipping chest had taken its ~40 stacks for the morning and refused a heart (G47's count):
+                # an organ that can't ship goes to the trash can (Ecopo) rather than ride out on the trip
+                print("   " + (tool("trash.py", "dump", *names).strip().splitlines() or ["trash.py said nothing"])[-2:][0])
+                tool("close.py")
+                from common import _key, data
+                flat = [it["name"] for top in data("stock")["pack"] for it in [top] + (top.get("items") or [])]
+                names = [nm for nm in names if any(_key(nm) in _key(n) for n in flat)]
             for nm in names:
                 # run 45: "a spotted potion" left the bag under another name (identified on the way) and every box "refused" it:
                 # an item no longer in the pack by that name isn't a full box (G47 counts only those)

@@ -133,7 +133,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`butcher.py`**: Butcher every corpse in the pack and the Cooler Box with the butcher's tool (run 13, G6).
     usage: python -I tools/butcher.py [--dry] [NAME ...]   (NAME: only corpses matching these words)
 - **`buyfood.py`**: Turn gold into food at an open or named shop in one step (Start Run 3: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from its tooltip, and buy by food per oren until the budget is gone. Meals earlyday.py doesn't know yet go in runs/foods.txt, one word a line, for it to eat.
-    usage: python -I tools/buyfood.py [--keep N] [--shop ROLE_ID]   stand by the shopkeeper (default merchant_inn); N orens are kept
+    usage: python -I tools/buyfood.py [--keep N] [--shop ROLE_ID] [--min-ratio R=0.55]   stand by the shopkeeper (default merchant_inn); N orens are kept
+      --min-ratio R  skip food under R nutrition an oren (0 buys every dish: a stock-up for a long stay)
     Exit 0 done, 1 refused (no shopkeeper near).
 - **`cast.py`**: Cast an attack spell at a hostile from range (bridge 0.33.0 `cast`: the game's own ButtonAbility.TryUse path, pc.UseAbility then EndTurn, with every rule of the game kept: range, line of sight, the spell stock, cooldowns). Run 27's 『Kobold』 (23% a round in melee, PV-heavy) had no ranged answer, and the stocked attack spells were barely cast (the user's tip after run 27). Each cast trains Casting by twice the MP spent (Chara.UseAbility: elements.ModExp(304, MP x 2)), and only a Casting level-up pays character exp: a weak exp engine at 69 MP, a free ranged attack all the same.
     usage: python -I tools/cast.py [SPELL=arrow_Cold] [NAME] [CASTS=10] [--mp-floor N] [--hp N] [--until PCT]
@@ -468,6 +469,14 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Each pair walks beside the source, grabs, walks to the target (inside a walled house: through
     its door) and places. Stops at the first failure (exit 3) and says what is in hand.
     After moving a station or a box, update tools/home.py (and the skills' tables) in the same session.
+- **`music.py`**: Play music in a town for Music skill exp and tips (run 46, G55's music lead).
+    usage: python -I tools/music.py [SONGS=200] [--instrument flute] [--min-sp 10] [--no-sleep] [--party-ok]
+    Refuses with the party along (run 46: karma 70 -> -45 over the Palmia stretches; allies answer thrown rocks and a kill
+    of a friendly townsperson is -5) unless --party-ok, and stops on any "Karma(-" line in the game log.
+    Holds the instrument, plays song after song; eats at the eat mark (farmday.eat_one) and sleeps at the SP floor (sleep.py,
+    the Rest ability without a bed). Stops (exit 3) on a hostile in view, HP under the loop floor, Hungry with no meal landed,
+    a sleep that didn't refill SP, a window it doesn't know, a song that wouldn't start, or runs/jobs/music.stop. Marks
+    itself "music" in runs/activity.csv. Exit 0 after SONGS songs.
 - **`namedexploder.py`**: Kill a NAMED exploder from range (runs 33 and 37: a named hot guy's death blast took 214 -> -342 and 216 -> -478; run 41: Misty Grassland B2's 『Hot guy』 halted the ladder three times at 3 cells, and each hand-run answer took a teleport). The loop the rule asks for: over 5 cells away, an arrow spell; closer, steps straight away from it; adjacent with no room, a teleport scroll. Run at speed x1.
     usage: python -I tools/namedexploder.py [NAME="Hot guy"] [SPELL=arrow_Cold] [--rounds N=40] [--mp-floor N=12]
     Exit 0 it's dead or out of view, 1 refused (no such foe in view), 3 stopped (MP at the floor, HP under 60%, a window).
@@ -753,7 +762,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     decision (a hostile in view, HP under 80%, worse than Hungry, a window); 1 refused (no dummy, no
     weapon or arrows). A hostile 10+ levels below me is ignored (run 14: a Lv1 silver cat).
 - **`trainday.py`**: Days at home spent on a low weapon skill at the training dummy (run 14, G10).
-    usage: python -I tools/trainday.py [DAYS=3] [--min-sp 6] [--throw "Putit In Amber" | --shoot "forest long bow"]
+    usage: python -I tools/trainday.py [DAYS=3] [--min-sp 6] [--no-farm] [--throw "Putit In Amber" | --shoot "forest long bow"]
+      --no-farm  skip the daily farm round (run 46, G55: the dummy measured on its own)
       --shoot needs arrows: Quick Craft "makeshift arrow" makes 40 from a leaf and a branch for 3 SP (run 16)
     The weapon is whatever is equipped: equip the low-skill weapon first (and the Rigid Hand Axe
     and the buckler again before any trip).

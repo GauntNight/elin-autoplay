@@ -118,8 +118,9 @@ def check(s, p, foes, kab, kab_seen):
         here = any(c.get("party") and c.get("name") == m["name"] for c in s.get("nearby") or [])
         if m["hp"] * 100 < 50 * m["maxHp"] and (not SOLO or m["name"] == "Kaberg") and not EXPENDABLE and here:
             return f"{m['name']} HP {m['hp']}/{m['maxHp']} under 50%: heal.py"
-    if not kab and not SOLO and not EXPENDABLE:
-        return "Kaberg is not in the party"
+    # run 46: solo is the default since run 38 (the user, 2026-11-01), and with the snow putit left at home an empty party
+    # stopped the circuit on its first floor with "Kaberg is not in the party" (the old stop here): an empty party is a
+    # solo run now, whether or not --solo was passed
     # run 16 (the user): high offense and high defense together is a kind to avoid, not trade hits with
     # run 17: two Lv12 lizardmen (avoid) took 45% of my HP in two turns at Lv18: within 8 levels now
     # run 33: or at any level once its record holds a fight that cost 30% (threat.avoid)

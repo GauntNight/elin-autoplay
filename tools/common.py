@@ -347,7 +347,11 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 16,       # run 45: raised one step at Lv39 / HP 286, unattended limit 14 -> 15: Ruined Grassland B2, Mossy Grassland B3
+    "max_danger": 16,       # run 46: lowered one step again at Lv42 (the rule: a near-death at or under the limit): Guiding Cave B4,
+                            # danger 13, HP 354 -> 42 (12%) on a mine its master (a mine dog) had laid; the cause was the mine, not
+                            # the floor's danger, so the user may overrule. Earlier the same run: raised 16 -> 17 at Lv41 / HP 352
+                            # on Warped Ruin B3, danger 15 (the unattended limit), no drink, lowest 86%; runs/conquests.csv.
+                            # run 45: raised one step at Lv39 / HP 286, unattended limit 14 -> 15: Ruined Grassland B2, Mossy Grassland B3
                             # and Warped Machinarium B3, all danger 14 (the unattended limit), cleared at full HP with no drink or teleport.
                             # run 43: raised one step at Lv38 / HP 277, unattended limit 13 -> 14: Traditional Cave B4, danger 13 (the
                             # unattended limit), cleared without a drink or a teleport, 12 HP lost on the floor.

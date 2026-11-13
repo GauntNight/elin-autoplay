@@ -39,7 +39,8 @@ def mark(tag, phase, note=""):
             "zone": (s.get("zone") or {}).get("name", ""),
             # run 35 (the user: "are groups better than solo at this point?"): every mark names the party size, so
             # stats and crewcheck.py can split each activity's rates by solo and crew
-            "note": (f"{note} " if note else "") + f"[party {len(s.get('party') or [])}]",
+            # run 46: karma fell ~100 across three hours of loops and no record showed which one: every mark names it too
+            "note": (f"{note} " if note else "") + f"[party {len(s.get('party') or [])}, karma {p.get('karma')}]",
         }
         new = not LOG.exists()
         with LOG.open("a", encoding="utf-8", newline="") as f:

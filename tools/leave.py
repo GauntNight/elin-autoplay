@@ -239,7 +239,9 @@ def main():
 
         def bed(name):
             n = name.lower()
-            return "sleeping bag" in n or "makeshift bed" in n or n.endswith(" bed") or " bed " in n
+            # run 46: "a stupid futon" (Kazretta, Palmia, 2,741) slept the music loop, and this said no bed was carried
+            return ("sleeping bag" in n or "makeshift bed" in n or n.endswith(" bed") or " bed " in n
+                    or "futon" in n or "hammock" in n)
 
         if not carried(bed):
             stored = [f"{b['name']} {b['x']},{b['z']}" for b in st["boxes"] if count(b.get("items") or [], bed)]

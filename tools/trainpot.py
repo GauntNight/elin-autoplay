@@ -19,7 +19,9 @@ SKILL_ID = {"crafting": "handicraft", "sculpting": "sculpture"}
 
 def pot_of(name):
     want = SKILL_ID.get(name.lower(), name.lower())
-    row = (data("skills").get("skills") or {}).get(want)
+    skills = data("skills").get("skills") or {}
+    # run 46: weapon skills are keyed weaponPolearm, weaponBlunt...: match the display name ("Polearm", "Mace") too
+    row = skills.get(want) or next((r for r in skills.values() if (r.get("name") or "").lower() == name.lower()), None)
     return row.get("potential") if row else None
 
 

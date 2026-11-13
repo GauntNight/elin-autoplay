@@ -384,6 +384,20 @@ def explore_floor(solo):
             print(f"  ally heal: {last(h)[:90]} ({h.rc})")
             if h.rc == 0:
                 continue
+        # run 46: up to three tries a floor: candle ghosts and blue baptists sit in walls in twos and threes
+        if out.rc == 3 and why.startswith("no progress on") and getattr(explore_floor, "meleed", 0) < 3:
+            # run 46 (Damp Grassland B2): an evasive fairy Lv12 adjacent at Lv40; fight.py threw the Putit until its throw
+            # limit and the no-progress stop ended the circuit, where one fight.py --melee killed it at once. One melee try
+            # a floor, only against a foe at or under my level; anything else stays a decision
+            explore_floor.meleed = getattr(explore_floor, "meleed", 0) + 1
+            lv = pc().get("lv") or 0
+            foes = [c for c in state().get("nearby") or [] if c.get("hostile") and (c.get("lv") or 99) <= lv]
+            if foes:
+                f = min(foes, key=lambda c: c.get("dist", 99))
+                m = run("fight.py", f.get("id") or f.get("name", ""), "--melee", timeout=300)
+                print(f"  no progress: one melee try on {f.get('name')}: {last(m)[:80]} ({m.rc})", flush=True)
+                if m.rc == 0:
+                    continue
         if out.rc == 3:
             stop(f"delve stopped: {why or last(out)[:120]}")
         if out.rc != 0:
@@ -963,6 +977,7 @@ def floors_loop(max_danger, floors, solo):
         crew = [f"{c.get('name')} {c.get('hp')}/{c.get('maxHp')}" for c in (state().get("party") or []) if not c.get("pc")]
         print(f"floor {f}: {z.get('name')} danger {z.get('danger')}  HP {p['hp']}/{p['maxHp']} SP {p['sp']}  {p['date']}"
               f"  party: {', '.join(crew) or 'none'}")
+        explore_floor.meleed = 0  # run 46: the no-progress melee tries are counted a floor
         explore_floor(solo)
         clear_view(solo)
         wood()

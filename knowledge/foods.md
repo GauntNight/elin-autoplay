@@ -45,8 +45,12 @@ Add every new food here after eating it. Unknown wild mushrooms go to bait, not 
 | Food | What happened | Run |
 |---|---|---|
 | white mushroom (id 699), raw | confusion, insanity, hallucination, fear; cleared after about 2 game hours of waiting | 03 |
-| egg of kitten | Karma -5 and nausea ("about to throw up"): a cat's egg counts as eating cat (the primer: cat meat -5 karma) | 05 |
-| egg of (any cat) / cat meat / humanoid corpses | Karma loss, insanity (the primer) | 05 |
+| of kitten | Karma -5 and nausea ("about to throw up"): a cat's egg counts as eating cat (the primer: cat meat -5 karma) | 05 |
+| eggs of cat | Karma loss: a cat's egg counts as eating cat (the primer); run 46: this row read "egg of (any cat)", which item.py parsed as "egg of" and refused every egg, a sheep's boiled egg too | 05 |
+| egg of cat | as above (the singular) | 05 |
+| of black cat | as above (any dish of it: an egg, eggs, boiled) | 05 |
+| of mercenary | a humanoid's egg or flesh, any dish of it (the primer: humanoid flesh costs karma and sanity; not tried) | 46 |
+| cat meat | Karma loss, insanity (the primer) | 05 |
 | scorpion on the bone (marbled meat of 『Scorpion』, cooked) | Poison: HP 41 -> 34 while walking, slowed; a troll blood cleared it. Read the 【traits】 first (item.py now refuses harmful traits) | 06 |
 | corpse of 『Yeek』 (raw, Royal Quality) | "You feel like you are about to throw up. It tasted awful!" (nausea; no karma change): cook special corpses or skip | 07 |
 | red mushroom (id 700), raw (probably; eaten by farmday.eat_one from the Cooler Box) | Poison twice: 486-04-15 (HP 75 -> 30 with burden) and 04-18; a troll blood didn't clear it, a blue herb did | 11 |

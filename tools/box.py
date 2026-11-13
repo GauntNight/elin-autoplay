@@ -153,7 +153,7 @@ def main():
     # run 21: 13 unidentified pieces shipped for 197 orens (a Godly shield brought 5; identified ☆
     # gear ships for 30-200+): an item still showing its quality class is identified first
     if "shipping" in where.lower() and not take and "--unidentified-ok" not in sys.argv:
-        unknown = [it for it in items if re.search(r"\((Good|Great|Miracle|Godly)\)", it)]
+        unknown = [it for it in items if re.search(r"\((Good|Great|Miracle|Godly|Excellent|Special)\)", it)]
         if unknown:
             sys.exit("refused: unidentified gear ships for almost nothing (fact #791): identify first, "
                      "or --unidentified-ok: " + " | ".join(unknown))
@@ -164,14 +164,32 @@ def main():
         if not h:
             sys.exit(f"no {where!r} on the map")
         x, z = h[0]["x"], h[0]["z"]
+    if not take:
+        # run 46: `box.py "shipping chest" uid:N` printed "none in the pack" for six things in the bags and exited 0,
+        # so seq.py ran on; a uid in a bag is brought into the pack's own grid first (items.to_pack)
+        for it in items:
+            if it.startswith("uid:"):
+                import items as carried
+                inv = carried.inventory()
+                hit = [c for c in inv if str(c.get("uid")) == it[4:]]
+                if hit and carried.container_of(hit[0], inv) is not None:
+                    ok, why = carried.to_pack(hit[0], inv)
+                    if not ok:
+                        sys.exit(f"{it}: could not bring it out of {carried.where(hit[0], inv)}: {why}")
     why = open_at(x, z)
     if why:
         sys.exit(why)
     if not items:
         print(f"{x},{z}: " + (", ".join(contents()) or "empty"))
+    failed = 0
     for it in items:
-        print(f"{it}: {transfer(it, take)}")
+        res = transfer(it, take)
+        print(f"{it}: {res}")
+        failed += not res.startswith("moved")
     close_all(lambda *_: None)
+    if failed:
+        # run 46: a run of "none in the pack" lines exited 0 and a seq.py chain went on as if they had moved
+        sys.exit(f"{failed} of {len(items)} not moved")
 
 
 if __name__ == "__main__":
