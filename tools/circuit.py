@@ -237,10 +237,11 @@ def main():
                 # run 39 (Guiding Cave) and run 38 (Tragedic Machinarium): Sleepy on arrival, and the ladder stopped on
                 # B1 ("sleep first, on the overworld"); sleep here on the nefia's tile first (sleep.py refuses at hunger
                 # 50+: then the ladder's own stop stands)
-                # run 47: three naps at the door in one night outlived their nefias (each lives 7 game days) and the Enter
-                # landed on the tile's field; the ladder naps by itself when Sleepy (evac, sleep, Enter), so only Very Sleepy
-                # (phase 2: -20% speed, the floor's danger) is slept off before going in
-                if ((state().get("pc") or {}).get("sleepPhase") or 0) >= 2:
+                # run 47: three naps at the door outlived their nefias (each lives 7 game days) and the Enter landed on the
+                # tile's field, so the nap was moved to Very Sleepy; the same night the ladder then stopped mid-floor on
+                # "Sleepy: sleep first" (it doesn't nap there). Back to Sleepy: an expired nefia costs a walk, the circuit's
+                # own "not a nefia" stop says so, and a re-run picks the next one
+                if ((state().get("pc") or {}).get("sleepPhase") or 0) >= 1:
                     # run 42: "refused: hunger 61/71: eat first" at the door, twice: the world map offers no meal, so step in for one and out again is the ladder's job: count it here
                     sl = fed_nap()
                     print(f"  sleepy at the door: sleep.py rc {sl.rc}: {last(sl)[:80]}", flush=True)
