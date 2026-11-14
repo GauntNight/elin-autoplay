@@ -283,6 +283,17 @@ def main():
             # slipped past the name check. Named exploders stop the ladder: kill from 5+ cells by hand (cast.py bolts),
             # teleport if it closes within 4, never throw or melee near it
             exploder = exploder or any(w in tname.lower() for w in ("kamikaze", "hot guy")) or t.get("id") == "hardgay"
+            # run 47, Ominous Cave B2: a mine dog met inside a delve pass, fought, and a mine it had laid took HP 280 -> 106; the
+            # ladder's levitate_over_mines runs only between passes. A levitating chara ignores a mine (fact #1413): cast it here
+            if "minelayer" in prof["flags"]:
+                me = call("state")["data"]["pc"]
+                for n in range(4):
+                    if "ConLevitate" in (me.get("conditions") or []):
+                        break
+                    call("cast", spell="SpLevitate")
+                    wait_until("frames", n=20, timeout=3000)
+                    me = call("state")["data"]["pc"]
+                print(f"  {t['name']} lays mines: Levitate {'on' if 'ConLevitate' in (me.get('conditions') or []) else 'FAILED (Gravity?)'}")
             # run 37 (**death** again): the state names it "Hot guy" without 『』: common.named reads the capital
             if exploder and named(t):
                 halt(f"{t['name']} is a NAMED exploder at {t['dist']}: its death blast killed me in runs 33 and 37; "
