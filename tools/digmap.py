@@ -114,22 +114,25 @@ def walk_to(tx, tz, danger_ok):
 
 
 def shovel_in_pack():
-    """Deselecting puts a held tool back in the bag it came from (run 41): take it out again before each dig."""
-    if any("shovel" in i["name"].lower() for i in data("inv")["items"]):
-        return
+    """Deselecting puts a held tool back in the bag it came from (run 41): take it out again before each dig. Returns the
+    shovel's name: run 47's pine shovel was refused because "iron shovel" was written in here twice."""
+    for i in data("inv")["items"]:
+        if "shovel" in i["name"].lower():
+            return i["name"]
     for i in data("stock")["pack"]:
-        if any("shovel" in x["name"].lower() for x in i.get("items") or []):
-            out = run("bag.py", i["name"], "--take", "iron shovel")
+        hit = [x["name"] for x in i.get("items") or [] if "shovel" in x["name"].lower()]
+        if hit:
+            out = run("bag.py", i["name"], "--take", hit[0])
             run("close.py")
             if out.rc:
                 refuse(f"no shovel: {last(out)}")
-            return
+            return hit[0]
     refuse("no shovel in the pack or a carried bag")
 
 
 def dig_here():
-    shovel_in_pack()
-    out = run("item.py", "iron shovel", "Grab")
+    name = shovel_in_pack()
+    out = run("item.py", name, "Grab")
     if out.rc:
         refuse(f"no shovel in hand: {last(out)}")
     out = run("act.py", "0", "0", "Dig", "right")

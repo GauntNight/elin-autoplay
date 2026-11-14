@@ -160,7 +160,9 @@ def ether_check():
     # the user, 2026-11-02: keep it while it is worth more than its cost, cure it when a bad one comes (fact #1161)
     # run 42: the Single Ether Wing (1554, fact #898): levitation, +10 weight capacity, speed +14 and more, no back slot: PV 88 -> 80, speed 132 -> 151, no HP or attribute; allowed by the same rule
     # run 43: Mana Battery (1564, "Absorb mana from rods" in the game's table): max HP and attributes unchanged at Lv38 (272 before and after); same rule
-    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1554, 1556, 1564)}
+    # run 47: Third Eye (etherEye, 1553) is FEAT.cs ModBase(PER, +a x (5 + n/3)) and ModBase(CHA, -a x (5 + n/3)): no HP, END
+    # or STR; PER helps to-hit and ranged, CHA sets only the party cap and prices, and the circuits run solo; same rule
+    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1553, 1554, 1556, 1564)}
     if eth:
         refuse("an ether disease: " + ", ".join(f"{v.get('name')} Lv{v.get('lv')}" for v in eth.values())
                + ": max HP or attributes may be down; the ether antibody cures it (Miral 10 medals, Yowyn's Ecopo shop)")

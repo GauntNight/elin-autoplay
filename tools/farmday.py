@@ -232,6 +232,11 @@ def home_guard(what, limit=65, hard=80):
         if s.get("drama") or (s.get("layers") or {}).get("top") == "LayerDrama":
             stop(f"a dialog is open during {what}: talk.py")
     feed_or_stop(what, limit, hard)
+    # run 47: home from a 12-map dig tour at burden phase 3; arrive.py's sweep and box walk went on while the backpack squashed me, 352 -> 127
+    # (home_guard read HP, hunger and hostiles, never the weight). Dropping the 111-weight pouch on my own floor fixed it at once
+    if (state().get("pc") or {}).get("burdenPhase", 0) >= 3:
+        stop(f"burden phase 3 during {what}: the backpack squashes every few turns: drop the heaviest bag here (item.py BAG Drop: "
+             "at home the floor is mine), then sort it")
     for _ in range(6):
         s = state()
         p = s.get("pc") or {}

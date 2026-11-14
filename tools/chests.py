@@ -67,9 +67,19 @@ def to_bags(names):
         d[bag] += 1
 
 
+def bagged():
+    return [x["name"] for i in data("stock")["pack"] for x in i.get("items") or [] if BASE in x["name"].lower()]
+
+
 def field():
     for _ in range(12):
+        # run 47: digmap's unload at burden phase 2 printed "no chest left in the pack" after every dig while 4-5 closed chests
+        # rode in the loot bag (the unclutter put them there): home mode took them out of the bags, field mode never looked,
+        # and the tour ended Overweight with the squash taking HP 352 -> 209 on the world map
+        from_bags()
         if not carried():
+            if bagged():
+                stop(f"{len(bagged())} chests in the bags behind a full grid ({free_cards()} free): drop or bag a stack, then again")
             print("no chest left in the pack")
             return
         # run 41: a chest's name varies ("a madam's favorite mystic treasure chest"), and listing the first while dropping the
