@@ -316,6 +316,7 @@ def explore_floor(solo):
     thrown = 0
     for _ in range(8):
         asked()
+        levitate_over_mines()  # run 47: a laid mine beside me after a mine dog's death on Chilly Ruin B1
         args = ["25"] + (["--solo"] if solo else []) + (["--expendable"] if "--expendable" in sys.argv else []) + GATE
         out = run_live("delve.py", *args, timeout=1500, prefix="    ")  # run 45: 15 silent minutes inside run()
         why = next((ln.split("stop:", 1)[1].strip() for ln in reversed(out.splitlines()) if "stop:" in ln), "")
@@ -594,7 +595,36 @@ def see_unseen():
     return bool(r.get("ok"))
 
 
+def levitate_over_mines():
+    """Run 46's near-death (354 -> 42 in one step on a mine a mine dog had laid) and run 47's mine beside me on Chilly Ruin B1:
+    TraitTrap.IgnoreWhenLevitating lists "mine" (TraitFloorSwitch.OnStepped: a levitating chara only says "levitating"), so
+    the Levitate spell is the counter. Cast it when the floor shows a laid mine or a mine-layer kind (threat.py's ActDropMine
+    flag) is in view and ConLevitate isn't on; my Casting fails some casts, so up to 4 tries. True when it's on."""
+    import threat
+    me = state().get("pc") or {}
+    if "ConLevitate" in (me.get("conditions") or []):
+        return True
+    mines = [h for h in (call("find", name="mine of", r=999, n=5).get("data") or {}).get("hits") or [] if h.get("kind") == "thing"]
+    layers = [c for c in state().get("nearby") or []
+              if c.get("hostile") and "minelayer" in ((threat.profile(c.get("id") or c.get("name", "")) or {}).get("flags") or [])]
+    if not mines and not layers:
+        return False
+    why = f"a mine at {mines[0]['x']},{mines[0]['z']}" if mines else f"{layers[0].get('name')} in view"
+    for i in range(4):
+        r = call("cast", spell="SpLevitate")
+        wait_until("frames", n=20, timeout=3000)
+        if "ConLevitate" in ((state().get("pc") or {}).get("conditions") or []):
+            print(f"  Levitate: on ({why}; mines are ignored while levitating), {i + 1} cast(s)", flush=True)
+            return True
+        if not r.get("ok"):
+            print(f"  Levitate: {r.get('error')} ({why})", flush=True)
+            return False
+    print(f"  Levitate: every cast failed ({why}): walk with care", flush=True)
+    return False
+
+
 def descend_at_x1(h, solo):
+    levitate_over_mines()
     before = zone().get("full")
     if not solo:
         walk(h["x"], h["z"], r=6, hp=THRESHOLDS["dungeon_hp"], stairs=True, timeout=60000, weak_ok=True)  # stops 6 short

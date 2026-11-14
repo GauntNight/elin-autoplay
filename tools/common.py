@@ -85,9 +85,11 @@ sys.excepthook = _bridge_exit  # every tool that imports common, whether or not 
 
 
 def setup():
+    # run 47: trainday's log stayed empty for 15 minutes in the background (stdout to a file is block-buffered) and its
+    # watchlog monitor saw only silence; line buffering makes every loop's log live
     for stream in (sys.stdout, sys.stderr):
         try:
-            stream.reconfigure(encoding="utf-8", errors="replace")
+            stream.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
         except (AttributeError, ValueError):
             pass
 

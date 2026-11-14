@@ -55,6 +55,14 @@ def close_all(say=print):
             # Cancel doesn't close these (run 04); LayerPause waits for a real key press (run 05:
             # a quest instance's time limit pauses, then moves you back on close)
             call("closetop")
+        elif t == "LayerDrama":
+            # run 47: a trainer's dialog under his list ignored Cancel six times and close.py still exited 0. A dialog
+            # ends by its own "Bye." choice; any other choice may be a quest's (elin-play: never guess on a dialog)
+            bye = [b for b in call("buttons")["data"]["buttons"] if (b.get("text") or "").split(" | ")[0].strip() == "Bye."]
+            if not bye:
+                say("a dialog is open with no Bye. choice: answer it with talk.py")
+                return False
+            call("click", i=bye[0]["i"])
         else:
             close = [b for b in call("buttons")["data"]["buttons"] if b["name"] == "button close"]
             if close:
@@ -68,9 +76,11 @@ def close_all(say=print):
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    close_all()
+    ok = close_all()
     if system_menu():
         sys.exit("the System menu is still open: dismiss it by hand")
+    if not ok:
+        sys.exit(f"still open: {top()}")  # run 47: exit 0 with a dialog still open let a chain walk on
 
 
 if __name__ == "__main__":
