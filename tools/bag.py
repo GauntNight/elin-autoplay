@@ -74,8 +74,10 @@ def main():
     # (run 10: with the backpack open too, "Cooler Box" moves sent food into the backpack to rot).
     checked = set()
     while True:
-        others = [b for b in bs if b.get("in") == "pack" and b.get("card") and b["card"] != mine[0]["card"]
-                  and b["card"] not in checked
+        # run 47: four carried chests all named "a mystic treasure chest": a name test skipped every one of them as "mine", they
+        # stayed open, and the gold bars and medals taken out of one went into another (twice): containers are told apart by uid
+        others = [b for b in bs if b.get("in") == "pack" and b.get("card") and b.get("uid") != mine[0].get("uid")
+                  and b.get("uid") not in checked
                   and any(k in b["card"].lower() for k in ("box", "backpack", "bag", "trunk", "pouch", "purse", "chest", "package"))]
         # run 25: "chest" was missing, so two carried mystic treasure chests opened from the pack stayed
         # registered windows all afternoon and every take landed inside them (the mushrooms, the identify
@@ -83,7 +85,7 @@ def main():
         if not others:
             break
         b = others[0]
-        checked.add(b["card"])
+        checked.add(b.get("uid"))
         other = {a["text"]: a["i"] for a in acts_of(b["i"])}
         if "Close" in other:
             call("invdo", i=other["Close"])
@@ -153,9 +155,16 @@ def main():
             # run 42: a stack that merged into one in the pack changes its name ("2 Small Medals" into "32 Small Medals"): that was a false alarm
             stem = re.sub(r"^[^A-Za-z]*(an?\s+)?", "", hit[0]["card"]).rstrip("s")
             if not any(stem in n for n in names) and not re.search(r"\borens?$", hit[0]["card"]):
-                err = (f"!! left the bag but isn't in the pack: another container window took it "
-                       f"(a carried chest or bag opened earlier?): close.py, then look inside it")
-                r = {"ok": False}
+                # run 47: medals taken out of a chest merged into the backpack's 45-medal stack, and this said "another container
+                # window took it" three times while nothing was lost: say which carried container holds it now
+                where = [i["name"] for i in call("stock")["data"]["pack"] if i["name"] != bagname
+                         and any(stem in x["name"] for x in i.get("items") or [])]
+                if where:
+                    r["data"]["moved"] = f"{hit[0]['card']} (merged into the stack in {where[0]})"
+                else:
+                    err = (f"!! left the bag but isn't in the pack or a carried bag: another container window took it "
+                           f"(a carried chest or bag opened earlier?): close.py, then look inside it")
+                    r = {"ok": False}
         moved = r.get("ok") and r["data"].get("changed")
         print(f"{it}: " + (f"moved {r['data']['moved']}" if moved else err))
         if not moved:
