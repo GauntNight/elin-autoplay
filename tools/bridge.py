@@ -10,6 +10,9 @@ usage: python -I tools/bridge.py <op> [args]
   shiftclick N              the game's quick move of inventory slot N into the open container
   drag I J [N]              drag slot I onto slot J (a hotbar slot, a picker's ing1, a crafter)
   altitude [D]              the placement height for the next Place (wall-mounted items)
+  qcraft                    the floating Quick Craft list (the game's altCraft option): each recipe, its skill,
+                            and the thing each ingredient would take (0.41.0, run 47)
+  qcraftdo id=RECIPE|i=N    start one craft from that list as a click on its slot does (guarded; 0.41.0)
   speed [1|2|3]             the game's own speed control (a hotbar's changeSpeed shortcut): x1, x2, x5; no index reads it (0.38.0)
   places [R]                world map: known places within R with distance and danger
   power                     my attacks, defense and resists as the game computes them
@@ -309,6 +312,8 @@ def main(argv):
         kw["text"] = " ".join(rest)
     elif op == "winbtn":
         kw["name"] = rest[0] if rest else ""
+    elif op == "qcraftdo":  # qcraftdo id=RECIPE | i=N: one craft from the floating Quick Craft list (bridge 0.41.0, altCraft)
+        keyed(("id", "i"), ints=("i",))
     elif op == "menu":  # menu | menu N | menu text=Sleep | menu close=1  (the open context menu, bridge 0.30.0)
         if rest and rest[0].isdigit():
             kw["i"] = int(rest[0])

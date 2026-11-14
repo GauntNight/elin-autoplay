@@ -69,6 +69,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       shiftclick N              the game's quick move of inventory slot N into the open container
       drag I J [N]              drag slot I onto slot J (a hotbar slot, a picker's ing1, a crafter)
       altitude [D]              the placement height for the next Place (wall-mounted items)
+      qcraft                    the floating Quick Craft list (the game's altCraft option): each recipe, its skill,
+                                and the thing each ingredient would take (0.41.0, run 47)
+      qcraftdo id=RECIPE|i=N    start one craft from that list as a click on its slot does (guarded; 0.41.0)
       speed [1|2|3]             the game's own speed control (a hotbar's changeSpeed shortcut): x1, x2, x5; no index reads it (0.38.0)
       places [R]                world map: known places within R with distance and danger
       power                     my attacks, defense and resists as the game computes them

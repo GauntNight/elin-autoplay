@@ -46,6 +46,10 @@ def main():
     setup()
     args = sys.argv[1:]
     keep = [args[i + 1] for i, a in enumerate(args) if a == "--keep"] + list(KEPT)
+    # run 47: the Rigid Long Bow ('Newly Bleed', the kit's ranged weapon on runs/carry.txt since run 45) shipped, because a
+    # `gearcheck.py weapon` read recorded it and this tool knew only KEPT. What I chose to carry never ships from here.
+    import items
+    keep += [ln for ln in items.carry_list() if ":" not in ln]
     if not (data("state").get("zone") or {}).get("full", "").startswith("Zone_startSite"):
         refuse("not on the home map")
     # run 40 (the user: "how often do you look at current equipment versus new?"): this tool made shipping unread pieces easy, and 14

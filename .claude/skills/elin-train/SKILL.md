@@ -19,7 +19,7 @@ low skills only (Martial 14 well, a skill past ~25 little); the LV35 sand bag wo
 | The dummy, riding Kaberg, unarmed (Martial 14 -> 27), the practice chest between bars | ~945 | ~9 | ~105 game days an hour, a meal each |
 | The dummy, riding Kaberg, a long spear after Guroot's +200 Polearm potential (38 platinum) | **~1,107** | **~14** | ~78 game days an hour; the potential is spent in ~5 level-ups |
 | Music (a flute) in a town | ~490 | ~6.7 | ~73 game days an hour; ~2,000 orens of tips an hour; **~100 karma lost with the party along** |
-| Quick Craft (bait) | ~0.06 exp a SP | | the normal window pays the station formula, not TaskCraft's +200 an item (that needs the game's altCraft option: the user's yes 2026-11-13, on from run 47; `craft.py` waits for LayerCraft, the floating window is LayerCraftFloat: facts #1400, #1409) |
+| Quick Craft (bait) | ~0.06 exp a SP | | the normal window pays the station formula. TaskCraft's +200 an item has **no route in EA 23.355** (run 47, lead 4 closed): altCraft has no Options toggle (only Save/config.txt, flipped by the user with Elin closed), and its floating list is always empty because `Thing.GetRecipes` is a stub (bridge `qcraft` read 0 recipes beside the stations; facts #1410, #1411). Recheck `bridge.py qcraft` after a game update |
 
 **The cost side** (the user decides the trade; asked at run 46's close-out): at x5 a training stretch burns game days 4-6x
 faster than a circuit. Each game day is a meal (~55 nutrition), a day's rent (~210 orens at 6,292 a month), corruption
@@ -34,7 +34,9 @@ circuit near +755, the dummy -420 unarmed and +90 with trained potential, music 
 2. **Potential just before:** `trainpot.py NAME=POT` with the trainer's list open (Guroot in Mysilia: weapon skills;
    Frealord, Ceroyon: crafts); the platinum is boxed at 66,46. +200 at a skill under 20 is ~38 platinum.
 3. **The weapon:** the lowest weapon skill with a weapon in the boxes (`stock.py --find spear|mace|staff`); unarmed trains
-   Martial Arts. Take the sword off first (item.py refuses a second weapon beside it).
+   Martial Arts. Take the sword off first (item.py refuses a second weapon beside it). A skill trained once moves past the
+   dummy's range: Polearm went 15 -> 29 in run 46, so run 47 took Staff 15 (the obsidian long staff, Armory 2 48,59).
+   arrive.py's packcheck puts the training weapon back in its box: take it out after the arrival sort, not before.
 4. **Mount Kaberg:** she waits at home; the resident board's Residents -> her row -> `bridge.py menu text=Find`, talk,
    "Join me!", then `bridge.py ride 488`. Riding trains every tick mounted.
 5. `trainday.py N --no-farm` in the background with `pulse.py` and a watchlog monitor; it eats from the Cooler Box, the

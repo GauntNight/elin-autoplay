@@ -22,7 +22,9 @@ SLOTS = [("ring", r"\bring\b"), ("neck", r"\b(necklace|amulet|neck guard|pendant
          ("head", r"\b(helm|hat|bucket|crown|cap|mask)\b"), ("body", r"\b(breastplate|robe|mail|armor|shirt|cuirass|dress)\b"),
          ("hand", r"\b(gloves|gauntlets)\b"), ("foot", r"\b(boots|shoes|sandals)\b"), ("back", r"\b(cloak|cape|mantle)\b"),
          ("waist", r"\b(girdle|belt)\b"), ("shield", r"\bshield\b"),
-         ("weapon", r"\b(axe|sword|spear|scimitar|claymore|dagger|mace|staff|bow|crossbow|gun|shotgun|rifle|claw|halberd|scythe|mallet|club|whip|katana)\b")]
+         # run 47: a ☆cane matched no slot and gearcheck showed 0 pieces; the rest of the game's weapon words came with it
+         ("weapon", r"\b(axe|sword|spear|scimitar|claymore|dagger|mace|staff|bow|crossbow|gun|shotgun|rifle|claw|halberd|scythe|mallet|club|whip|katana"
+                    r"|cane|wand|rod of combat|trident|naginata|sickle|wakizashi|rapier|hammer|lance|knuckle|blade|kunai|shuriken|flail|pistol)\b")]
 UNREAD = re.compile(r"no inventory slot|no usable slot|the game ignores")
 SKIP_LINE = re.compile(r"^(It is made|It is categorized|It uses|It can be equipped|Total |An? [a-z])")
 

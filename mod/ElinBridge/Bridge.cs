@@ -26,7 +26,7 @@ namespace ElinAutoplay
     [BepInPlugin("elin.autoplay.bridge", "ElinBridge", Version)]
     public class Bridge : BaseUnityPlugin
     {
-        public const string Version = "0.40.0";
+        public const string Version = "0.41.0";
         public const int Port = 47323;
 
         class Request
@@ -430,6 +430,10 @@ namespace ElinAutoplay
                     }
                 case "menu":  // 0.30.0: the open context menu (Bed Options, the System menu, poppers): list, press, close
                     return Menu((int?)cmd["i"], (string)cmd["text"], (bool?)cmd["close"] ?? false);
+                case "qcraft":  // 0.41.0 (run 47, G55 lead 4): the floating Quick Craft list (altCraft), read-only
+                    return QCraft(null, null, false);
+                case "qcraftdo":  // 0.41.0: start one craft from that list, as a click on its slot (guarded)
+                    return QCraft((string)cmd["id"], (int?)cmd["i"], true);
                 case "autocombat":
                     return AutoCombat((int)cmd["uid"], (string)cmd["tactics"]);
                 case "abortcombat":
@@ -2267,6 +2271,71 @@ namespace ElinAutoplay
             return Ok(new JObject { ["chose"] = c.text });
         }
 
+        // 0.41.0 (run 47, G55 lead 4): the floating Quick Craft list the game's altCraft option shows on
+        // local maps (LayerCraftFloat: Scene adds it on a zone, the world map removes it). It holds every
+        // known recipe whose ingredients are all on hand (the pack, the 3x3 around me, stations in reach:
+        // RecipeUpdater). `qcraft` reads it, with the thing each ingredient would take; `qcraftdo id=X`
+        // starts one craft as a click on its slot does (the layer's own onClick: a TaskCraft in floatMode,
+        // +200 to the recipe's skill an item and +20 a progress step; that path sets no SP cost).
+        static JObject QCraft(string id, int? idx, bool act)
+        {
+            var layer = LayerCraftFloat.Instance;
+            var o = new JObject { ["altCraft"] = Safe(() => EClass.game.altCraft), ["layer"] = (bool)layer };
+            if (!layer) return act ? Err("no floating craft layer (altCraft off, or on the world map)") : Ok(o);
+            EClass.game.updater.recipe.Build(EClass.pc.pos, RecipeUpdater.Mode.Immediate);
+            var list = RecipeUpdater.recipes.OrderBy(r => r.id).ToList();
+            if (!act)
+            {
+                var arr = new JArray();
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var r = list[i];
+                    var e = new JObject { ["i"] = i, ["id"] = r.id, ["name"] = Clean(r.Name) };
+                    try
+                    {
+                        var sk = r.source.GetReqSkill();
+                        e["skill"] = Clean(sk.Name); e["skillId"] = sk.id; e["need"] = sk.Value; e["have"] = EClass.pc.Evalue(sk.id);
+                    }
+                    catch { }
+                    var ings = new JArray();
+                    foreach (var ing in r.ingredients)
+                    {
+                        var io = new JObject { ["ing"] = Clean(ing.GetName()), ["req"] = ing.req };
+                        var t = ing.thing;
+                        if (t != null)
+                        {
+                            io["thing"] = Clean(t.Name); io["uid"] = t.uid; io["num"] = t.Num;
+                            io["mine"] = t.GetRootCard() == EClass.pc;
+                            io["in"] = t.parent is Card pc0 ? Clean(pc0 == EClass.pc ? "pack" : pc0.Name) : "ground";
+                        }
+                        ings.Add(io);
+                    }
+                    e["ings"] = ings;
+                    arr.Add(e);
+                }
+                o["recipes"] = arr;
+                o["ai"] = EClass.pc.ai?.GetType().Name;
+                return Ok(o);
+            }
+            Recipe pick = null;
+            if (id != null)
+            {
+                var m = list.Where(r => r.id == id).ToList();
+                if (m.Count != 1) return Err("recipe " + id + " is " + (m.Count == 0 ? "not on the list" : "on the list " + m.Count + " times"));
+                pick = m[0];
+            }
+            else if (idx != null && idx >= 0 && idx < list.Count) pick = list[idx.Value];
+            if (pick == null) return Err("give id=RECIPE or i=N from the last qcraft listing");
+            if (!EClass.player.waitingInput || !EClass.pc.HasNoGoal)
+                return Err("busy: not waiting for input (ai " + EClass.pc.ai?.GetType().Name + ")");
+            ButtonGrid btn = layer.GetComponentsInChildren<ButtonGrid>(false).FirstOrDefault(b => b.recipe == pick);
+            layer.list.callbacks.OnClick(pick, btn);
+            o["recipe"] = pick.id;
+            o["ai"] = EClass.pc.ai?.GetType().Name;
+            o["started"] = EClass.pc.ai is TaskCraft;
+            return Ok(o);
+        }
+
         // The open context menu (UIContextMenuManager.currentMenu): a menu is not a layer, so
         // `buttons` under a layer never listed it and the first review left it open. No argument
         // lists its entries; i= or text= presses one through the same path as `click`; close=1
@@ -2340,7 +2409,7 @@ namespace ElinAutoplay
         }
 
         static readonly HashSet<string> GuardedOps = new HashSet<string>
-            { "goto", "walkto", "move", "step", "do", "invdo", "invacts", "drag", "shiftclick", "autocombat", "act", "pick" };
+            { "goto", "walkto", "move", "step", "do", "invdo", "invacts", "drag", "shiftclick", "autocombat", "act", "pick", "qcraftdo" };
         // 0.30.1 (run 21): the trash can, the butcher's tool, pickers, the millstone, the ration
         // maker and the tax chest take items through their own drag grid; 0.30.0 refused every
         // drag into them ("window open: LayerDragGrid") and trash.py reported 30 dumps of nothing.
