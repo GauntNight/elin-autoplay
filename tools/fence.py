@@ -29,7 +29,9 @@ def goods(carried):
     for it in carried:
         if not it.get("stolen"):
             continue
-        why = inv.protected(it, carried)
+        # run 47: 8 stolen wall lamps were held back as "kit (light)": a thing the game marks stolen was taken minutes ago and
+        # is never my kit (the worn torch is the light); the other guards (worn, unidentified, the carry list) still hold
+        why = inv.protected(it, carried, kit=False)
         if why:
             held.append((it, why))
         else:

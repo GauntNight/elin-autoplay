@@ -191,6 +191,9 @@ then up with `--height` (the torch at 62,50 sits at +4; +7 was too high, +0 on t
   `packcheck --move`, the trash sweep and boxcount.py, by the numbers in elin-play's table (a meal, a stop when no meal
   landed, a fight with what's at or under my level, the walk's HP floor). A tool's "no meal" is a stop for me as well:
   never start the next long job on it. (41)
+- **Burden phase 3 at home squashes on every walk** (run 47: arrive.py's sweep and box walk took 352 -> 127):
+  `farmday.home_guard` stops there now. Drop the heaviest bag on my own floor (`item.py BAG Drop`: the pouch of cans and
+  ores was 111 weight), heal, then take its contents to the boxes. (47)
 - Monsters wander onto the home map. Check `look.py` on arrival and after every long task; never
   leave time passing unwatched (`springday.py` stops on threats and never waits with `--once`).
 - Valuables in private boxes; the pack light (a death drops carried items and gold).

@@ -187,6 +187,15 @@ def auto(target, r):
                 print(f"stop: burden phase {me['burdenPhase']} ({me.get('burdenText')}): sell or stash before more thefts"
                       f" (--burden-phase 3 only while the fence is in this town and I stay until the sale)")
                 break
+            # run 47: Eternal Traveler 「Wini」 (adv_wini, a Lv50 wandering adventurer, a wizard) discharged a vortex of magic
+            # during a theft: HP ~350 -> 2. The witness check only looks within 4 of the mark; an adventurer anywhere in view,
+            # or anyone above my level, ends the batch: one noticed theft turns them hostile, and they outclass me
+            big = [c for c in data("state").get("nearby") or [] if not c.get("party")
+                   and (str(c.get("id") or "").startswith("adv_") or (c.get("lv") or 0) > (me.get("lv") or 0))]
+            if big:
+                print("stop: " + ", ".join(f"{c['name']} Lv{c.get('lv')} d{c.get('dist')}" for c in big)
+                      + " in view: an adventurer or anyone above my level turns hostile on a noticed theft (run 47: Wini Lv50, HP 350 -> 2)")
+                break
             p = max(ps, key=lambda q: (q["contribution"], -max(abs(q["x"] - me["x"]), abs(q["z"] - me["z"]))))
             tried.add(p["uid"])
             take(p["uid"], 45)

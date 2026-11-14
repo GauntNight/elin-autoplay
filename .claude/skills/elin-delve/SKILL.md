@@ -74,7 +74,11 @@ nefia of that base danger within R tiles, `wgo.py` there, Enter, `ladder.py`, on
   time (run 42: the shipping and the close-out wait on the circuit; a nefia is ~10 real minutes); `--wrecks` mines each
   floor's wrecks (off by default: wreck stones fill the bags; a ladder run by hand needs `--no-wrecks`, run 35: without
   it the floors mine wrecks into granite and logs, Burden twice).
-- **What it does itself** (runs 39-44): sleeps on the tile when Sleepy before each Enter; eats before a nap (`fed_nap`) and
+- **The grid is what ends a circuit now** (run 47: refused at the door four times, after every second conquest): the
+  ladder wants 3 free cards and purge can only drop junk by rule. Before leaving home, box the kit's spares (a second
+  arrow stack, rods past one of a kind, a plain bow) in the yard chest 68,44.
+- **What it does itself** (runs 39-44): sleeps on the tile when Sleepy before each Enter (run 47: twice the 9-hour nap
+  outlived the nefia and the Enter landed on its field: the circuit stops, re-run it); eats before a nap (`fed_nap`) and
   takes the stairs up first when the meal stop left me on a floor; fights hostiles 10+ levels under mine before each
   evacuation (`clear_weak`); naps once to refill an empty list; started on a nefia's floor it runs the ladder there first.
 - **The unload:** every **four** conquests (`circuit.UNLOAD_EVERY`; run 40: was two, three bags carry 3-4 conquests) and
@@ -189,6 +193,15 @@ most floors sit far under the gate.
   behind** (the user, same run): between fights the corpses are picked up, not butchered (`loot.py --no-butcher`; at most
   5 wait in the pack), and every stop of delve butchers them when nothing hostile is in view; loot.py won't butcher with a
   hostile in view and butcher.py stops when one appears. On an ambush map, `loot.py 20` before leaving.
+
+### Mine-layers (the mine dog: ActDropMine, threat.py's `minelayer`)
+
+A mine dog buries mines as it fights; a laid mine does (50 + TrapLv x 2 + rnd 150) x 1.5 when stepped on: run 46, 354 ->
+42 in one step; run 47, Ominous Cave B2, 280 -> 106 (fact #1413). **A levitating chara ignores a mine**, so the Levitate
+spell is the counter: `delve.py` casts it the moment a mine-layer becomes the target (run 47, Tainted Cave B2: "Levitate
+on", the dog killed at full HP) and `ladder.levitate_over_mines` between passes when a laid mine is on the floor. My
+Casting fails some casts (it retries 4 times). The dog also casts Gravity (ConGravity); whether that cancels levitation is
+unread. Hurt among mines: stand still (a mine fires on a step), drink, then teleport off the area.
 
 ### Exploders (suicide attackers)
 

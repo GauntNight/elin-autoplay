@@ -162,7 +162,13 @@ minutes paid 75,600 orens an hour against a circuit's 9,345 (run 41).
   greedy tour with each leg's worst ambush level), `digmap.py N [--max-dist D] [--danger-ok L]` walks, eats, sleeps and
   digs nearest first (a route over `route_max` is skipped); each dig is a row in runs/digs.csv.
 - The chests ride home closed and their money counts as carried: `chests.py --field` on a local map empties them and
-  leaves them (15 weight each, Burden 2 at five); `chests.py` at home ships them. Some are locked: the lockpick (elin-pack).
+  leaves them (15 weight each, Burden 2 at five); `chests.py` at home ships them. Some are locked: `unlock.py` (lock 29
+  opened on its 7th try at Lockpicking 63).
+- **Weight on a tour** (run 47: 12 maps, 22,004 orens and 26+ gold bars in ~10 real minutes): the chests and bars put me
+  at **burden phase 3 on the world map, where the squash took 352 -> 209** and nothing can be dropped (no Drop there) and
+  a zone change can tumble for MaxHP x burden% / 200. So: heal to above that number with potions first (the spell does
+  nothing on the world map), then Enter, `chests.py --field` (it takes chests out of the bags since run 47), and on.
+  Unload at home before a circuit: the bars and medals.
 - Every boss chest's map gets dug on the way when its spot is near; the rest wait in the shared Maps box for Poppy
   (elin-home).
 - **A background dig is running until its task says it ended** (run 44: digmap walked on after a hunger stop while I

@@ -18,6 +18,7 @@ low skills only (Martial 14 well, a skill past ~25 little); the LV35 sand bag wo
 | The circuit (danger 6-16) | ~99 | ~5 | ~24 game days an hour; earns gold, nefias (+60 points each) and karma |
 | The dummy, riding Kaberg, unarmed (Martial 14 -> 27), the practice chest between bars | ~945 | ~9 | ~105 game days an hour, a meal each |
 | The dummy, riding Kaberg, a long spear after Guroot's +200 Polearm potential (38 platinum) | **~1,107** | **~14** | ~78 game days an hour; the potential is spent in ~5 level-ups |
+| **Run 47, the same method on fresh skills:** Staff 15 at pot 300 (38 platinum) for 31.6 minutes, then Mace 17 at pot 300 (21 platinum) for 14.1 | **~1,133** | **~12.7** | ~89 game days an hour (45.7 minutes, ~68 days, +863 exp); about break-even on the score (~884 for the days) |
 | Music (a flute) in a town | ~490 | ~6.7 | ~73 game days an hour; ~2,000 orens of tips an hour; **~100 karma lost with the party along** |
 | Quick Craft (bait) | ~0.06 exp a SP | | the normal window pays the station formula. TaskCraft's +200 an item has **no route in EA 23.355** (run 47, lead 4 closed): altCraft has no Options toggle (only Save/config.txt, flipped by the user with Elin closed), and its floating list is always empty because `Thing.GetRecipes` is a stub (bridge `qcraft` read 0 recipes beside the stations; facts #1410, #1411). Recheck `bridge.py qcraft` after a game update |
 
@@ -26,13 +27,25 @@ faster than a circuit. Each game day is a meal (~55 nutrition), a day's rent (~2
 (an ether disease came after ~210 game days in run 46), and 13 points of the run score. Per real hour the score had the
 circuit near +755, the dummy -420 unarmed and +90 with trained potential, music -285.
 
+## The way to train (G55 M2, adopted run 47)
+
+**When exp is the aim: the home dummy, riding Kaberg, with the lowest weapon skill at a trainer's +200 potential bought
+just before.** It paid ~1,107 (run 46) and ~1,133 (run 47) exp an hour against the circuit's ~99, on Polearm, then Staff,
+then Mace. The user's rule (2026-11-13): training only in stretches that about break even on the score, because the dummy
+burns ~80-90 game days an hour (13 points, a meal and a day's rent each). One skill's potential is spent in ~10 level-ups
+(Staff 15 -> 25 in 31.6 minutes): then switch to the next lowest skill and buy its potential (Guroot: Martial Art, Long
+Sword, Axe, Staff, Bow, Polearm, Short Sword, Crossbow, Scythe, Mace). Left: Bow 10, Crossbow 4 (ranged: `--shoot`
+needs arrows), Short Sword 17, Scythe 20.
+
 ## How to run a training stretch
 
 1. **Food first:** ~1 meal a game day; a 45-minute dummy stretch eats ~100. Buy every dish (`buyfood.py --min-ratio 0`) at
    two or three shops (an inn has 20-40), keep them in the Cooler Box, and know which carry 【Waking】 Anti Sleep (a loop
    that sleeps refuses them; a floor doesn't).
 2. **Potential just before:** `trainpot.py NAME=POT` with the trainer's list open (Guroot in Mysilia: weapon skills;
-   Frealord, Ceroyon: crafts); the platinum is boxed at 66,46. +200 at a skill under 20 is ~38 platinum.
+   Frealord, Ceroyon: crafts). +200 at a skill under 20 is ~21-38 platinum. **The coins must ride to Mysilia: put
+   `platinum coin` on runs/carry.txt first** (run 47: arrive.py's sort boxed the 280 coins, the list showed 0, and the
+   round trip for them cost ~8 real minutes); take the line off after.
 3. **The weapon:** the lowest weapon skill with a weapon in the boxes (`stock.py --find spear|mace|staff`); unarmed trains
    Martial Arts. Take the sword off first (item.py refuses a second weapon beside it). A skill trained once moves past the
    dummy's range: Polearm went 15 -> 29 in run 46, so run 47 took Staff 15 (the obsidian long staff, Armory 2 48,59).
@@ -51,4 +64,5 @@ fresh crowd paid ~6x a bored one.
 ## What this skill changed
 
 New in run 46 (G55). Measure: exp per real hour and per game day of each marked stretch (runs/activity.csv). Baseline:
-the circuit, ~99 an hour and ~5 a game day (run 46). Latest: the dummy with trained potential, ~1,107 and ~14 (run 46).
+the circuit, ~99 an hour and ~5 a game day (run 46). Latest: the dummy with trained potential, ~1,133 and ~12.7 (run 47,
+Staff then Mace; run 46's Polearm ~1,107 and ~14).
