@@ -275,6 +275,15 @@ def feed_or_stop(what, limit=65, hard=80):
 def _eat_by_kind(inv, grid_full):
     """eat_one's meal through tools/items.py: the first of meals() that lands. A refusal by item.py (a harmful
     food, foods.md) moves on to the next; a meal that started and didn't land ends it, as before."""
+    # run 47, Isolated Cave B1: poisoned, every meal was "interrupted" by the poison's tick and the ladder stopped Hungry
+    # with 19 meals in the Cooler Box: a blue herb cures the poison first ("Poison leaves your body")
+    if "ConPoison" in (state()["pc"].get("conditions") or []):
+        carried = inv.inventory()
+        herb = next((c for c in carried if "blue herb" in c["name"].lower()), None)
+        if herb:
+            inv.use(herb, "Eat", carried)
+            wait_idle(timeout=15000)
+            print(f"  poisoned: ate a blue herb first ({'cured' if 'ConPoison' not in (state()['pc'].get('conditions') or []) else 'still poisoned'})")
     tried = set()
     for _ in range(8):
         carried = inv.inventory()
