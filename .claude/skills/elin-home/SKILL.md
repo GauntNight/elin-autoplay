@@ -278,6 +278,10 @@ run 37 (the circuit is the engine now, and under the run score a training day at
 knowledge/tool-notes.md. Before using one again, test its hunger stop and eat step by hand (run 18), and stop one
 with `stopjob.py springday` only.
 
+**Why the field stays** (the user, 2026-11-14): "Farming is only useful if our crops are particularly high quality which,
+after many cycles, they are" (the seeds in the boxes run +13 to +24). The field is kept for that quality, not for
+rations, which are bought (G14 dropped); G56 M4 reshapes it into one rectangle under the farm signs.
+
 **A day:** `springday.py 1 UNTIL --once` after 06:00: mushrooms reaped and cut, ripe crops reaped
 (seeds) or harvested (food), stubs cut, every bare cell replanted from the Farm box, the field
 watered (refilling at the lake; only dry cells), a meal, then return. **Rain waters the field**

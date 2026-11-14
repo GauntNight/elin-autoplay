@@ -82,8 +82,9 @@ never `step`.
   ration cost and days; it refuses a fare over the rations carried, clicks by name, and reports the new zone. No
   ambushes, no confirmation, autosaved on arrival. The fare is 1 + hours/24 rations (from Mysilia: Meadow 3 / 2 days,
   Palmia 6 / 5 days, fact #876; from Port Kapul: Vernis 3, Meadow 5, fact #708). The time passes the same as a walk.
-- **Rations come from inns only** (Olvina's Upan 13 tiles from home, Tiguen in Mysilia, Chisierra in Yowyn, Semnof in
-  Palmia; 3-4 a restock, 50 each) or from home (`ration.py`, G14).
+- **Rations are bought** (the user, 2026-11-14, dropping G14: "at our current wealth level we just buy rations unless
+  there is some reason to farm them"): inns (Olvina's Upan 13 tiles from home, Tiguen in Mysilia, Chisierra in Yowyn,
+  Semnof in Palmia; 3-4 a restock, 50 each). `ration.py` makes them at home only for a reason the run log names.
 - **Unattended, a town past fields over the limit is reached only by Fast Travel**; to Lumiest by Fast Travel, never a
   walk (fact #1168). It is also the safe way to move an escort (run 16).
 - **Home:** Fast Travel to Meadow, or a scroll of return read on a local map (`recall.py`: one read, ~19-36 turns, never
