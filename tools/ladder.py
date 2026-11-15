@@ -21,7 +21,7 @@ the floors done at every exit).
 
 usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
                                  [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
-  --sleepy-ok  go on while Sleepy and nap only at Very Sleepy (circuit.py passes it when the nefia expires before a nap ends)
+  --sleepy-ok  go on through Very Sleepy (phase 2) and nap at phase 3 (circuit.py passes it when the nefia expires before a nap ends)
   --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
   --in X,Z  the way in on the first floor when I am no longer standing on it
   --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen
@@ -447,8 +447,18 @@ def nap_outside():
     if "ntyris" not in str((state().get("zone") or {}).get("full")):
         if not stairs.take("up"):  # an evacuation that landed on B1's entrance stairway
             return False
-    out = run("sleep.py", timeout=600)
-    print(f"  nap outside: {last(out)[:90]}")
+    # run 48 (bridge 0.42.0 expireH): on the world map now, the nefia's hours left can be read. A nap that would outlive it
+    # (the fourth time in runs 47-48) is skipped through Very Sleepy (phase 2): re-enter at once and go on (--sleepy-ok)
+    left = next((p.get("expireH") for p in data("places", r=0).get("places") or []
+                 if p.get("dist") == 0 and "Danger Lv." in (p.get("name") or "")), None)
+    skip = left is not None and left < 36 and ((state().get("pc") or {}).get("sleepPhase") or 0) <= 2
+    if skip:
+        print(f"  nap outside skipped: the nefia expires in {left} h; back in Sleepy (--sleepy-ok)", flush=True)
+        if "--sleepy-ok" not in sys.argv:
+            sys.argv.append("--sleepy-ok")
+    else:
+        out = run("sleep.py", timeout=600)
+        print(f"  nap outside: {last(out)[:90]}")
     # run 35: the 05:00 shipping report opened during the nap, the game ignored the Enter, and the next check read the
     # world map as "not a nefia: expired" (circuit.py closes a report before its Enter since run 34)
     if (state().get("layers") or {}).get("top"):
@@ -480,7 +490,7 @@ def nap_outside():
         stop(f"re-entered {z2.get('full')} ({z2.get('name')}), not a nefia: the nefia is gone (expired during the nap?); "
              "leave.py and pick another")
     p = pc()
-    return "sleepy" not in (p.get("sleepText") or "").lower()
+    return skip or "sleepy" not in (p.get("sleepText") or "").lower()
 
 
 def upkeep():
@@ -496,9 +506,9 @@ def upkeep():
         stop(f"SP {p['sp']}: sleep outside before going on (never in a dungeon)")
     # bridge 0.30.0 reports the sleepiness phase text; an older mod shows a condition at most
     sleepy = "sleepy" in (p.get("sleepText") or "").lower() or any("sleepy" in c.lower() for c in p.get("conditions") or [])
-    # run 48: --sleepy-ok (circuit.py, when the nefia would expire during a nap): Sleepy costs 10% speed, so go on, and nap
-    # at Very Sleepy (phase 2+) as before
-    if sleepy and "--sleepy-ok" in sys.argv and (p.get("sleepPhase") or 0) < 2:
+    # run 48: --sleepy-ok (circuit.py, or nap_outside once it read the nefia's hours left): Sleepy and Very Sleepy cost 10-20%
+    # speed, so go on through phase 2 and nap at phase 3 as before
+    if sleepy and "--sleepy-ok" in sys.argv and (p.get("sleepPhase") or 0) < 3:
         print(f"  {p.get('sleepText') or 'Sleepy'}, going on (--sleepy-ok: the nefia expires before a nap would end)", flush=True)
         sleepy = False
     if sleepy and not nap_outside():

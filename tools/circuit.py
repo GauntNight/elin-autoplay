@@ -137,6 +137,8 @@ def candidates(lo, hi, r, skip=()):
         if any(k.lower() in p["name"].lower() for k in skip):  # run 34: a master below the gate (Ancient Grassland)
             continue
         d = int(m.group(1))
+        if not lo <= d <= hi:
+            continue
         # run 48 (bridge 0.42.0 expireH): Isolated Ruin was 36 tiles off; the walk (~3.2 game hours a tile) and the nap at its
         # door outlived it, the fourth time (runs 47-48). A nefia that expires before the walk and a conquest (~20 h) is skipped
         left = p.get("expireH")

@@ -60,7 +60,9 @@ def spell_names():
     names = {}
     for r in rows:
         a = str(r.get("alias") or "")
-        if r.get("type") == "Spell" and r.get("name"):
+        # run 48: Telekinesis is type ActTelekinesis (group SPELL): its books read "spell unknown to the table" and kept
+        # piling into the library chain until every box refused
+        if (r.get("type") == "Spell" or r.get("group") == "SPELL") and r.get("name"):
             names[str(r["name"]).lower()] = a
     for r in rows:
         a = str(r.get("alias") or "")

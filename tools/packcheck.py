@@ -84,7 +84,7 @@ ROUTES = [
     (("seed",), BOX_STR(home.FARM_BOX) + "|" + BOX_STR(home.FARM_BOX2), "Farm box (the Depot; Farm box 2 in the Farmhouse when full)"),
     (("watering can", "hoe", "fishing rod", "bait"), BOX_STR(home.FARM_BOX), "Farm box (the Depot)"),  # run 13: bait beside the rod
     # run 18 (G12): spare room boards and plates, and walls for rotating facings, wait by the wall workshop
-    (("room board", "room plate", "house plate", "house board", "plank wall", "stone wall", "log wall"),
+    (("room board", "room plate", "house plate", "house board", "plank wall", "stone wall", "log wall", "a roof", "signboard"),  # run 48: a roof, a signboard
      BOX_STR(home.WOOD_BOX), "Wood box (building parts)"),
     (("log", "plank", "branch", "stick", "bark", "resin"), BOX_STR(home.WOOD_BOX), "Wood box (the Workshop)"),
     # G56 M2 (run 48): the stonecutter and the mason's table stand in the Workshop, so stone and cut stone wait there in
@@ -103,7 +103,7 @@ ROUTES = [
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
     (("paint", "dye"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.SPARES), "valuables (paint and dyes: materials; run 31: dyes for G30's flower beds; the yard's chest last, run 44)"),
     (("platinum", "gold bar", "medal", "ecopo", "coin", "ticket", "figure", "figurine", "card of", "gene of",
-      "flicker of decency", "gem", "jewel", "cards of", "figures of", "mandrake"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
+      "flicker of decency", "gem", "jewel", "cards of", "figures of", "mandrake", "a card"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
      "valuables (the Storehouse; the Storage Chest when full, run 21; the yard's 276-slot chest last, run 44)"),
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf
     # run 31 (G30 M5): loose lights (an old lantern from a nefia) wait with the decorations until they're installed
@@ -114,7 +114,7 @@ ROUTES = [
     (("oil", "ale", "butter", "chili", "ketchup", "salt", "sugar", "mayo", "mayonnaise", "spice", "beer", "wine",
       "sake", "sauce", "sesame", "flour", "vinegar", "tea", "cappuccino",
       "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin",
-      "glutamine", "honeycomb", "honey", "yeast", "juice"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
+      "glutamine", "honeycomb", "honey", "yeast", "juice", "crim powder"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
     (("grave of",), "ship", "the shipping chest (a boss's grave: junk, value 0-ish)"),
     (("Scrubber", "charm ("), "ship", "the shipping chest (☆The Scrubber, a boss-chest regular, and plain charms: run 30)"),
     # run 34: four "decide" stacks held up leave.py twice (loot from Rustic Forest and run 33's chests)
