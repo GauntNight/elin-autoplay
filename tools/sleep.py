@@ -12,7 +12,7 @@ Refuses (exit 1): a nefia without --user-ok, the home map without --home-ok, a w
 at or over THRESHOLDS["sleep_hunger"] (50: eat first). Exit 3 when the click didn't put me to sleep (run 40).
 Bridge 0.16.0+ (`buttons` names the slot's hot item; `click` runs it).
 """
-import re
+
 import sys
 import time
 from pathlib import Path
@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
 from close import close_all  # noqa: E402
-from common import THRESHOLDS, refuse, run, setup, wait_until  # noqa: E402
+from common import THRESHOLDS, last, refuse, run, setup, wait_until  # noqa: E402
 
 
 def main():
@@ -53,8 +53,16 @@ def main():
     slept = False
     # run 44: the sleeping bag was gone and the hotbar's sleep said "There's no bed in your backpack. You can use Rest
     # Ability to sleep but..."; the ability bar's Rest (card 'Rest', no text: pick it by card) slept me in Mifu Village
-    beds = [i for i in call("inv")["data"]["items"]
-            if re.search(r"sleeping bag|makeshift bed|\bbed\b", i["name"].lower()) and "recipe" not in i["name"].lower()]
+    # run 48: a stupid futon in the pouch was missed twice over (pack-level `inv` only, and a name regex with no
+    # "futon"): Rest slept 15 game hours for +15 SP. A bed is its kind at any depth, moved into the pack's grid first.
+    import items as inv_items  # noqa: E402
+    beds = inv_items.find(kind="bed")
+    bag_of_bed = None
+    if beds and beds[0].get("path"):
+        bag_of_bed = beds[0]["path"][-1]
+        ok, why = inv_items.to_pack(beds[0])
+        print(f"{beds[0]['name']}: out of its bag into the pack" if ok else f"{beds[0]['name']}: could not take it out ({why})",
+              flush=True)
     # run 40: right after a walk (three times at a nefia's door) the click starts nothing, no message, and the same click
     # works a moment later; the failed door nap cost Tainted Forest, which expired during the nap from B1
     for attempt in range(3):
@@ -95,6 +103,9 @@ def main():
     log = [l for l in s.get("log") or [] if "sleep" in l.lower() or "wake" in l.lower() or "bed" in l.lower()
            or "sleepy" in l.lower() or "bad idea" in l.lower()]
     print(f"SP {p0['sp']} -> {p['sp']}/{p['maxSp']}  {p0['date']} -> {p['date']}  hunger {p['hunger']}")
+    if bag_of_bed:  # the bed goes back where it rode: a grid card is what ends circuits (run 47's Live lesson)
+        out = run("bag.py", f"uid:{bag_of_bed}", f"uid:{beds[0]['uid']}", timeout=120)
+        print(f"{beds[0]['name']}: back in its bag" if out.rc == 0 else f"{beds[0]['name']}: left in the pack ({last(out)[:80]})")
     print("log: " + " / ".join(log[-4:]))
     if not slept:  # run 40: Boring Ruin's door printed rc 0 with no sleep, and the ladder then stopped Sleepy on B1
         print("did not sleep: the game's last lines: " + " / ".join((s.get("log") or [])[-4:]))

@@ -102,7 +102,27 @@ def main():
     FOODS.write_text("\n".join(sorted(w for w in words if w)) + "\n", encoding="utf-8", newline="\n")
     run("close.py", timeout=10)
     print(f"bought {bought} food; {gold()} orens left; best: {[(round(r, 2), c[:22]) for r, _, _, c in offers[:4]]}")
+    bag_food()
     return 0
+
+
+def bag_food():
+    """Run 48: Erobird's stock-up put six new stacks in the pack's grid, the circuit's first ladder refused at the door
+    (1 free card, 3 wanted) and purge found nothing cheap to drop. Meals go into the Cooler Box first (nothing rots
+    there), then any carried bag; rations stay in the pack for the fares."""
+    import items as inv  # noqa: E402
+    its = inv.inventory()
+    food = [it for it in its if not it.get("path") and it.get("kind") in ("meal", "prepared")]
+    bags = [it for it in its if not it.get("path") and it.get("kind") == "container" and not it.get("equipped")
+            and not it.get("lockLv")]
+    bags.sort(key=lambda b: 0 if "cooler" in (b.get("id") or "").lower() else 1)
+    for f in food:
+        for b in bags:
+            if run("bag.py", f"uid:{b['uid']}", f"uid:{f['uid']}", timeout=120).rc == 0:
+                print(f"  bagged: {f['name']} -> {b['name']}")
+                break
+        else:
+            print(f"  not bagged: {f['name']} (every bag refused)")
 
 
 if __name__ == "__main__":

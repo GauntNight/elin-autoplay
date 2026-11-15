@@ -16,7 +16,8 @@ usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 
   --skip NAME    leave out a nefia whose name contains NAME (repeatable): one whose master lies below the gate
   --until HH:MM  no new nefia after this clock time (run 42: the shipping and the close-out wait on the circuit; a nefia is ~10 real minutes)
 It registers as a job (runs/jobs/circuit.json: journal.py refuses while it runs) and runs/jobs/circuit.stop ends it between nefias.
-Started on a nefia's floor it runs the ladder there first (run 40). An empty list gets one nap to refill it (run 40).
+Started on a nefia's floor it runs the ladder there first (run 40). A nefia that expires before the walk and a conquest is skipped,
+and a nap at the door happens only when the nefia outlives it (run 48, bridge 0.42.0 expireH). An empty list gets one nap to refill it (run 40).
 Exit 0 after N conquests, 1 refused (not on the world map or a nefia, the kit), 3 stopped (a ladder decision, no nefia
 in range, the unload due).
 """
@@ -111,6 +112,19 @@ def fed_nap():
     return run("sleep.py", timeout=600)
 
 
+WALK_H_PER_TILE = 3.2  # run 48: 12 tiles in 37.8 game hours, 16 in ~48, 3 in 7.6 (wgo legs, x5 speed)
+CONQUEST_H = 20        # run 48: Traditional Ruin and Historic Cave took ~20 game hours from the door to the evacuation
+NAP_H = 16             # a nap at the door runs 9-15 game hours (runs 47-48)
+
+
+def expire_here():
+    """Hours left on the nefia of this world-map tile (bridge 0.42.0), or None (an older mod, a place that never expires)."""
+    for p in (call("places", r=0).get("data") or {}).get("places") or []:
+        if p.get("dist") == 0 and "Danger Lv." in (p.get("name") or ""):
+            return p.get("expireH")
+    return None
+
+
 def candidates(lo, hi, r, skip=()):
     rep = call("places", r=r)
     if not rep.get("ok"):
@@ -123,6 +137,12 @@ def candidates(lo, hi, r, skip=()):
         if any(k.lower() in p["name"].lower() for k in skip):  # run 34: a master below the gate (Ancient Grassland)
             continue
         d = int(m.group(1))
+        # run 48 (bridge 0.42.0 expireH): Isolated Ruin was 36 tiles off; the walk (~3.2 game hours a tile) and the nap at its
+        # door outlived it, the fourth time (runs 47-48). A nefia that expires before the walk and a conquest (~20 h) is skipped
+        left = p.get("expireH")
+        if left is not None and p["dist"] > 0 and left < p["dist"] * WALK_H_PER_TILE + CONQUEST_H:
+            print(f"  skipped: {p['name']} expires in {left} h; the walk alone is ~{round(p['dist'] * WALK_H_PER_TILE)} h", flush=True)
+            continue
         # distance 0 is the nefia just left (evac lands on its tile), unless it was never entered: run 37 walked onto
         # Ancient Machinarium's tile by hand and the circuit stopped "no nefia within 5"
         if lo <= d <= hi and (p["dist"] > 0 or not p.get("known")):
@@ -241,10 +261,18 @@ def main():
                 # tile's field, so the nap was moved to Very Sleepy; the same night the ladder then stopped mid-floor on
                 # "Sleepy: sleep first" (it doesn't nap there). Back to Sleepy: an expired nefia costs a walk, the circuit's
                 # own "not a nefia" stop says so, and a re-run picks the next one
+                sleepy_ok = []
                 if ((state().get("pc") or {}).get("sleepPhase") or 0) >= 1:
-                    # run 42: "refused: hunger 61/71: eat first" at the door, twice: the world map offers no meal, so step in for one and out again is the ladder's job: count it here
-                    sl = fed_nap()
-                    print(f"  sleepy at the door: sleep.py rc {sl.rc}: {last(sl)[:80]}", flush=True)
+                    # run 48: the fourth nap that outlived its nefia (Isolated Ruin, after a 36-tile walk). Nap here only when
+                    # the nefia outlives the nap and a conquest; otherwise go in Sleepy and let the ladder nap at Very Sleepy
+                    left = expire_here()
+                    if left is not None and left < NAP_H + CONQUEST_H:
+                        print(f"  sleepy at the door, but it expires in {left} h: no nap; the ladder goes on until Very Sleepy", flush=True)
+                        sleepy_ok = ["--sleepy-ok"]
+                    else:
+                        # run 42: "refused: hunger 61/71: eat first" at the door, twice: the world map offers no meal, so step in for one and out again is the ladder's job: count it here
+                        sl = fed_nap()
+                        print(f"  sleepy at the door: sleep.py rc {sl.rc}: {last(sl)[:80]}", flush=True)
                 acts = (call("acts", dx=0, dz=0, mode="all").get("data") or {}).get("acts") or []
                 ent = [a for a in acts if a["text"] == "Enter"]
                 if not ent:
@@ -254,11 +282,13 @@ def main():
                 z = state().get("zone") or {}
                 if not z.get("nefia"):  # run 34: an expired nefia's tile enters its Wilds field instead
                     stop(f"entered {z.get('full')} ({z.get('name')}), not a nefia: leave.py and run the circuit again")
+            if resume:
+                sleepy_ok = []
             resume = False
             # run 34: ladder.py takes MAX_DANGER first and FLOORS second; passing only the floors capped the danger
             # at 5 and ran 3 floors (ladder lowers the cap by one itself under --unattended)
             wreck_flag = [] if "--wrecks" in args else ["--no-wrecks"]
-            lad = run_live("ladder.py", str(THRESHOLDS["max_danger"]), str(floors), *wreck_flag, *extra, timeout=7200)  # 5 floors ran past an hour in run 33
+            lad = run_live("ladder.py", str(THRESHOLDS["max_danger"]), str(floors), *wreck_flag, *extra, *sleepy_ok, timeout=7200)  # 5 floors ran past an hour in run 33
             # run 36: Misty Cave (5) used its five floors (a nap outside counts one) and ended "done:" on B4 at full HP;
             # a clean finish without the master is another batch of floors, twice at most, not the circuit's end
             for _more in range(2):
@@ -268,6 +298,14 @@ def main():
                 lad = run_live("ladder.py", str(THRESHOLDS["max_danger"]), str(floors), *wreck_flag, *extra, timeout=7200)
             text = lad.strip()
             if "conquered:" not in text:
+                # run 48 (Chilly Cave B4): the master (an Evolved Crab) died, the zone read *Conquered*, and the floor's
+                # summoned offspring of Shub-Niggurath (an avoid kind) stopped delve before the ladder looked: the circuit
+                # said "without a conquest" and logged nothing. The stop is still a decision, but a conquest is one
+                zname = (state().get("zone") or {}).get("name") or ""
+                if "Conquered" in zname:
+                    log_conquest(text)
+                    stop(f"conquered ({zname.strip()}) but the ladder stopped: {last(lad)[:120]}. By hand: the boss chest "
+                         f"(ladder.chests), clear of the foe (teleport), evac.py, then circuit.py again")
                 stop(f"ladder rc {lad.rc} without a conquest: {last(lad)[:140]}")
             done += 1
             log_conquest(text)

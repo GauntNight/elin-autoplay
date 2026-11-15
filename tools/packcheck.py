@@ -34,7 +34,7 @@ KIT = ("orens", "bandage", "throwing dagger", "cooler box", "backpack", "cure mi
        "rod of cure", "rod of slow", "rod of silence", "rod of holy shield", "woodcutter's axe",
        "pickaxe", "shears", "sleeping bag", "short bow", "long bow", "arrow", "torch", "tax bill",
        "adventure log", "potion of paralysis", "potions of paralysis", "blue herb", "iron sickle", "bronze war sickle", "hand gun", "bullets",  # run 32: Gun training (skill 1) at the dummy  # run 21: "sickle" took a ☆war sickle as kit
-       "forest necklace", "edible necklace", "potion of silence", "rod of holy light", "makeshift bed", "hammer",
+       "forest necklace", "edible necklace", "potion of silence", "rod of holy light", "makeshift bed", "futon", "hammer",  # run 48: the stupid futon is the carried bed
        "butcher's tool", "loot bag", "spoils bag", "haul bag", "pouch",
        "shovel",  # the user, 2026-10-29: a few of the wiki's hidden Small Medals need digging (medals.py)
        "fireproof blanket",  # the user, 2026-10-30: 3 ride along (leave.py); --move had no reason to keep them
@@ -99,7 +99,7 @@ ROUTES = [
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
     (("paint", "dye"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.SPARES), "valuables (paint and dyes: materials; run 31: dyes for G30's flower beds; the yard's chest last, run 44)"),
     (("platinum", "gold bar", "medal", "ecopo", "coin", "ticket", "figure", "figurine", "card of", "gene of",
-      "flicker of decency", "gem", "jewel", "cards of", "figures of"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
+      "flicker of decency", "gem", "jewel", "cards of", "figures of", "mandrake"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
      "valuables (the Storehouse; the Storage Chest when full, run 21; the yard's 276-slot chest last, run 44)"),
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf
     # run 31 (G30 M5): loose lights (an old lantern from a nefia) wait with the decorations until they're installed
@@ -116,7 +116,9 @@ ROUTES = [
     (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a dish", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern",
       # run 46: boss-chest and floor odds with no rule (a plate, hanging pots, sea pants, the rest)
       "tableware", "trash bin", "pot of water", "gamble chest", "a plate", "hanging pots", "sea pants", "cobweb", "moon chakram",
-      "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu", "ragged cloth"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
+      "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu", "ragged cloth",
+      # run 48: a boss chest's skull, the loot bag's odds (the dried mandrake is a currency: valuables, above)
+      "skull", "iron scale", "a junk", "towel", "anchor", "assorted vegetable", "broken barrel", "a cup", "small window", "dirty dish"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
     # organs: board supply and gift jobs ask for them (a heart, grotesque offal; run 08, run 12)
     # run 15 (G14): ration grain waits by the millstone's stock: the harvest box keeps it (never shipped)
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),

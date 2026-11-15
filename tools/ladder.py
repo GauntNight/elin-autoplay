@@ -20,7 +20,8 @@ Exit 0 after FLOORS floors. The run is marked in runs/activity.csv (activity.mar
 the floors done at every exit).
 
 usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
-                                 [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why']
+                                 [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
+  --sleepy-ok  go on while Sleepy and nap only at Very Sleepy (circuit.py passes it when the nefia expires before a nap ends)
   --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
   --in X,Z  the way in on the first floor when I am no longer standing on it
   --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen
@@ -495,6 +496,11 @@ def upkeep():
         stop(f"SP {p['sp']}: sleep outside before going on (never in a dungeon)")
     # bridge 0.30.0 reports the sleepiness phase text; an older mod shows a condition at most
     sleepy = "sleepy" in (p.get("sleepText") or "").lower() or any("sleepy" in c.lower() for c in p.get("conditions") or [])
+    # run 48: --sleepy-ok (circuit.py, when the nefia would expire during a nap): Sleepy costs 10% speed, so go on, and nap
+    # at Very Sleepy (phase 2+) as before
+    if sleepy and "--sleepy-ok" in sys.argv and (p.get("sleepPhase") or 0) < 2:
+        print(f"  {p.get('sleepText') or 'Sleepy'}, going on (--sleepy-ok: the nefia expires before a nap would end)", flush=True)
+        sleepy = False
     if sleepy and not nap_outside():
         stop(f"{p.get('sleepText') or 'Sleepy'}: sleep first, on the overworld (never in a dungeon)")
     if p["hunger"] >= 65:

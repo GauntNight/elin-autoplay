@@ -22,6 +22,25 @@ usage: python -I tools/town.py           the checks, with every thing out of pla
        python -I tools/town.py --garden  G30 M3 (run 32): the field planted (a planted seed counts) with nothing ripe
                                          or withered left, no rotten food in the harvest box or a fridge, a flower
                                          within 3 of a door of every house. Exit 1 if any fail.
+
+G56, a town that looks good and works (the user, 2026-11-14; M0, run 48): four checks read from the game, and a map.
+A house is a lot (the rooms op); its wall outline is the rooms' bounding box grown by one cell.
+       python -I tools/town.py --walls    every outline cell a wall or a door (a gap otherwise), no wall cell just
+                                          outside the outline that isn't another house's (a bit sticking out), every
+                                          cell inside the box in a room or an inner wall (else the house isn't a
+                                          rectangle), one wall material a house and that material wood or rock
+                                          (materials.json's category: no grass or straw)
+       python -I tools/town.py --storage  no empty container and none off the routes (packcheck's ROUTES and the boxes
+                                          the home tools use by name), and every big container (60+ slots, read from
+                                          the game, not a name) inside home.STORAGE_QUARTER once the plan sets it
+       python -I tools/town.py --inputs   each crafting station in the same house as the box that holds its main
+                                          input (STATION_INPUT below)
+       python -I tools/town.py --field    the tilled cells one rectangle, every cell within a farm sign's reach
+                                          (TraitSpotFarm, radius 2: a 5x5 square), then --garden's planted check
+       python -I tools/town.py --map      a text map of the town as it stands (walls by material, doors, boxes,
+                                          stations, lights, the field, signs): the plan map starts from it
+       python -I tools/town.py --survey   the five G56 checks in a row (walls, storage, inputs, field, lights), one
+                                          PASS or FAIL line each at the end. Exit 1 if any fail.
 """
 import json
 import sys
@@ -172,11 +191,280 @@ def garden_check(d):
     return 1 if fails else 0
 
 
+# G56 (run 48): the box that holds each station's main input, by home.py's name for it. A station not listed here is
+# reported, never guessed. The wall workshop takes planks (or cut stone, if the town goes stone: change it with the plan).
+STATION_INPUT = {
+    "loom": "BAG_PARTS", "spinner": "BAG_PARTS",
+    "sawmill": "WOOD_BOX", "carpenter's table": "WOOD_BOX", "workbench": "WOOD_BOX", "drafting table": "WOOD_BOX",
+    "signboard workshop": "WOOD_BOX", "wall workshop": "WOOD_BOX",
+    "mason's table": "STONE_BOX", "stonecutter": "STONE_BOX", "flooring workshop": "STONE_BOX",
+    "kiln": "STONE_BOX", "smelter": "STONE_BOX", "blacksmith's table": "STONE_BOX",
+    "tinker's table": "PARTS_BOX",
+    "bonfire": "PANTRY", "millstone": "HARVEST_BOX", "ration maker": "HARVEST_BOX",
+    "cutting board": "PANTRY", "machine table": "PARTS_BOX",  # run 48: the first survey named both as unknown
+}
+
+
+def _rect(x0, z0, x1, z1):
+    return [(x, z) for z in range(z0, z1 + 1) for x in range(x0, x1 + 1)]
+
+
+def _outline(r):
+    x0, z0, x1, z1 = r
+    return {(x, z) for x, z in _rect(x0, z0, x1, z1) if x in (x0, x1) or z in (z0, z1)}
+
+
+def houses_of(d):
+    """{name: {"lot", "rect" (the wall outline's corners), "rooms", "cells"}} for every lot on the map."""
+    lots = {}
+    for r in d["rooms"]:
+        lots.setdefault(r["lot"], []).append(r)
+    out = {}
+    for lot, rs in sorted(lots.items()):
+        named = sorted({house_of(r["name"]) for r in rs if r["plate"] and house_of(r["name"])})
+        name = named[0] if len(named) == 1 else f"lot {lot}" + (f" ({'/'.join(named)})" if named else "")
+        # run 48 (the first survey): every house showed "gaps" along its south row and east column. Elin's walls are
+        # panels (blockDir), and the cells of a room's east and south walls are room cells themselves, so the outline
+        # is the rooms' box plus one column west and one row north: the Workshop's rooms 47-56 x 55-60 make the
+        # outline 46-56 x 55-61, as home.py has it.
+        rect = (min(r["x"] for r in rs) - 1, min(r["z"] for r in rs), max(r["mx"] for r in rs), max(r["mz"] for r in rs) + 1)
+        out[name] = {"lot": lot, "rect": rect, "rooms": rs, "cells": sum(r["cells"] for r in rs)}
+    return out
+
+
+def _materials():
+    game = Path(__file__).resolve().parent.parent / "knowledge/game/materials.json"
+    return {m["alias"]: m.get("category") for m in json.loads(game.read_text(encoding="utf-8"))}
+
+
+def walls_check(d):
+    from collections import Counter
+    from common import cells
+    houses = houses_of(d)
+    cat = _materials()
+    doors = {(t["x"], t["z"]) for t in d["things"] if t["door"]}
+    pts = set()
+    for h in houses.values():
+        x0, z0, x1, z1 = h["rect"]
+        pts |= set(_rect(x0 - 1, z0 - 1, x1 + 1, z1 + 1))
+    info = cells(sorted(pts))
+    every_outline = set().union(*(_outline(h["rect"]) for h in houses.values())) if houses else set()
+
+    def wall(c):
+        return bool((info.get(c) or {}).get("wall"))
+
+    fails = 0
+    print(f"walls: {len(houses)} houses (outline = the rooms' box + 1)")
+    for name, h in houses.items():
+        x0, z0, x1, z1 = h["rect"]
+        ol = _outline(h["rect"])
+        gaps = sorted(c for c in ol if not wall(c) and c not in doors and not (info.get(c) or {}).get("door"))
+        ring = _outline((x0 - 1, z0 - 1, x1 + 1, z1 + 1))
+        bits = sorted(c for c in ring if wall(c) and c not in every_outline)
+        inner = [c for c in _rect(x0 + 1, z0 + 1, x1 - 1, z1 - 1) if wall(c)]
+        notch = (x1 - x0) * (z1 - z0) - h["cells"]  # the rooms' own box (the outline less its west column and north row)
+        mats = Counter((info[c].get("blockMat") or "?") for c in ol if wall(c))
+        bad_mat = [m for m in mats if cat.get(m) not in ("wood", "rock")]
+        problems = []
+        if gaps:
+            problems.append(f"{len(gaps)} gaps " + " ".join(f"{x},{z}" for x, z in gaps[:12]))
+        if bits:
+            problems.append(f"{len(bits)} bits outside " + " ".join(f"{x},{z}" for x, z in bits[:12]))
+        if notch > 0:
+            problems.append(f"not a rectangle: {notch} cells in the box are in no room")
+        if len(mats) > 1:
+            problems.append("mixed materials")
+        if bad_mat:
+            problems.append("not wood or stone: " + ", ".join(bad_mat))
+        mat_txt = ", ".join(f"{m} ({cat.get(m) or '?'}) {n}" for m, n in mats.most_common())
+        print(f"  {name}: {x0}-{x1} x {z0}-{z1}, {len(ol)} outline cells, {sum(mats.values())} walls: {mat_txt or 'none'}"
+              + (f"; {len(inner)} inner walls" if inner else "")
+              + (f"\n     FAIL: " + "; ".join(problems) if problems else "  ok"))
+        fails += bool(problems)
+    print(f"\n{'PASS' if not fails else f'{fails} of {len(houses)} houses fail the wall check'}")
+    return 1 if fails else 0
+
+
+def _box_cells(where):
+    import re
+    return {tuple(int(v) for v in c.split(",")) for c in where.split("|") if re.fullmatch(r"\d+,\d+", c)}
+
+
+def storage_check(d):
+    import packcheck  # noqa: E402 (its ROUTES are the routes the sort uses)
+    boxes = [b for b in data("stock")["boxes"] if b.get("installed") and not b.get("property")]
+    on_route = set().union(*(_box_cells(w) for _, w, _ in packcheck.ROUTES))
+    on_route |= {tuple(home.DISH_BOX), tuple(home.HARVEST_FRIDGE), tuple(home.MAPS_BOX)}  # used by dishes.py, Delegated Farming, Poppy
+    on_route |= _box_cells(packcheck.ARMORY[0]) | {tuple(home.STORAGE_CHEST_2)}  # gear goes by code (packcheck.ARMORY); rebalance.py
+    office = (set(OFFICE) - set(home.WAGONS)) | {tuple(home.MAPS_BOX)}  # run 48: G47 made the wagons "office" for check 3
+    fails = 0
+    # run 48: a locked box counts (the mystic chest 65,40 relocked with 6 stacks in it); Fiama's and the practice chest are office
+    mine = [b for b in boxes if (b["x"], b["z"]) not in office and b.get("trait") not in OFFICE_TRAITS]
+    empty = [b for b in mine if not b.get("count")]
+    print(f"storage: {len(mine)} containers (office and others' left out)")
+    print(f"a. empty: {len(empty)}" + "".join(f"\n     {b['name']} ({b['x']},{b['z']}) {b.get('slots')} slots" for b in empty))
+    fails += bool(empty)
+    off = [b for b in mine if (b["x"], b["z"]) not in on_route]
+    print(f"b. off the routes: {len(off)}" + "".join(f"\n     {b['name']} ({b['x']},{b['z']}) {b.get('count')}/{b.get('slots')}" for b in off))
+    fails += bool(off)
+    big = [b for b in mine if (b.get("slots") or 0) >= 60]
+    q = getattr(home, "STORAGE_QUARTER", None)
+    if big:
+        bx = (min(b["x"] for b in big), min(b["z"] for b in big), max(b["x"] for b in big), max(b["z"] for b in big))
+        print(f"c. big containers (60+ slots): {len(big)}, spread over {bx[0]}-{bx[2]} x {bx[1]}-{bx[3]}")
+        for b in big:
+            print(f"     {b['name']} ({b['x']},{b['z']}) {b.get('count')}/{b.get('slots')}")
+    if q is None:
+        print("   no storage quarter set yet (home.STORAGE_QUARTER: M0's plan names it)")
+        fails += 1
+    else:
+        (qx0, qz0), (qx1, qz1) = q
+        out = [b for b in big if not (qx0 <= b["x"] <= qx1 and qz0 <= b["z"] <= qz1)]
+        print(f"   outside the quarter {qx0}-{qx1} x {qz0}-{qz1}: {len(out)}" + "".join(f"\n     {b['name']} ({b['x']},{b['z']})" for b in out))
+        fails += bool(out)
+    print(f"\n{'PASS' if not fails else f'{fails} of 3 storage checks fail'}")
+    return 1 if fails else 0
+
+
+def inputs_check(d):
+    rooms = {r["uid"]: r for r in d["rooms"]}
+    lot_at = {(t["x"], t["z"]): (rooms[t["room"]]["lot"] if t["room"] in rooms else None) for t in d["things"]}
+    lot_name = {h["lot"]: n for n, h in houses_of(d).items()}
+    fails, unknown = 0, []
+    stations = [t for t in d["things"] if t["crafter"]]
+    print(f"inputs: {len(stations)} stations")
+    for t in sorted(stations, key=lambda t: (t["x"], t["z"])):
+        key = next((k for k in STATION_INPUT if t["name"].lower().endswith(k)), None)
+        if key is None:
+            unknown.append(t)
+            continue
+        cell = getattr(home, STATION_INPUT[key])
+        cell = tuple(cell[0] if isinstance(cell, list) else cell)
+        here, there = lot_at.get((t["x"], t["z"])), lot_at.get(cell)
+        ok = here is not None and here == there
+        print(f"  {'ok  ' if ok else 'FAIL'} {t['name']} ({t['x']},{t['z']}) in {lot_name.get(here, 'the open')};"
+              f" its input box {STATION_INPUT[key]} {cell[0]},{cell[1]} in {lot_name.get(there, 'the open')}")
+        fails += not ok
+    if unknown:
+        print("  no main input known (STATION_INPUT): " + ", ".join(f"{t['name']} ({t['x']},{t['z']})" for t in unknown))
+    print(f"\n{'PASS' if not fails else f'{fails} stations away from their input'}")
+    return 1 if fails else 0
+
+
+def field_check(d):
+    from common import cells
+    signs = [(t["x"], t["z"]) for t in d["things"] if t["trait"] == "TraitSpotFarm"]
+    fx = [c[0] for c in home.FIELD]
+    fz = [c[1] for c in home.FIELD]
+    area = _rect(min(fx) - 8, min(fz) - 8, max(fx) + 8, max(fz) + 8)
+    info = cells(area)
+    tilled = sorted(c for c, i in info.items() if (i.get("floor") or "") == "field")
+    reach = {(x, z) for sx, sz in signs for x in range(sx - 2, sx + 3) for z in range(sz - 2, sz + 3)}
+    fails = 0
+    if not tilled:
+        print("field: no tilled cell near home.FIELD")
+        return 1
+    x0, z0 = min(c[0] for c in tilled), min(c[1] for c in tilled)
+    x1, z1 = max(c[0] for c in tilled), max(c[1] for c in tilled)
+    box = (x1 - x0 + 1) * (z1 - z0 + 1)
+    print(f"field: {len(tilled)} tilled cells in the box {x0}-{x1} x {z0}-{z1} ({box} cells); farm signs at "
+          + (", ".join(f"{x},{z}" for x, z in signs) or "none"))
+    holes = sorted(set(_rect(x0, z0, x1, z1)) - set(tilled) - set(signs))  # a sign inside the field stands on its own cell
+    print(f"a. one rectangle: {'yes' if not holes else 'no, ' + str(len(holes)) + ' untilled cells inside the box'}")
+    fails += bool(holes)
+    outside = [c for c in tilled if c not in reach]
+    print(f"b. inside a sign's reach (5x5): {len(tilled) - len(outside)} of {len(tilled)}"
+          + (" ; outside: " + " ".join(f"{x},{z}" for x, z in outside[:20]) if outside else ""))
+    fails += bool(outside)
+    print("c. planted (--garden a):")
+    g = garden_check(d)
+    fails += bool(g)
+    print(f"\n{'PASS' if not fails else 'the field check fails'}")
+    return 1 if fails else 0
+
+
+def map_view(d, rect=None):
+    """A text map: north (higher z) at the top, x rising to the right."""
+    from common import cells
+    houses = houses_of(d)
+    if rect is None:
+        xs = [h["rect"][0] for h in houses.values()] + [h["rect"][2] for h in houses.values()] + [c[0] for c in home.FIELD]
+        zs = [h["rect"][1] for h in houses.values()] + [h["rect"][3] for h in houses.values()] + [c[1] for c in home.FIELD]
+        xs += [w[0] for w in home.WAGONS]
+        zs += [w[1] for w in home.WAGONS]
+        rect = (min(xs) - 2, min(zs) - 2, max(xs) + 2, max(zs) + 2)
+    x0, z0, x1, z1 = rect
+    info = cells(_rect(x0, z0, x1, z1))
+    cat = _materials()
+    game = json.loads((Path(__file__).resolve().parent.parent / "knowledge/game/things.json").read_text(encoding="utf-8"))
+    light_ids = {r["id"] for r in game if r.get("category") == "light"}
+    big = {(b["x"], b["z"]): b.get("slots") or 0 for b in data("stock")["boxes"]}
+    over = {}
+    for t in d["things"]:
+        c = (t["x"], t["z"])
+        if t["door"]:
+            over[c] = "+"
+        elif t["crafter"]:
+            over[c] = "S"
+        elif t["container"] and not t["bed"]:
+            over.setdefault(c, "W" if big.get(c, 0) >= 60 else "c")
+        elif t["bed"]:
+            over.setdefault(c, "B")
+        elif t["trait"] == "TraitSpotFarm":
+            over[c] = "F"
+        elif t["id"] in light_ids:
+            over.setdefault(c, "L")
+    print(f"map {x0}-{x1} x {z0}-{z1}: # wood wall, % stone wall, g grass or straw wall, ? other wall, + door,"
+          " S station, W big box (60+), c box, B bed, L light, F farm sign, f tilled, ~ water, . floor")
+    print("     " + "".join(str(x % 10) for x in range(x0, x1 + 1)))
+    for z in range(z1, z0 - 1, -1):
+        row = []
+        for x in range(x0, x1 + 1):
+            i = info.get((x, z)) or {}
+            ch = " "
+            if i.get("wall"):
+                m = cat.get(i.get("blockMat"))
+                ch = "#" if m == "wood" else "%" if m == "rock" else "g" if m == "grass" else "?"
+            elif i.get("water"):
+                ch = "~"
+            elif (i.get("floor") or "") == "field":
+                ch = "f"
+            elif i.get("floor"):
+                ch = "."
+            ch = over.get((x, z), ch)
+            row.append(ch)
+        print(f"{z:4d} " + "".join(row))
+    for name, h in houses.items():
+        x0_, z0_, x1_, z1_ = h["rect"]
+        print(f"  {name}: {x0_}-{x1_} x {z0_}-{z1_}")
+    return 0
+
+
 def main(argv):
     setup()
     d = data("rooms")
     if "--garden" in argv:
         return garden_check(d)
+    if "--walls" in argv:
+        return walls_check(d)
+    if "--storage" in argv:
+        return storage_check(d)
+    if "--inputs" in argv:
+        return inputs_check(d)
+    if "--field" in argv:
+        return field_check(d)
+    if "--map" in argv:
+        return map_view(d)
+    if "--survey" in argv:
+        results = {}
+        for name, fn in (("walls", walls_check), ("storage", storage_check), ("stations", inputs_check),
+                         ("field", field_check), ("lights", lights_check)):
+            print(f"\n===== {name} =====")
+            results[name] = fn(d)
+        print("\n===== G56 survey =====")
+        for name, rc in results.items():
+            print(f"  {name}: {'PASS' if rc == 0 else 'FAIL'}")
+        return 1 if any(results.values()) else 0
     if "--json" in argv:
         print(json.dumps(d, indent=1, ensure_ascii=False))
         return 0

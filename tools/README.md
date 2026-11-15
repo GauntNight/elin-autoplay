@@ -161,7 +161,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       --skip NAME    leave out a nefia whose name contains NAME (repeatable): one whose master lies below the gate
       --until HH:MM  no new nefia after this clock time (run 42: the shipping and the close-out wait on the circuit; a nefia is ~10 real minutes)
     It registers as a job (runs/jobs/circuit.json: journal.py refuses while it runs) and runs/jobs/circuit.stop ends it between nefias.
-    Started on a nefia's floor it runs the ladder there first (run 40). An empty list gets one nap to refill it (run 40).
+    Started on a nefia's floor it runs the ladder there first (run 40). A nefia that expires before the walk and a conquest is skipped,
+    and a nap at the door happens only when the nefia outlives it (run 48, bridge 0.42.0 expireH). An empty list gets one nap to refill it (run 40).
     Exit 0 after N conquests, 1 refused (not on the world map or a nefia, the kit), 3 stopped (a ladder decision, no nefia
     in range, the unload due).
 - **`clear.py`**: Clear wild plants off the home map to bring the soil back under its limit (G3, run 05).
@@ -436,7 +437,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                                                         (--log: a row in runs/index.csv for the run tracker)
 - **`ladder.py`**: Go down a multi-floor dungeon one floor at a time (run 20, the user: "we need some dungeons ... to level up two weapon skill"): on each floor delve.py until the floor is explored, loot.py, wrecks.py, a QuickSave, then the stairway that isn't the way in, and down. Lesimas and other quest dungeons aren't nefias, so delve.py's floor gate skips them: the gate here covers every floor.
     usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
-                                     [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why']
+                                     [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
+      --sleepy-ok  go on while Sleepy and nap only at Very Sleepy (circuit.py passes it when the nefia expires before a nap ends)
       --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
       --in X,Z  the way in on the first floor when I am no longer standing on it
       --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen

@@ -26,7 +26,7 @@ namespace ElinAutoplay
     [BepInPlugin("elin.autoplay.bridge", "ElinBridge", Version)]
     public class Bridge : BaseUnityPlugin
     {
-        public const string Version = "0.41.0";
+        public const string Version = "0.42.0";
         public const int Port = 47323;
 
         class Request
@@ -914,6 +914,9 @@ namespace ElinAutoplay
                     ["known"] = s.isKnown,
                     ["danger"] = s.DangerLv,
                     ["town"] = s is Zone zz && zz.IsTown,
+                    // 0.42.0 (run 48): a random nefia lives 7 game days (Zone.dateExpire); naps at its door outlived it four
+                    // times (runs 47-48), each after a long walk. Hours left, or null for a place that never expires.
+                    ["expireH"] = s.dateExpire != 0 ? (int?)EClass.world.date.GetRemainingHours(s.dateExpire) : null,
                 }));
             }
             // Carried treasure maps: the dig spot, in the same frame as pc.pos (TaskDig.GetTreasureMap
