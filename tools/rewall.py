@@ -35,11 +35,13 @@ def act(x, z, prefix, mode="right"):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    pick = sys.argv[sys.argv.index("--pickaxe") + 1] if "--pickaxe" in sys.argv else "steel pickaxe"
+    # run 48: the --pickaxe value ("basalt pickaxe") was read as a cell and the int() failed: the flag's value is not an argument
+    skip = {sys.argv.index("--pickaxe") + 1} if "--pickaxe" in sys.argv else set()
+    args = [a for i, a in enumerate(sys.argv[1:], 1) if not a.startswith("--") and i not in skip]
     if len(args) < 2:
         sys.exit(__doc__)
     wall, pts = args[0], [tuple(int(v) for v in a.split(",")) for a in args[1:]]
-    pick = sys.argv[sys.argv.index("--pickaxe") + 1] if "--pickaxe" in sys.argv else "steel pickaxe"
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     done = []
     for x, z in pts:
