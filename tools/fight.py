@@ -6,7 +6,7 @@ target is gone, not in view or unreachable, or after a turn limit.
 Survival first (the user's #1 goal): refuses (exit 1) a target more than 2 levels above me
 unless --force, an avoid-group kind within 8 levels, and the world map; stops at 60% HP by default.
 
-usage: python -I tools/fight.py NAME [min_hp_pct] [max_rounds] [--force] [--single]
+usage: python -I tools/fight.py NAME [min_hp_pct] [max_rounds] [--force] [--single] [--town-ok] [--acid-ok]
 
 Run 16: the fight goes through the game's own auto-combat (bridge 0.26.0 `autocombat`, warrior
 tactics) whenever the bridge has it: in GoalAutoCombat a lethal hit on me or a party member who
@@ -232,7 +232,7 @@ def _fight(trk):
         i = argv.index("--until")
         argv = argv[:i] + argv[i + 2:]
     # run 38: "--melee" (read from sys.argv below) was left in the positional args and crashed int(args[1])
-    args = [a for a in argv if a not in ("--force", "--single", "--melee")]
+    args = [a for a in argv if a not in ("--force", "--single", "--melee", "--town-ok", "--acid-ok")]
     hits = []  # the target's HP lost to each of my attacks, in percent (--until)
     name = args[0].lower()
     min_hp = int(args[1]) if len(args) > 1 else 60
@@ -248,6 +248,11 @@ def _fight(trk):
     if on_world:
         refuse("on the world map: bump into the monster with `bridge.py move DIR` "
                "(n s e w) to start the encounter, then fight there")
+    # run 48: Anastazija (Derphy's guild doorman, Lv32) caught a theft and turned hostile; fight.py killed her as she begged and
+    # the death cost Karma -5, the karma the thefts were spending. In a town the answer is to walk off or take the stairs
+    if z.get("town") and "--town-ok" not in sys.argv:
+        refuse("in a town: a townsperson's death costs karma (run 48: Anastazija, -5): walk away, take the stairs or leave "
+               "the map; --town-ok for a monster that came into town")
     foes0 = [c for c in s0.get("nearby") or [] if match(c, name, force)]
     if foes0 and not force:
         t0 = min(foes0, key=lambda c: c["dist"])

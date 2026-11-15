@@ -322,7 +322,13 @@ def storage_check(d):
         out = [b for b in big if not (qx0 <= b["x"] <= qx1 and qz0 <= b["z"] <= qz1)]
         print(f"   outside the quarter {qx0}-{qx1} x {qz0}-{qz1}: {len(out)}" + "".join(f"\n     {b['name']} ({b['x']},{b['z']})" for b in out))
         fails += bool(out)
-    print(f"\n{'PASS' if not fails else f'{fails} of 3 storage checks fail'}")
+    # run 48: both big wagons (54,38 and 58,35) lay uninstalled ("Pick (a big wagon)", no Open act) and this check, reading
+    # installed boxes only, passed while every route through them refused; a loose container is a fail of its own
+    loose = [b for b in data("stock")["boxes"] if not b.get("installed") and not b.get("property") and (b.get("slots") or 0) >= 16]
+    print(f"d. loose (not installed: no Open act, routes through it refuse): {len(loose)}"
+          + "".join(f"\n     {b['name']} ({b['x']},{b['z']}) {b.get('count')}/{b.get('slots')}: pick it up and place it back" for b in loose))
+    fails += bool(loose)
+    print(f"\n{'PASS' if not fails else f'{fails} of 4 storage checks fail'}")
     return 1 if fails else 0
 
 
