@@ -287,7 +287,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       --dry  list what would be sold and what is held back, and sell nothing (no shopkeeper needed)
     Exit 0, 1 refused (nothing stolen is carried, the shopkeeper not in view), 3 stopped (the gold didn't move).
 - **`fight.py`**: Melee a visible creature by name until it dies, using the game's own Attack act (the act walks into range). Stops (exit 3) when my HP drops below a floor, when one round costs more than 15% of my max HP (THRESHOLDS hit_pct: teleport), when a window opens; exit 0 when the target is gone, not in view or unreachable, or after a turn limit.
-    usage: python -I tools/fight.py NAME [min_hp_pct] [max_rounds] [--force] [--single]
+    usage: python -I tools/fight.py NAME [min_hp_pct] [max_rounds] [--force] [--single] [--town-ok] [--acid-ok]
 - **`fightlog.py`**: The fight log (the user, run 29: "per monster in the graph is perfect", with a column for specials such as "destroys equipment with fire", "weakens stats (slime)", "invisible", "runs away").
     usage: python -I tools/fightlog.py [KIND]     the per-kind summary (all kinds, or one)
 - **`find.py`**: Nearest explored cells whose object (tree, plant, rock), thing (item, furniture, board) or visible creature matches a name. One bridge call (`find` op, bridge 0.9.0+); older bridges fall back to a cell-by-cell scan of objects only (slow beyond radius 15).
@@ -438,7 +438,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`ladder.py`**: Go down a multi-floor dungeon one floor at a time (run 20, the user: "we need some dungeons ... to level up two weapon skill"): on each floor delve.py until the floor is explored, loot.py, wrecks.py, a QuickSave, then the stairway that isn't the way in, and down. Lesimas and other quest dungeons aren't nefias, so delve.py's floor gate skips them: the gate here covers every floor.
     usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
                                      [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
-      --sleepy-ok  go on while Sleepy and nap only at Very Sleepy (circuit.py passes it when the nefia expires before a nap ends)
+      --sleepy-ok  go on through Very Sleepy (phase 2) and nap at phase 3 (circuit.py passes it when the nefia expires before a nap ends)
       --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
       --in X,Z  the way in on the first floor when I am no longer standing on it
       --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen
