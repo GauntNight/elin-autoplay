@@ -7,7 +7,7 @@ description: Guild work in Elin - the user's guild rule (every guild keeps risin
 
 **The rule (the user, 2026-11-01):** "all guilds should keep increasing until they are max rank". Rank 6 is the game's
 cap. A guild goal done sets the next rank as a goal at once (elin-goals); the goals and their milestones are in
-`knowledge/goals.md` (G53 Thieves rank 4, G49 Mages rank 4, G50 Merchants rank 5 at this writing; the Fighters are done).
+`knowledge/goals.md` (G57 Thieves rank 5, G49 Mages rank 4, G50 Merchants rank 5 at this writing; G53, Thieves rank 4, done in run 48; the Fighters are done).
 The review of 2026-11-11: the three ride along with the circuits and the trips, without a plan slot of their own.
 
 **Read the number:** `python -I tools/journal.py guilds` prints each guild's rank and contribution from the journal
@@ -41,6 +41,9 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
 3. **The named-witness rule:** a named NPC from Lv15 still blocks a theft beside them (run 43: Monazess Lv26, a unique,
    caught one and stayed hostile, after I had raised the limit from 15 to 30 without a reason). The limit changes on a
    read of the formula against today's numbers, never in the moment.
+   **A witness behind a door is not in view** (run 48: Anastazija, the doorman, Lv32, caught a theft by the pub's stairway
+   from the next room and broke the door down): when one turns hostile, walk away or take the stairs. Her death cost
+   Karma -5, the karma the thefts spend: `fight.py` refuses in a town without `--town-ok`.
 4. **The karma budget:** `steal.py auto` stops itself at karma 20 (`--karma-floor N`; 0 is the last non-criminal value)
    and at burden phase 2 (`--burden-phase 3` only while staying for the sale) (run 44: run 43's batch ended Overweight
    with the fence asleep). Karma is the binding resource: -1 a theft, about +5 a conquest, so thefts alternate with
