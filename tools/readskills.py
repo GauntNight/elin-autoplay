@@ -33,8 +33,10 @@ def boxed(skip):
 
 
 def carried():
-    """The specialized books in the pack, bags included (item.py finds them there)."""
-    return [i["name"] for i in data("inv")["items"] if BOOK.search(i["name"])]
+    """The specialized books in the pack, bags included (item.py finds them there). Run 48: the "inv" listing holds the
+    pack's top level only, so two books in a haul bag read as "carried: []": items.py's kind lookup sees every depth."""
+    from items import find
+    return [i["name"] for i in find(kind="skillbook", usable_only=False) if BOOK.search(i["name"])]
 
 
 def snapshot():

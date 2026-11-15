@@ -157,6 +157,16 @@ def main():
         if unknown:
             sys.exit("refused: unidentified gear ships for almost nothing (fact #791): identify first, "
                      "or --unidentified-ok: " + " | ".join(unknown))
+        # run 48: empty cans, a book pile, sacks and washing tubs went into the shipping chest by name, against the
+        # user's run-08 rule (trash.py's docstring: shipping pays 0, the can pays Ecopo). The game's own category decides
+        import items as carried
+        inv = carried.inventory()
+        junk = [it for it in items for c in inv
+                if c.get("kind", "").startswith("junk")
+                and (str(c.get("uid")) == it[4:] if it.startswith("uid:") else it.lower() in c["name"].lower())]
+        if junk:
+            sys.exit("refused: garbage goes in the trash can, never the shipping chest (the user, run 08): "
+                     "python -I tools/trash.py dump " + " ".join(f'"{j}"' for j in sorted(set(junk))))
     if re.fullmatch(r"\d+,\d+", where):
         x, z = map(int, where.split(","))
     else:
