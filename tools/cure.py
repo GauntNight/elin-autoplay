@@ -78,7 +78,10 @@ def main():
             call("rclick", i=i)
         casts += 1
         time.sleep(1.2)
-        if casts >= 4 and pc()["mp"] >= mp_before:
+        # run 48: "casts don't land (MP 126 unchanged)" while HP had gone 195 -> 305: the MP read lagged the cast. A cast
+        # that raised HP landed whatever MP reads
+        now = pc()
+        if casts >= 4 and now["mp"] >= mp_before and now["hp"] <= hp:
             stop(f"casts don't land (MP {mp_before} unchanged after a cast): look.py")
     p = pc()
     print(f"healed: HP {p['hp']}/{p['maxHp']}  MP {p['mp']}  casts {casts}")
