@@ -511,6 +511,11 @@ def upkeep():
     if sleepy and "--sleepy-ok" in sys.argv and (p.get("sleepPhase") or 0) < 3:
         print(f"  {p.get('sleepText') or 'Sleepy'}, going on (--sleepy-ok: the nefia expires before a nap would end)", flush=True)
         sleepy = False
+    # run 48: twice the evacuation for a nap at Sleepy (phase 1) met "You are not sleepy" on the world map (the game sleeps
+    # only part way into phase 1), and phase 1 costs no speed (fact #378: phases 2/3 -10/-20%): nap from Very Sleepy
+    if sleepy and (p.get("sleepPhase") or 0) < 2:
+        print(f"  {p.get('sleepText') or 'Sleepy'} (phase 1): going on; the nap waits for Very Sleepy", flush=True)
+        sleepy = False
     if sleepy and not nap_outside():
         stop(f"{p.get('sleepText') or 'Sleepy'}: sleep first, on the overworld (never in a dungeon)")
     if p["hunger"] >= 65:
