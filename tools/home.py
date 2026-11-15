@@ -46,15 +46,15 @@ STATIONS = {"loom": (47, 60), "wall workshop": (48, 60), "spinner": (49, 60), "d
             "signboard workshop": (52, 60), "mason's table": (53, 60), "stonecutter": (54, 60),
             "tinker's table": (55, 60), "carpenter's table": (50, 56), "sawmill": (47, 56), "workbench": (49, 56),
             "kiln": (59, 60), "smelter": (60, 60), "blacksmith's table": (61, 60),  # the Forge (run 18)
-            "millstone": (66, 59), "ration maker": (67, 59)}  # run 18: in the Kitchen
+            "millstone": (58, 44), "ration maker": (60, 42)}  # run 18: in the Kitchen; G56 M2 (run 48): into the Farmhouse beside the grain
 WOOD_BOX = (48, 57)        # logs, planks, branches, sticks, bark, resin (run 18: into the Workshop)
 STONE_BOX = (61, 57)       # run 18: in the Forge (stone house 58-62 x 55-61, door 60,55); stones, cut stone, soil, glass, bricks, ores, ingots
-STONE_BOX_2 = (61, 56)     # run 20: a wooden box 'Stone 2' beside it (hide strings), for the overflow
+STONE_BOX_2 = (52, 58)     # run 20: a wooden box 'Stone 2' beside the Forge's (61,56); G56 M2 (run 48): moved into the Workshop by the stonecutter and the mason's table: stone, cut stone, bricks
 FODDER_BOX = (60, 41)      # run 18: in the Farmhouse; shared: grass, leaves, grass walls (materials only)
 
 # Storage: the Storehouse, a rosewood house 63-69 x 37-42, door 66,42 (G12, run 18), except the
 # Workshop's bag-parts and parts boxes
-BAG_PARTS = [(58, 35)]     # run 18: in the Workshop; threads, fiber, strings, ropes, skins, bolts; G54 (run 45): the maniac chest
+BAG_PARTS = [(48, 59), (58, 35)]  # G56 M2 (run 48): the box still named "Armory 2" beside the loom and spinner first, the big wagon after; run 18: in the Workshop; threads, fiber, strings, ropes, skins, bolts; G54 (run 45): the maniac chest
                            # 54,56 (15 slots) retired into the second big wagon (stations draw from any box at home)
 MAPS_BOX = (55, 56)        # run 19 (the user): 'Maps', SHARED, distribution off (allow none): treasure maps only, for
                            # Poppy's Treasure Hunt (fact #688: it takes maps from shared boxes only)
@@ -67,24 +67,28 @@ BIG_WAGONS = [(54, 38), (58, 35)]  # G54 M1 (run 45): Nino's two big wagons, 96 
                                    # valuables of the retired mystic chests, [1] the armory overflow and the bag parts
 WAGONS = [(66, 46), (69, 46), (68, 44), (70, 44)] + BIG_WAGONS  # (68, 44): the third ★Storage Chest (Miral, 20 medals, 9 wrenches since run 44: 280 slots by its window), the yard too
 VALUABLES = [(66, 46), (69, 46), (68, 39), (44, 47), (44, 49), (42, 49)]  # 'Valuables 7' stays last (packcheck's decorations use VALUABLES[-1]); coins, bars, medals, tickets, figures, cards, genes, gems
-LIBRARY = [(67, 40), (42, 48), (47, 58), (54, 38), (44, 48), (65, 38), (68, 44)]  # run 45 (G54): 47,59's mystic chest -> the big wagon     # G47 (run 42): the boxes 66,38 and 48,58 retired into the yard's chest; [1] stays 'Library 3' (town.py) (run 30, G28: the Depot's sturdy box, was the bin
+LIBRARY = [(67, 40), (42, 48), (64, 46), (54, 38), (44, 48), (65, 38), (68, 44)]  # run 45 (G54): 47,59's mystic chest -> the big wagon     # G47 (run 42): the boxes 66,38 and 48,58 retired into the yard's chest; [1] stays 'Library 3' (town.py) (run 30, G28: the Depot's sturdy box, was the bin
                            # package 64,38); books, spellbooks, recipes, letters;
                            # run 23: 'Library 2' (48,58), a wooden box in the Workshop, before the Storage Chest
                            # run 37: 'Library 5' (67,40), a sturdy box in the library room (nails from the new
                            # tinker's table at 54,58; the old one at 55,60 has no reachable side)
                            # run 39: 'Library 6' (44,48), a sturdy box in the Depot (oak planks, copper ingots,
                            # iron nails from scrap): the library chain was full again at the first unload
-ARMORY2 = (48, 59)         # run 23: 'Armory 2', a wooden box in the Workshop (private): gear when the armory is full
+ARMORY2 = (68, 44)         # G56 M2 (run 48): 48,59 holds the bag parts now; its plain gear went into the yard chest. run 23: 'Armory 2', a wooden box in the Workshop (private): gear when the armory is full
 ARMORY3 = (42, 50)         # run 30 (G28): 'Armory 3', a sturdy box in the Depot (private), when Armory 2 is full
 ARMORY4 = (58, 35)         # run 37: 'Armory 4', a wooden box in the Depot at 45,50 (private), when Armory 3 is full; G54 (run 45): retired
                            # into the second big wagon
 ARMORY5 = (70, 44)         # G47 (run 42): the third wagon, 60 slots, when the armory boxes are full
 SPARES3 = (68, 44)         # G47 (run 42): was 'Spares 3', a wooden box at 49,58, retired
 SPARES4 = (44, 50)         # run 38: 'Spares 4', a sturdy box in the Depot (private): the spares chests were all full
-STORAGE_CHEST = (47, 58)   # run 20: Ashland's farewell gift, the ★Storage Chest (100 slots, fireproof; no rename): the
-                           # Workshop's middle row; the library's overflow
-STORAGE_CHEST_2 = (43, 51) # run 31 (G29 M1): the second ★Storage Chest (Miral, 20 medals; 3 wrenches: 96 + 60 slots), in the
-                           # Depot's NE corner: the overflow of every box at 90%+ (tools/rebalance.py)
+STORAGE_CHEST = (64, 46)   # run 20: Ashland's farewell gift, the ★Storage Chest (100 slots, fireproof; no rename): the
+                           # library's overflow; G56 M1 (run 48): from the Workshop's 47,58 into the storage quarter. A magic
+                           # chest carries its contents weightless: grabbed with 240 stacks, burden phase 0 (move.py)
+STORAGE_CHEST_2 = (63, 46) # run 31 (G29 M1): the second ★Storage Chest (Miral, 20 medals; 3 wrenches: 96 + 60 slots): the
+                           # overflow of every box at 90%+ (tools/rebalance.py); G56 M1 (run 48): from the Depot's 43,51
+# G56 (the user, 2026-11-14; M0's plan, run 48): the storage quarter, the north band between the field and the Residence that
+# holds the big wagons, the wagons and the three ★Storage Chests (town.py --storage checks every 60+ slot box is inside it)
+STORAGE_QUARTER = ((51, 35), (71, 47))
 # G54 (run 45): the five mystic chests used as overflow (45,51 43,46 44,46 45,47 47,59; 15 slots each) retired into the first
 # big wagon; the names stay so the routes that use them don't change
 OVERFLOW3 = (54, 38)       # run 31: a mystic treasure chest from a nefia (it rode in the loot bag), installed in the Depot

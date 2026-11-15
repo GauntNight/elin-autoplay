@@ -23,7 +23,7 @@ from home import BOX_STR, HARVEST_BOX, STATIONS  # noqa: E402
 from packcheck import has_word, split_listing  # noqa: E402
 
 MILL, MAKER = STATIONS["millstone"], STATIONS["ration maker"]
-STAND = (59, 43)  # beside both (run 16)
+STAND = (59, 43)  # beside both (run 16; again since G56 M2, run 48: the millstone 58,44 and the maker 60,42)
 GRAIN = ("bundle of wheat", "bundles of wheat", "bundle of rice plant", "bundles of rice plant",
          "sack of flour", "sacks of flour", "bag of rice", "bags of rice")
 NUTS = ("api nut", "crim", "coffee bean")

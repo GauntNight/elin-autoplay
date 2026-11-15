@@ -87,8 +87,12 @@ ROUTES = [
     (("room board", "room plate", "house plate", "house board", "plank wall", "stone wall", "log wall"),
      BOX_STR(home.WOOD_BOX), "Wood box (building parts)"),
     (("log", "plank", "branch", "stick", "bark", "resin"), BOX_STR(home.WOOD_BOX), "Wood box (the Workshop)"),
-    (("stone", "ore", "sand", "fragment", "clay", "brick", "ingot", "cut stone", "soil", "glass", "pebble"),
+    # G56 M2 (run 48): the stonecutter and the mason's table stand in the Workshop, so stone and cut stone wait there in
+    # 'Stone 2' (52,58); ores, ingots, glass and the rest stay in the Forge by the smelter and kiln (pebbles too: cookdishes)
+    (("ore", "sand", "fragment", "clay", "ingot", "soil", "glass", "pebble"),
      BOX_STR(home.STONE_BOX) + "|" + BOX_STR(home.STONE_BOX_2), "Stone and ore box (the Forge)"),
+    (("stone", "brick", "cut stone"),
+     BOX_STR(home.STONE_BOX_2) + "|" + BOX_STR(home.STONE_BOX), "Stone 2 (the Workshop, by the stonecutter)"),
     # run 19 (the user): treasure maps in the shared Maps box, where Poppy's Treasure Hunt finds them
     (("treasure map",), BOX_STR(home.MAPS_BOX), "the shared Maps box (the Workshop)"),
     (("thread", "fiber", "string", "rope", "skin", "big leaf", "big leaves", "needle", "texture", "bolt"),
@@ -103,13 +107,14 @@ ROUTES = [
      "valuables (the Storehouse; the Storage Chest when full, run 21; the yard's 276-slot chest last, run 44)"),
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf
     # run 31 (G30 M5): loose lights (an old lantern from a nefia) wait with the decorations until they're installed
-    (("holy wreath", "holy garland", "holy socks", "holy boots", "gift box", "candy cane", "doll", "lantern", "candle", "lamp"),
+    (("holy wreath", "holy garland", "holy socks", "holy boots", "gift box", "candy cane", "doll", "lantern", "candle", "lamp",
+      "wall decoration"),  # run 48
      BOX_STR(home.VALUABLES[-1]) + "|" + BOX_STR(home.COLLECTIBLES) + "|" + BOX_STR(home.SPARES), "decorations (Valuables 7 in the Depot; the collectibles shelf; the yard's chest, run 42)"),
     (("book", "spellbook", "recipe", "journal", "letter", "parchment"), "|".join(BOX_STR(b) for b in home.LIBRARY), "the library (the Storehouse)"),
     (("oil", "ale", "butter", "chili", "ketchup", "salt", "sugar", "mayo", "mayonnaise", "spice", "beer", "wine",
       "sake", "sauce", "sesame", "flour", "vinegar", "tea", "cappuccino",
       "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin",
-      "glutamine", "honeycomb", "honey", "yeast"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
+      "glutamine", "honeycomb", "honey", "yeast", "juice"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
     (("grave of",), "ship", "the shipping chest (a boss's grave: junk, value 0-ish)"),
     (("Scrubber", "charm ("), "ship", "the shipping chest (☆The Scrubber, a boss-chest regular, and plain charms: run 30)"),
     # run 34: four "decide" stacks held up leave.py twice (loot from Rustic Forest and run 33's chests)

@@ -65,7 +65,7 @@ STATION_HOUSE = {
 }
 
 # Boxes by their home.py cell (the themes of elin-home 2a and packcheck). OFFICE stays outside.
-BOX_HOUSE = {home.WOOD_BOX: "Workshop", home.STONE_BOX: "Forge", home.STONE_BOX_2: "Forge",
+BOX_HOUSE = {home.WOOD_BOX: "Workshop", home.STONE_BOX: "Forge", home.STONE_BOX_2: "Workshop",
              home.FARM_BOX: "Farmhouse", home.HARVEST_BOX: "Farmhouse", home.HARVEST_FRIDGE: "Farmhouse", home.FODDER_BOX: "Farmhouse",
              home.PANTRY: "Kitchen", home.PANTRY_2: "Kitchen", home.PANTRY_3: "Kitchen", home.DISH_BOX: "Kitchen",
              home.PARTS_BOX: "Workshop", home.MAPS_BOX: "Workshop", home.SPARES: "Storehouse", home.SPARES2: "Storehouse",
@@ -76,19 +76,19 @@ for xy in home.BAG_PARTS:
 for xy in home.VALUABLES + home.LIBRARY:
     if xy not in home.WAGONS:  # run 42 (G47): the wagons stand in the east yard, like the office
         BOX_HOUSE[xy] = "Storehouse"
-BOX_HOUSE[home.STORAGE_CHEST] = "Workshop"  # run 20: the library overflow sits in the Workshop
 BOX_HOUSE[home.OVERFLOW2] = "Workshop"  # run 22: the mystic treasure chest beside it
 for xy in (home.ARMORY2, home.SPARES3, (48, 58)):  # run 23: three wooden boxes beside them (Armory 2, Spares 3, Library 2)
     BOX_HOUSE[xy] = "Workshop"
 for xy in (home.FARM_BOX, home.SPARES2, home.LIBRARY[1], home.VALUABLES[-1], home.ARMORY3, home.PANTRY_2):
     BOX_HOUSE[xy] = "Depot"  # run 30 (G28): the six sturdy boxes of the new Depot
-BOX_HOUSE[home.STORAGE_CHEST_2] = "Depot"  # run 31 (G29 M1): the second ★Storage Chest, every box's overflow
 BOX_HOUSE[home.OVERFLOW3] = "Depot"  # run 31: a mystic treasure chest beside it
 for xy in home.OVERFLOW4:
     BOX_HOUSE[xy] = "Depot"  # run 31: two more, installed for G30 M4
-for xy in home.WAGONS:  # run 42 (G47): the yard's big containers belong to no house
+# run 42 (G47): the yard's big containers belong to no house; G56 M1 (run 48): the two ★Storage Chests joined them in the quarter
+YARD = set(home.WAGONS) | {tuple(home.STORAGE_CHEST), tuple(home.STORAGE_CHEST_2)}
+for xy in YARD:
     BOX_HOUSE.pop(xy, None)
-OFFICE = {home.MAIL_POST, home.TAX_CHEST, home.SHIPPING, home.TRASH_CAN, home.PRACTICE_CHEST, home.FIAMA_CHEST, home.MAIL_PACKAGE, *home.MAIL_SPOTS, *home.WAGONS}
+OFFICE = {home.MAIL_POST, home.TAX_CHEST, home.SHIPPING, home.TRASH_CAN, home.PRACTICE_CHEST, home.FIAMA_CHEST, home.MAIL_PACKAGE, *home.MAIL_SPOTS, *YARD}
 OFFICE_TRAITS = ("TraitMailPost", "TraitShippingChest", "TraitChestPractice", "TraitTrashcan",
                  "TraitDeliveryChest", "TraitTaxChest")
 
@@ -197,7 +197,7 @@ STATION_INPUT = {
     "loom": "BAG_PARTS", "spinner": "BAG_PARTS",
     "sawmill": "WOOD_BOX", "carpenter's table": "WOOD_BOX", "workbench": "WOOD_BOX", "drafting table": "WOOD_BOX",
     "signboard workshop": "WOOD_BOX", "wall workshop": "WOOD_BOX",
-    "mason's table": "STONE_BOX", "stonecutter": "STONE_BOX", "flooring workshop": "STONE_BOX",
+    "mason's table": "STONE_BOX_2", "stonecutter": "STONE_BOX_2", "flooring workshop": "STONE_BOX_2",  # G56 M2 (run 48)
     "kiln": "STONE_BOX", "smelter": "STONE_BOX", "blacksmith's table": "STONE_BOX",
     "tinker's table": "PARTS_BOX",
     "bonfire": "PANTRY", "millstone": "HARVEST_BOX", "ration maker": "HARVEST_BOX",
@@ -296,7 +296,7 @@ def storage_check(d):
     on_route = set().union(*(_box_cells(w) for _, w, _ in packcheck.ROUTES))
     on_route |= {tuple(home.DISH_BOX), tuple(home.HARVEST_FRIDGE), tuple(home.MAPS_BOX)}  # used by dishes.py, Delegated Farming, Poppy
     on_route |= _box_cells(packcheck.ARMORY[0]) | {tuple(home.STORAGE_CHEST_2)}  # gear goes by code (packcheck.ARMORY); rebalance.py
-    office = (set(OFFICE) - set(home.WAGONS)) | {tuple(home.MAPS_BOX)}  # run 48: G47 made the wagons "office" for check 3
+    office = (set(OFFICE) - YARD) | {tuple(home.MAPS_BOX)}  # run 48: G47 made the yard's boxes "office" for check 3
     fails = 0
     # run 48: a locked box counts (the mystic chest 65,40 relocked with 6 stacks in it); Fiama's and the practice chest are office
     mine = [b for b in boxes if (b["x"], b["z"]) not in office and b.get("trait") not in OFFICE_TRAITS]

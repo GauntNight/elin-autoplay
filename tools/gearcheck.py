@@ -31,6 +31,15 @@ SKIP_LINE = re.compile(r"^(It is made|It is categorized|It uses|It can be equipp
 
 def slot_of(name):
     n = re.sub(r"『.*?』|《.*?》", "", name).lower()
+    # run 48: "☆The Godbane Ring Mail [7, 25]" matched \bring\b and was read against the rings, never against the worn
+    # breastplate. The game's table (the longest base name in the piece's name: "ring mail" is torso) decides first
+    wears = {"head": "head", "torso": "body", "waist": "waist", "back": "back", "foot": "foot", "arm": "hand", "shield": "shield", "amulet": "neck", "ring": "ring"}
+    hits = [k for k, r in _THINGS().items() if (r.get("defense") or r.get("offense")) and re.search(rf"\b{re.escape(k)}\b", n)]
+    if hits:
+        row = _THINGS()[max(hits, key=len)]
+        slot = wears.get(row.get("category"), "weapon" if row.get("offense") else None)
+        if slot:
+            return slot
     slot = next((slot for slot, rx in SLOTS if re.search(rx, n)), None)
     if slot:
         return slot
