@@ -119,7 +119,7 @@ the stairs ignores far weaker foes.
 | an exploder close, or a **named** one | section 6; a named one is killed from range at x1 (`namedexploder.py`) or the floor is left |
 | blindness (ConBlind) | walk away until it clears (~7 turns), drink by the table, then kill the caster from range (run 14) |
 | low HP after a floor, SP under 10 | heal; SP comes back only from sleep: out, and sleep on the overworld |
-| Sleepy | never in a dungeon: `evac.py`, `sleep.py` on the world-map tile, Enter again (the ladder's own nap does this) |
+| Sleepy | never in a dungeon: `evac.py`, `sleep.py` on the world-map tile, Enter again (the ladder's own nap does this; from Very Sleepy since run 48: the world map refused two naps at phase 1, which costs no speed) |
 | a meal that didn't lower hunger, "no meal" | `eat.py` on the food actually in the pack; none: leave and restock (section 8) |
 | no way down, a walk that ends where it began | a pocket: section 7 (a rod of teleport, `tunnel.py`); the true bottom or a locked story stairway is a hand decision |
 | the pack at 42+ stacks, the bags full | `purge.py --free N`; bags full: the unload (section 3) |
