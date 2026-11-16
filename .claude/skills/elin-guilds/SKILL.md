@@ -46,7 +46,9 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
    Karma -5, the karma the thefts spend: `fight.py` refuses in a town without `--town-ok`.
 4. **The karma budget:** `steal.py auto` stops itself at karma 20 (`--karma-floor N`; 0 is the last non-criminal value)
    and at burden phase 2 (`--burden-phase 3` only while staying for the sale) (run 44: run 43's batch ended Overweight
-   with the fence asleep). Karma is the binding resource: -1 a theft, about +5 a conquest, so thefts alternate with
+   with the fence asleep). **Phase 3 only with the fence open and a few cells away**: an Overweight walk costs HP on
+   every step (run 49: furniture batches of cat statues and laundries, Siyun asleep, then 403 -> 277 over ~10 cells to
+   her; the heaviest non-stolen things dropped to get back to phase 2). Karma is the binding resource: -1 a theft, about +5 a conquest, so thefts alternate with
    circuits (run 45: 60 thefts took karma 80 -> 20; ten conquests paid it back to 65 for 45 more).
 5. **Sell:** `python -I tools/fence.py Siyun` (Derphy ~95,81; Josotta or any prostitute gives directions). It sells what
    steal.py logged to `runs/stolen.txt`, pulls 8 stacks a bag a pass (run it two or three times), never sells kit items,
