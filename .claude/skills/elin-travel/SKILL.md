@@ -87,6 +87,7 @@ never `step`.
   Semnof in Palmia; 3-4 a restock, 50 each). `ration.py` makes them at home only for a reason the run log names.
 - **Unattended, a town past fields over the limit is reached only by Fast Travel**; to Lumiest by Fast Travel, never a
   walk (fact #1168). It is also the safe way to move an escort (run 16).
+- **Home over 10 tiles away is a recall, never a walk** (run 49: 17 game days of detours and ambushes from 24,149): `wgo.py` refuses it (`--walk-ok` overrides); enter any tile's map, then `recall.py`.
 - **Home:** Fast Travel to Meadow, or a scroll of return read on a local map (`recall.py`: one read, ~19-36 turns, never
   a combat escape; a claimed zone becomes the home and recall.py refuses then). On arrival `arrive.py` (elin-home 1).
 - **A pick-up gates the walk after it** (run 45: a `;` chain walked home without the big wagon, a wasted 25-game-hour

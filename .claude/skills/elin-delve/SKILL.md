@@ -77,6 +77,7 @@ nefia of that base danger within R tiles, `wgo.py` there, Enter, `ladder.py`, on
 - **The grid is what ends a circuit now** (run 47: refused at the door four times, after every second conquest): the
   ladder wants 3 free cards and purge can only drop junk by rule. Before leaving home, box the kit's spares (a second
   arrow stack, rods past one of a kind, a plain bow) in the yard chest 68,44.
+- **A nefia's walk is its route** (run 49): circuit.py judges expiry and nearness by `wgo.route_steps` (a shortest path round blocked tiles: Derphy reads 16 steps for 14 tiles); two run-49 walks of 8-9 game days at 14-17 straight tiles had expired on the way.
 - **What it does itself** (runs 39-44): sleeps on the tile when Sleepy before each Enter (run 47: twice the 9-hour nap
   outlived the nefia and the Enter landed on its field: the circuit stops, re-run it); eats before a nap (`fed_nap`) and
   takes the stairs up first when the meal stop left me on a floor; fights hostiles 10+ levels under mine before each
@@ -124,6 +125,7 @@ the stairs ignores far weaker foes.
 | no way down, a walk that ends where it began | a pocket: section 7 (a rod of teleport, `tunnel.py`); the true bottom or a locked story stairway is a hand decision |
 | the pack at 42+ stacks, the bags full | `purge.py --free N`; bags full: the unload (section 3) |
 | burden phase 2 or 3 | shed weight before any zone change (`purge.py --heavy`, section 7) |
+| a foe in view that no attack reaches ("no target left") | delve and explore leave it alone for the floor after three such answers (runs/jobs/delve_unreachable.json), unless it comes adjacent (run 49: ~50 stops on a hot guy behind a wall, ~10 real minutes); stop a ladder gracefully with `runs/jobs/ladder.stop` (read between delve runs) |
 | "Enemy spotted" with nobody in view | an invisible foe beside me (run 41: a walk to the stairs ended four times): See Invisible (`ladder.see_unseen` does it once a floor), then fight what it shows |
 | a window, a dialog | read it first (`talk.py`, `read.py`), then `close.py` |
 | a neutral Evolved creature ends the exploring | **leave it alone when it is within 5 levels of mine: take the stairs on (or `circuit.py --skip NAME`)**, never `fight.py --force` (run 48: a neutral Evolved Wasp out-traded me to 57% over 12 rounds; run 49: a neutral Evolved Candle Ghost Lv42 at my Lv43 hit back for 41% in its first round, a teleport and the nefia lost; fact #1448). One far under my level may be fought for its gene. Why delve stops: it lists the creature as a foe, and fight.py answers "target not in view" without `--force` |

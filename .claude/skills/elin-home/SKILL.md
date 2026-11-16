@@ -130,7 +130,7 @@ quest items (★).
 **Stock caps (the user, run 27; `tools/stock.py`, run 28):** the pack, the bags and every home box count
 together (bridge `stock` reads them all in one call). A spellbook of a spell at 100+ casts is excess; under it,
 **read it** (`stock.py --read`: +3-9 casts a charge, Literacy exp, the book falls apart at 0 and frees the slot;
-never a cursed one: x3 difficulty). Rods: teleport and cure all, speed 2, every other kind 1 (the most charges);
+never a cursed one: x3 difficulty). Genes: superior ones stay, plain and inferior ones are excess (run 49: 246 gene stacks had filled the valuables chain; G38's crew is done). Rods: teleport and cure all, speed 2, every other kind 1 (the most charges);
 hostile summons, strip blessing and empty rods none. Potions: heals all, debuffs none, the rest 5. Scrolls:
 teleport all, return 8, evacuation 6, identify 10, levitate none (the Ether Wing). `stock.py` reports, then
 `stock.py --ship` carries the excess to the shipping chest box by box. Run it on any visit where arrive.py
