@@ -84,7 +84,8 @@ towns refuse to trade and their guards attack.
 - **What a shop's level buys** (fact #1456, the game's code): more items a restock (about 4 at level 1, 8 at 10, 10 at
   15), made at the shop's level, always of normal rarity. It never makes a shop sell ☆ gear (the user asked, after run 49).
 - **Which shops: the ones that stock what runs short** (the user, 2026-10-30, fact #1025: the shops we frequent that
-  have valuable stuff, not shops picked for cheap points; asked again 2026-11-16). Potions and scrolls aren't short (stock.py ships the excess every
+  have valuable stuff, not shops picked for cheap points; 2026-11-16, agreed for these stores: "they close a gap we tend
+  to [have] and are high value"). Potions and scrolls aren't short (stock.py ships the excess every
   visit); the waivers are: fireproof blankets (98 rows to run 49) and lockpicks (52). Both turn up at random in general
   stores and the thieves' shop: Sesa and Sayig (Aquli Teola, never invested), Gizbird (Mysilia), Tarraf (Palmia), Kerona
   (Derphy B1). A store taken from 1 to 10 shows about twice the items a visit, so about twice the chance of either.
@@ -94,7 +95,7 @@ towns refuse to trade and their guards attack.
   step ~3,900 for 16 points, ~245 a point): price a point before paying, and look for never-invested shops (guild
   offices, camps, villages) first.
 - **Never a town secretary:** that investment pays the guild nothing (fact #1336).
-- **The budget:** only orens above the six-bill reserve (G50).
+- **The budget:** only orens above the six-bill reserve (G50); all of it until rank 5 (the user, 2026-11-16: "go all in").
 - The guild's informers buy fame: `famesale.py` (elin-delve 2: a sale also pulls the nefia refill back under the gate).
 
 ## Mages (G34, G36, G43, G49)
