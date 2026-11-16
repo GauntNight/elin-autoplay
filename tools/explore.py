@@ -33,7 +33,13 @@ def grid(r=40):
 
 def danger(s, min_hp):
     p = s["pc"]
-    foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
+    # run 49: a foe delve has marked unreachable for this floor (in view, no attack reaches it) stops nothing here either
+    try:
+        from delve import UNREACH_AFTER, unreachable
+        gone = {u for u, n in unreachable(str((s.get("zone") or {}).get("full") or "")).items() if n >= UNREACH_AFTER}
+    except Exception:  # noqa: BLE001
+        gone = set()
+    foes = [c for c in s.get("nearby") or [] if c.get("hostile") and (str(c.get("uid")) not in gone or c.get("dist", 9) <= 1)]
     if foes:
         return "hostile in view: " + ", ".join(f"{c['name']} Lv{c['lv']} d{c['dist']}" for c in foes)
     if p["hp"] * 100 < min_hp * p["maxHp"]:

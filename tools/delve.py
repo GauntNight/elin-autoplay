@@ -26,6 +26,7 @@ usage: python -I tools/delve.py [STEPS=8] [--solo] [--expendable] [--max-danger 
 Targets come from tools/threat.py (the user, run 16: casters and high damage first, high defense
 last): a kind in its "avoid" group within 8 levels of mine (4 until run 17) stops the delve instead of a melee.
 """
+import json
 import re
 import sys
 from pathlib import Path
@@ -73,10 +74,43 @@ def party(s):
     return [m for m in call("power")["data"]["party"] if not m.get("pc")]
 
 
+UNREACH_FILE = Path(__file__).resolve().parent.parent / "runs" / "jobs" / "delve_unreachable.json"
+UNREACH_AFTER = 3  # "no target left" answers on one foe before it is left alone for the floor
+
+
+def unreachable(zone):
+    """Foes on this floor no attack has reached (run 49: a hot guy in view at 2-3 cells answered "no target left" ~50
+    times in a row; the explore steps between moved me, so the turn-counter guard never fired, and each ladder call began
+    delve afresh): {uid: tries} for this zone, kept in a file across delve runs."""
+    try:
+        d = json.loads(UNREACH_FILE.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        d = {}
+    return d.get(zone) or {}
+
+
+def note_no_target(zone, uid, name):
+    try:
+        d = json.loads(UNREACH_FILE.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        d = {}
+    z = {k: v for k, v in (d.get(zone) or {}).items()}
+    z[str(uid)] = z.get(str(uid), 0) + 1
+    d = {zone: z}  # only the current floor is kept
+    UNREACH_FILE.parent.mkdir(parents=True, exist_ok=True)
+    UNREACH_FILE.write_text(json.dumps(d), encoding="utf-8")
+    if z[str(uid)] == UNREACH_AFTER:
+        print(f"  left alone for this floor: {name} (no attack reached it {UNREACH_AFTER} times: in view, not targetable)",
+              flush=True)
+
+
 def status():
     s = call("state")["data"]
     p = s["pc"]
-    foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
+    zone = str((s.get("zone") or {}).get("full") or "")
+    gone = {u for u, n in unreachable(zone).items() if n >= UNREACH_AFTER}
+    # an ignored foe that comes adjacent counts again (an exploder must still be stepped from or teleported off)
+    foes = [c for c in s.get("nearby") or [] if c.get("hostile") and (str(c.get("uid")) not in gone or c.get("dist", 9) <= 1)]
     kab = party(s)
     kab_seen = any("Kaberg" in c["name"] for c in s.get("nearby") or [])
     return s, p, foes, kab, kab_seen
@@ -357,6 +391,8 @@ def main():
                         else "four fight steps without damage") + f"; last: {tool}: {last(out)[:80]}")
             print(f"[{k}] fought {t['name']} Lv{t['lv']}: {last(out)[:110]}  | HP {p['hp']}/{p['maxHp']}"
                   + "".join(f", {m['name']} {m['hp']}/{m['maxHp']}" for m in kab))
+            if "no target" in last(out).lower() and t.get("uid") is not None:  # run 49: a foe in view no attack reaches
+                note_no_target(str((s.get("zone") or {}).get("full") or ""), t["uid"], t["name"])
             # the fight tool stopped for a decision (HP, a hit over 15% in one round, a window) or
             # refused (a rule): mine to make, not the next step's
             if out.rc in (1, 3):
