@@ -18,7 +18,6 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 - A far treasure map barely pays its walk: the map 73 tiles off took ten game days, about its own gold in rent (fact #1476). Dig the maps within a day or two of where I am; the far ones go to Poppy's Maps box, where her Treasure Hunt costs no days. (50)
 - A tool that enters "this tile" can enter a nefia: digmap's meal and unload steps went into two nefias' B1, one beside a kamikaze samurai at 3 cells. Any Enter that isn't meant for a nefia checks the tile first (digmap.off_nefia now). (50)
-- The shipping chest's refusal reads the same whether it is full or the thing has no price: a dish, a plate and the empty treasure chests were refused all run while ☆ pieces still went in. Read what else it took before calling it full. (50)
 - A far cluster is old by the time I get there: a refill's nefias live 7 game days from one spawn, so a batch seen 35-50 tiles off (run 49, east of Palmia) is near its end on arrival by any route, and Palmia's 15+ of 495-01-06 were all gone ten days later. Circuit where the day's refill lands near where I stand; move only for a fame sale or the unload. (49)
 - A tool's answer that changes nothing is not progress: delve stopped ~50 times on "hostile in view: a hot guy d2-3" and each answer was "no target left" (in view, not targetable), while the explore steps moved me back and forth so the turn-counter guard never fired (~10 real minutes). A stop that repeats with the same answer needs its own guard, not the turn counter. (49)
 - A tool that keeps what it can't name fills the house: stock.py kept every "spell unknown to the table" (49 telekinesis books), until the library chain's seven boxes refused every spellbook and one arrival took 13.5 real minutes trying each box. A "keep, unknown" pile needs a count beside it. (48)
@@ -30,6 +29,7 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 ## Promoted (where the older lessons live now)
 
+- The shipping chest's refusals (50) -> fact #1479 and elin-home 2, the user's rule: it takes anything, valued or not; a refusal means it is full for the day; a container ships only empty.
 - Spare kit in the grid (47, 50) -> elin-pack 2 "Spare kit"; the identification pile in the bags (48, 50) -> elin-pack 2 and circuit.py's full-bags stop before every walk.
 - Names written into tools (47-50) -> elin-play's hard rule "A thing's kind comes from the game's table or its uid".
 

@@ -64,7 +64,7 @@ run 45's G54). `tools/town.py` checks the town against the game's own rooms (G12
 | **Residence** (grass rooms: mine 59-62 x 51-53, door 60,51; the residents' 62-68 x 49-53, door 65,49) | | ARMORY 66,51 (shared, priority 5, weapons and armour: residents take what beats theirs); my pine bed 60,52 |
 
 Outside on purpose (the office, since G56 M3 in run 49): mail post 62,47, tax chest 63,47, house board 58,48, the labelled
-mail package 60,50 (no Grab), shipping chest 56,52 (empties every morning), trash can 58,51, the home, quest and resident
+mail package 60,50 (no Grab), shipping chest 56,52 (empties every morning; it takes anything, valued or not, so a refusal means it is full for the day, ~40 stacks, and a container ships only when it is empty: the user, run 50, fact #1479), trash can 58,51, the home, quest and resident
 boards 54,50-52, the hearth stone 55,50, Fiama's lock-50 quest chest 54,50, the dummy 60,46 and practice chest 61,46; the
 sitting corner 55-57 x 48-49 (G56 B, run 50). **The field is 49-53 x 43-49, 33 cells under two farm signs (51,47 and 51,43)**
 (G56 M4, run 50; home.FIELD); its edge cells and the old dig scars are lawn floor. The lake (stand at 48,41) stays unroofed;
