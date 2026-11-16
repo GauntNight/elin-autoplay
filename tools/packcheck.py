@@ -74,7 +74,7 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "sand borer", "sardine", "scad", "sea urchin", "shark", "striped jack", "sunfish",
            "sweetfish", "tadpole", "tilefish", "tuna", "turtle", "whale")
 JUNK = ("rotten", "garbage", "empty bottle", "shit", "salt water", "remnant of what once was", "remnants of what once was",
-        "pair of sandal")  # run 49: the game files sandals as junk (box.py refuses them for the chest); run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
+        "pair of sandal", "exotic teapot", "cluttered book", "a stain")  # run 49: the game files these as junk (box.py refuses them for the chest); run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
 # (a "Return request" quest item is a vomit: packcheck dumped Casaneck's, so it is never auto-junk)
 
 # Where each kind of item lives at home (elin-home section 2 and 2a). First match wins.
@@ -125,7 +125,7 @@ ROUTES = [
       "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu", "ragged cloth",
       # run 48: a boss chest's skull, the loot bag's odds (the dried mandrake is a currency: valuables, above)
       "skull", "iron scale", "a junk", "towel", "anchor", "assorted vegetable", "broken barrel", "a cup", "small window", "dirty dish",
-      "a cabinet", "exotic teapot", "a stain"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
+      "a cabinet"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
     # organs: board supply and gift jobs ask for them (a heart, grotesque offal; run 08, run 12)
     # run 15 (G14): ration grain waits by the millstone's stock: the harvest box keeps it (never shipped)
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),
