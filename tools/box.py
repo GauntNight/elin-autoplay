@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
 from close import close_all  # noqa: E402
-from common import _key, act, contents, pc, stack_hits, top, wait_idle, wait_until  # noqa: E402
+from common import _key, act, contents, pc, stack_hits, top, txlog, wait_idle, wait_until  # noqa: E402
 from unpack import stand_beside  # noqa: E402
 
 
@@ -161,8 +161,10 @@ def main():
         # user's run-08 rule (trash.py's docstring: shipping pays 0, the can pays Ecopo). The game's own category decides
         import items as carried
         inv = carried.inventory()
+        # run 49: a ☆ junk piece (☆The Scrubber, a boss-chest regular) is no garbage: the trash can's grid doesn't take
+        # it (trash.py dumped nothing), and packcheck has shipped it since run 30
         junk = [it for it in items for c in inv
-                if c.get("kind", "").startswith("junk")
+                if c.get("kind", "").startswith("junk") and not c["name"].startswith("☆")
                 and (str(c.get("uid")) == it[4:] if it.startswith("uid:") else it.lower() in c["name"].lower())]
         if junk:
             sys.exit("refused: garbage goes in the trash can, never the shipping chest (the user, run 08): "
@@ -195,6 +197,9 @@ def main():
     for it in items:
         res = transfer(it, take)
         print(f"{it}: {res}")
+        if res.startswith("moved"):  # run 49: the run's item ledger (common.txlog)
+            box = f"{where} ({x},{z})" if where != f"{x},{z}" else where
+            txlog("took" if take else "boxed", res[6:], box if take else "pack", "pack" if take else box)
         failed += not res.startswith("moved")
     close_all(lambda *_: None)
     if failed:

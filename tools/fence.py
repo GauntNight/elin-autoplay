@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, last, refuse, run, setup, stop  # noqa: E402
+from common import call, data, last, refuse, run, setup, stop, txlog  # noqa: E402
 import items as inv  # noqa: E402
 
 
@@ -83,6 +83,7 @@ def main():
         a = sells[-1]  # "Sell N" for the whole stack
         call("invdo", i=a["i"])
         sold.append(f"{it['name']} ({a['text']})")
+        txlog("sold", it["name"], "pack", "the fence", a["text"])  # run 49: the run's item ledger
     run("close.py")
     run("talk.py")
     # run 43: 14 "sold" with the gold, the guild total and the pack unchanged: a sale counts only when the purse moved

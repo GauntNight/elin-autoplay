@@ -13,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call, close as bridge_close  # noqa: E402
-from common import pc, run, walk, walk_beside, wait_until  # noqa: E402
+from common import pc, run, txlog, walk, walk_beside, wait_until  # noqa: E402
 from farmday import home_guard  # noqa: E402
 
 PICK = ("garbage", "rotten", "rubble", "empty bottle", "empty can")
@@ -155,6 +155,7 @@ def dump(extra):
             print(f"!! drag refused: {r.get('error')}; stopping", file=sys.stderr)
             break
         dumped.append(src.get("card"))
+        txlog("dumped", src.get("card"), "pack", "the trash can")  # run 49: the run's item ledger
         wait_until("frames", n=10, timeout=1500)  # the grid rebuilds after each drop
     # run 11: close.py reported the recycle window closed but it stayed open; the next bag.py
     # Shift+click sent the Cooler Box food (19 mushrooms, soybeans, a heart) into the recycler.

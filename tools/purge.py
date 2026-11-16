@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import bag_slots, base_ready, call, data, pc, ready, refuse, run, setup, stop  # noqa: E402
+from common import bag_slots, base_ready, call, data, pc, ready, refuse, run, setup, stop, txlog  # noqa: E402
 from packcheck import errand  # noqa: E402  (run 44: carry.txt items never drop)
 
 BAGS = ("a backpack", "a loot bag", "a spoils bag", "a haul bag")
@@ -119,7 +119,11 @@ def drop_in_open(name):
     drop = [a for a in acts if a.get("text") == "Drop"]
     if not drop:
         return False
-    return bool(call("invdo", i=drop[0]["i"]).get("ok"))
+    ok = bool(call("invdo", i=drop[0]["i"]).get("ok"))
+    if ok:  # run 49: purge printed "dropped 9 stacks" and never which (the run's item ledger)
+        zone = (data("state").get("zone") or {}).get("full", "")
+        txlog("dropped", name, "pack", f"the floor ({zone})", "purge")
+    return ok
 
 
 def shed_heavy(dry):

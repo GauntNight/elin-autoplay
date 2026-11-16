@@ -17,7 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call, norm  # noqa: E402
-from common import open_inventory, stack_hits, wait_idle, wait_until  # noqa: E402
+from common import open_inventory, stack_hits, txlog, wait_idle, wait_until  # noqa: E402
 
 
 def slots():
@@ -167,6 +167,8 @@ def main():
                     r = {"ok": False}
         moved = r.get("ok") and r["data"].get("changed")
         print(f"{it}: " + (f"moved {r['data']['moved']}" if moved else err))
+        if moved:  # run 49: the run's item ledger
+            txlog("bagged", r["data"]["moved"], "", sys.argv[1] if len(sys.argv) > 1 else "a bag")
         if not moved:
             failed.append(it)
         wait_until("frames", n=8, timeout=1000)  # the grids rebuild after a move

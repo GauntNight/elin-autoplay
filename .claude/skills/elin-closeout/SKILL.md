@@ -146,6 +146,11 @@ Mermaid rules (each one cost a re-render on 2026-10-17):
   never push without the user's yes, and only after
   `python -I tools/publishcheck.py --history` says clean. Run logs say "unattended" or "the user watching", never
   where the user is or when they sleep; quotes lose those words too (2026-11-04).
+- **The item ledger** (the user, 2026-11-15, run 49: "we can adjust logs to capture details in local logs. In case
+  investigation is needed. We can delete the temp logs at the end of a run"): `runs/tx/items.log` holds a line for every
+  thing boxed, taken, bagged, dropped (purge's drops by name), dumped, sold, eaten or read (common.txlog). Before the
+  run log is final, search it for anything the run lost or can't find (`grep -i NAME runs/tx/items.log`) and put the
+  answer in the log; then delete the folder (`rm -r runs/tx`), so each run starts a fresh ledger.
 - **Everything off** (the user, 2026-11-03: "make sure the Ollama server and things go off when we exit"; KB #155).
   Last, because `kb.py embed` and `bench` above need the server, and when no more edits to facts or notes are coming:
   1. `TaskStop` any Monitor or background task of this session that is still running.

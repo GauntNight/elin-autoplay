@@ -221,7 +221,10 @@ def main():
     before = mine_count() if action == "transfer" else None
     r = call("invdo", i=hit[0]["i"])
     print(r["data"]["did"] if r.get("ok") else r.get("error"), "-", rep["data"]["item"])
-    from common import wait_until
+    from common import txlog, wait_until
+    if r.get("ok"):  # run 49: every act on a carried thing goes in the run's item ledger (common.txlog)
+        txlog(hit[0]["text"].split(" (")[0].lower(), rep["data"]["item"], "a shop or box" if take else "pack",
+              "", " ".join(sys.argv[1:])[:120])
     if action == "transfer":
         # A full box or pack refuses silently (run 03): check that something actually moved.
         wait_until("frames", n=8, timeout=1000)

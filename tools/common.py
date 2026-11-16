@@ -133,6 +133,26 @@ def log_waiver(tool, what, why):
         out.writerow([time.strftime("%Y-%m-%d %H:%M"), tool, what, why])
 
 
+TXLOG = TOOLS.parent / "runs" / "tx" / "items.log"
+
+
+def txlog(action, what, src="", dst="", note=""):
+    """One line per thing that leaves my hands or changes place: the run's item ledger (the user, 2026-11-15, run 49:
+    "we can adjust logs to capture details in local logs. In case investigation is needed. We can delete the temp logs
+    at the end of a run. Transactions, purges, etc can all be captured"). Run 49 found the futon, the hammer and the
+    butcher's tool gone with no line anywhere saying where; purge printed "dropped 9 stacks" without names. Tab-separated:
+    real time, the tool, the action (moved, took, dropped, dumped, sold, bought, ate, used...), the thing, from, to, a
+    note. The close-out deletes runs/tx/ (elin-closeout) once the run log holds what mattered. Never raises."""
+    try:
+        TXLOG.parent.mkdir(parents=True, exist_ok=True)
+        tool = Path(sys.argv[0]).stem if sys.argv and sys.argv[0] else "?"
+        row = [time.strftime("%Y-%m-%d %H:%M:%S"), tool, action, str(what), str(src or ""), str(dst or ""), str(note or "")]
+        with TXLOG.open("a", encoding="utf-8", newline="\n") as f:
+            f.write("\t".join(c.replace("\t", " ").replace("\n", " ") for c in row) + "\n")
+    except Exception:  # noqa: BLE001 (a ledger line must never stop a game step)
+        pass
+
+
 def last(text):
     lines = [ln for ln in (text or "").splitlines() if ln.strip()]
     return lines[-1] if lines else ""
