@@ -259,6 +259,50 @@ def route_danger(dx, dz):
     return worst, at
 
 
+_GRID = {}
+
+
+def prime_grid(r):
+    """Read the terrain grid once out to r (route_steps re-reads only for a farther target)."""
+    if _GRID.get("r", 0) >= r:
+        return
+    _GRID.clear()
+    cells = {}
+    for want in TERRAIN_LETTERS:
+        for h in (call("terrain", r=r, want=want, n=80000).get("data") or {}).get("hits") or []:
+            cells[(h["dx"], h["dz"])] = h
+    _GRID.update(r=r, cells=cells)
+
+
+def route_steps(dx, dz, pad=25):
+    """World-map steps to (dx, dz) round blocked tiles (sea, cliffs), by a shortest 8-way path over the bridge's terrain
+    grid; None when no path fits the box. Run 49: Strange Grassland and Silent Ruin were 14-17 tiles off in a straight
+    line and both walks wandered 35+ tiles round water (11,132 -> 46,127 -> 24,149), 8-9 game days each, and both nefias
+    expired on the way while circuit.py's check had used the straight distance. The grid is read once per call of
+    circuit.candidates (clear _GRID to read it again)."""
+    from collections import deque
+    prime_grid(max(abs(dx), abs(dz)) + pad)
+    cells = _GRID["cells"]
+    if (dx, dz) not in cells:
+        return None
+    seen, todo = {(0, 0): 0}, deque([(0, 0)])
+    while todo:
+        x, z = todo.popleft()
+        if (x, z) == (dx, dz):
+            return seen[(x, z)]
+        for ox in (-1, 0, 1):
+            for oz in (-1, 0, 1):
+                n = (x + ox, z + oz)
+                if n in seen:
+                    continue
+                c = cells.get(n)
+                if c is None or (c.get("blocked") and n != (dx, dz)):
+                    continue
+                seen[n] = seen[(x, z)] + 1
+                todo.append(n)
+    return None
+
+
 def tile_danger():
     """The worst ambush level of the tiles one step around me (run 28: the game's pathing swung east of the
     straight Mysilia -> Mifu line to ~74,99, and the ambush map there was danger 26 where the line's check

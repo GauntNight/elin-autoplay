@@ -129,6 +129,12 @@ def candidates(lo, hi, r, skip=()):
     rep = call("places", r=r)
     if not rep.get("ok"):
         refuse(str(rep.get("error")))
+    try:  # the terrain grid for route(), read once here from where I stand (run 49)
+        import wgo
+        wgo._GRID.clear()
+        wgo.prime_grid(r + 25)
+    except Exception:  # noqa: BLE001 (route() falls back to twice the straight distance)
+        pass
     out = []
     for p in rep["data"]["places"]:
         m = re.search(r"\(Danger Lv\.(\d+)\)", p["name"])
@@ -142,14 +148,32 @@ def candidates(lo, hi, r, skip=()):
         # run 48 (bridge 0.42.0 expireH): Isolated Ruin was 36 tiles off; the walk (~3.2 game hours a tile) and the nap at its
         # door outlived it, the fourth time (runs 47-48). A nefia that expires before the walk and a conquest (~20 h) is skipped
         left = p.get("expireH")
-        if left is not None and p["dist"] > 0 and left < p["dist"] * WALK_H_PER_TILE + CONQUEST_H:
-            print(f"  skipped: {p['name']} expires in {left} h; the walk alone is ~{round(p['dist'] * WALK_H_PER_TILE)} h", flush=True)
+        # run 49: Strange Grassland and Silent Ruin were 14-17 tiles off in a straight line and both walks wandered round
+        # water for 8-9 game days and expired on the way: the walk is the route's steps round blocked tiles (wgo.route_steps),
+        # and with no route in the box, twice the straight distance
+        steps = route(p)
+        p["steps"] = steps
+        if left is not None and p["dist"] > 0 and left < steps * WALK_H_PER_TILE + CONQUEST_H:
+            print(f"  skipped: {p['name']} expires in {left} h; the walk alone is ~{round(steps * WALK_H_PER_TILE)} h "
+                  f"({steps} steps for {p['dist']} tiles)", flush=True)
             continue
         # distance 0 is the nefia just left (evac lands on its tile), unless it was never entered: run 37 walked onto
         # Ancient Machinarium's tile by hand and the circuit stopped "no nefia within 5"
         if lo <= d <= hi and (p["dist"] > 0 or not p.get("known")):
-            out.append((p["dist"], d, p))
+            out.append((p.get("steps") or p["dist"], d, p))  # run 49: nearest by the route, not the straight line
     return sorted(out, key=lambda t: (t[0], t[1]))  # run 34: a tie compared the place dicts (TypeError)
+
+
+def route(p):
+    """A place's walk in world-map steps round blocked tiles (wgo.route_steps), else twice the straight distance."""
+    if p["dist"] <= 0:
+        return 0
+    try:
+        import wgo
+        s = wgo.route_steps(p["dx"], p["dz"])
+    except Exception:  # noqa: BLE001 (an older mod without the terrain op: the straight line, doubled)
+        s = None
+    return s if s is not None else 2 * p["dist"]
 
 
 def over_gate(hi, r):
