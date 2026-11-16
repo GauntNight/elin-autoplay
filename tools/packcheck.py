@@ -73,7 +73,8 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "goby", "goldfish", "mackerel", "moonfish", "muddler", "pintuna", "bream", "salmon",
            "sand borer", "sardine", "scad", "sea urchin", "shark", "striped jack", "sunfish",
            "sweetfish", "tadpole", "tilefish", "tuna", "turtle", "whale")
-JUNK = ("rotten", "garbage", "empty bottle", "shit", "salt water", "remnant of what once was", "remnants of what once was")  # run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
+JUNK = ("rotten", "garbage", "empty bottle", "shit", "salt water", "remnant of what once was", "remnants of what once was",
+        "pair of sandal")  # run 49: the game files sandals as junk (box.py refuses them for the chest); run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
 # (a "Return request" quest item is a vomit: packcheck dumped Casaneck's, so it is never auto-junk)
 
 # Where each kind of item lives at home (elin-home section 2 and 2a). First match wins.
