@@ -22,6 +22,9 @@ def grab(x, z, name=None):
     r = walk_beside(x, z, weak_ok=True)
     if not r.get("done") and r.get("why") not in ("arrived",):
         stop(f"can't reach {x},{z}: {r.get('why')}")
+    if pc().get("held"):  # run 49: a held blanket turned the right-click into "Place" and the Grab was refused
+        from unpack import put_away_held
+        put_away_held()
     p = pc()
     acts = call("acts", dx=x - p["x"], dz=z - p["z"], mode="right")["data"]["acts"]
     grabs = [a for a in acts if a["text"].startswith("Grab (")]

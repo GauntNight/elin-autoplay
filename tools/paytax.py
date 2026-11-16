@@ -14,7 +14,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call, close as bridge_close  # noqa: E402
 
 TOOLS = Path(__file__).resolve().parent
-MAIL_POST, CHEST = "61,50", (62, 49)
+sys.path.insert(0, str(TOOLS))
+import home  # noqa: E402  (run 49, G56 M3: the office moved out of the Residence's notch; one place for its cells)
+
+MAIL_POST, CHEST = home.BOX_STR(home.MAIL_POST), home.TAX_CHEST
 
 
 from common import last, run  # noqa: E402

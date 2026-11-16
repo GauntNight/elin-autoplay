@@ -36,7 +36,14 @@ def carried():
     """The specialized books in the pack, bags included (item.py finds them there). Run 48: the "inv" listing holds the
     pack's top level only, so two books in a haul bag read as "carried: []": items.py's kind lookup sees every depth."""
     from items import find
-    return [i["name"] for i in find(kind="skillbook", usable_only=False) if BOOK.search(i["name"])]
+    return [i for i in find(kind="skillbook", usable_only=False) if BOOK.search(i["name"])]
+
+
+def read_one(it):
+    """Read one carried book by its uid. Run 49: item.py by name found no slot for a book inside a bag ("no inventory
+    slot holding ..."), so items.use opens the bag (or brings the book up a level) and reads that very thing."""
+    from items import use
+    return use(it, "Read", None, *(["--cursed-ok"] if "cursed" in it["name"].lower() else []))
 
 
 def snapshot():
@@ -56,11 +63,11 @@ def main():
     for where, names in rows.items():
         print(f"  {where}: {'; '.join(names)}")
     if "--dry" in args:
-        print(f"{sum(len(v) for v in rows.values())} stacks in {len(rows)} boxes; carried: {carried()}")
+        print(f"{sum(len(v) for v in rows.values())} stacks in {len(rows)} boxes; carried: {[i['name'] for i in carried()]}")
         return 0
     reads = gained = 0
     while reads < limit:
-        here = [n for n in carried() if BOOK.search(n).group(1).lower() not in skip]
+        here = [i for i in carried() if BOOK.search(i["name"]).group(1).lower() not in skip]
         if not here:
             rows = {} if here_only else boxed(skip)
             if not rows:
@@ -78,9 +85,10 @@ def main():
         why = ready(hp=60, hunger=70)
         if why:
             stop(f"{why} ({reads} read, +{gained} exp)")
-        name = here[0]
+        name = here[0]["name"]
         lv0, exp0 = snapshot()
-        r = run("item.py", name, "Read", *(["--cursed-ok"] if "cursed" in name.lower() else []))
+        r = read_one(here[0])
+        run("close.py", timeout=30)
         if r.rc != 0:
             stop(f"item.py Read refused on {name}: {r}")
         wait_idle(timeout=120000)

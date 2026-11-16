@@ -104,7 +104,8 @@ TRASH_CAN = (58, 51)       # run 18: was written 57,51 (the collectibles shelf)
 COLLECTIBLES = (68, 40)    # display shelf: cards, figures, the decor backpack
 FARM_BOX2 = (59, 41)       # run 18: the old condiments box, empty, for seeds when the Farm box (a 20-slot package) is full
 SPARE_BOX = (68, 44)       # G47 (run 42): the wooden box 68,41 retired
-MAIL_SPOTS = [(59, 49), (60, 49)]  # run 18: mail parcels (salary, deliveries) are set down here by the mail post
+MAIL_SPOTS = [(62, 48), (63, 48)]  # run 18: mail parcels (salary, deliveries) are set down beside the mail post (59-60,49
+                           # then); run 49 (G56 M3): the post moved to 62,47, so the free cells beside it, ~ until one lands
 MAIL_PACKAGE = (60, 50)    # "a package labelled Sender: Mysilia Post Office" beside the mail post: no Grab offered (office)
 FIAMA_CHEST = (54, 50)     # Fiama's Lecture quest chest on the home board's cell: lock 50, worthless (fact #631)
 
@@ -113,8 +114,10 @@ FIAMA_CHEST = (54, 50)     # Fiama's Lecture quest chest on the home board's cel
 DEPOT = ((41, 45), (46, 52))
 
 # Office and living
-MAIL_POST = (61, 50)
-TAX_CHEST = (62, 49)
+# run 49 (G56 M3): the office left the Residence's notch (62,49 is a wall of its one rectangle now, 61,50 its entry
+# hall) for the cells beside the seating by the dummy, outside the new door 60,49
+MAIL_POST = (62, 47)
+TAX_CHEST = (63, 47)
 MY_BED = (60, 52)          # the pine bed (run 12); the makeshift bed rides in the kit
 RESIDENTS_HOUSE = ((62, 49), (68, 53))  # grass walls; door 65,49; torch 63,51
 ARMORY = (66, 51)          # shared, priority 5, weapon + armour: residents take what beats theirs

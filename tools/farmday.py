@@ -32,7 +32,7 @@ from common import THRESHOLDS, last, ready, state, stop, wait_idle, wait_until  
 from common import run as _run, walk as common_walk  # noqa: E402
 from packcheck import has_word, split_listing  # noqa: E402
 
-MAIL_POST = "61,50"
+MAIL_POST = BOX_STR(home.MAIL_POST)  # run 49 (G56 M3): read from home.py, the office moved
 LAKE_STAND, LAKE_WATER = (48, 41), (47, 40)
 BONFIRE_STAND = home.BONFIRE_STAND  # run 18: the Kitchen
 _BF = (str(home.BONFIRE[0] - BONFIRE_STAND[0]), str(home.BONFIRE[1] - BONFIRE_STAND[1]))
