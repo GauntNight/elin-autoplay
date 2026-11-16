@@ -171,6 +171,13 @@ def decide(items, stock):
             continue
         if plain is not None and plain.search(n.lower()):
             plan.append((it, "excess", "plain gear left in an armory (the residents took what beats theirs)"))
+    # run 49: 246 gene stacks filled the valuables chain and the Storage Chests (55 in one), and every arrival's sort was
+    # refused there. G38 (the gene-built crew) is done and the circuits run solo since run 38: a plain or inferior gene is
+    # excess (an inferior one gives nothing: fact #1112); a superior gene stays, the Gene Machine's best for a crew later
+    for it in items:
+        n = it["name"].lower()
+        if re.search(r"\bgenes? of\b", n) and "superior" not in n and "★" not in it["name"]:
+            plan.append((it, "excess", "a plain or inferior gene: the crew is done (G38), solo since run 38"))
     return plan
 
 
