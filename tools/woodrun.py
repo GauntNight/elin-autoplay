@@ -15,6 +15,7 @@ from common import data, last, pc, ready, refuse, run, setup, state, stop  # noq
 
 LOG = re.compile(r"^(\d+|an?) (\w+ )*?logs?$")
 BRANCH = re.compile(r"^(\d+|an?) (\w+ )*?branch(es)?$")
+BRANCH_KEEP = 4  # run 49: a stick for the shovel (and the bonfire) needs one; the rest are dropped
 
 
 def held_logs():
@@ -31,9 +32,18 @@ def clear_pack():
     if names:
         run("bag.py", "a haul bag", *names, timeout=120)
         run("close.py", timeout=30)
+    # run 49: the docstring said "past the cap" but every branch was dropped, and home had none for a stick (the shovel,
+    # runs 47-49): the first BRANCH_KEEP stay, in the haul bag with the logs
+    kept = 0
     for i in data("inv")["items"]:
         if BRANCH.match(i["name"]):
-            run("item.py", i["name"], "Drop", timeout=60)
+            n = int(i["name"].split()[0]) if i["name"].split()[0].isdigit() else 1
+            if kept + n <= BRANCH_KEEP:
+                kept += n
+                run("bag.py", "a haul bag", i["name"], timeout=120)
+                run("close.py", timeout=30)
+            else:
+                run("item.py", i["name"], "Drop", timeout=60)
 
 
 def main():
