@@ -293,9 +293,37 @@ def route(name):
             if where == "trash" and unidentified:  # run 34: "A Rotten Raw Food Claw (Miracle)"
                 return "decide", "decide: unidentified, not junk whatever it is made of (identify it first)"
             return where, label
+    # run 49: every arrival stopped on odds with no named route (a vase, a canvas, a long chair, a bowl, a box of decorated
+    # knives...). The game's own category is a rule too (the run-48 lesson: the category beats the name): junk goes to
+    # the trash can, loot furniture and decor ship; never a ☆/★ piece, never an unidentified one, and a plan or a book
+    # never reaches here (routed above)
+    cat = game_category(name)
+    if cat and not unidentified and not re.search(r"[☆★]", name):
+        if cat == "junk":
+            return "trash", "the trash can (the game's category: junk)"
+        if cat in SHIP_CATS:
+            return "ship", f"the shipping chest (loot {cat} by the game's category: run 49)"
     # run 12: the old default was the shipping chest, and a flower crown and the Border Watch plan
     # went in at 02:30, three hours before the 05:00 sale; nothing is shipped without a rule now
     return "decide", "decide: not moved (no rule for it: ship, install, or add a route)"
+
+
+# run 49: loot furniture and decor by the game's category (things.json); a light, a bed or a container the town wants is
+# placed by hand before an arrival sorts it
+SHIP_CATS = {"deco", "mount", "chair", "crafter", "container", "table", "furniture", "bed", "light", "ext", "util", "tool_deco"}
+_CATS = {}
+
+
+def game_category(name):
+    """The game's category of a carried thing by its exact name (items.py's reader), or None."""
+    if not _CATS:
+        try:
+            import items
+            for it in items.inventory():
+                _CATS[norm_name(it.get("name") or "")] = it.get("cat")
+        except Exception:  # noqa: BLE001 (no bridge: no category rule)
+            _CATS[""] = None
+    return _CATS.get(norm_name(name))
 
 
 # run 24: 24 Small Medals taken for Miral's ether antibodies went back into the valuables box with
