@@ -81,7 +81,14 @@ towns refuse to trade and their guards attack.
   shop level and the price, says Yes only at or under MAX orens, then Bye, and prints the guild contribution. Each direct
   investment raises the shop one level and pays 5 + the shop's new level. The price climbs with the level
   (CalcMoney.Invest: max(c x 700, c² x 80 + 200), less CHA/2 + Investing).
-- **Low-level shops first** (run 29; G50's How): a level 1 shop cost 143 orens for +6, level 2 504 for +7, level 7-10
+- **What a shop's level buys** (fact #1456, the game's code): more items a restock (about 4 at level 1, 8 at 10, 10 at
+  15), made at the shop's level, always of normal rarity. It never makes a shop sell ☆ gear (the user asked, after run 49).
+- **Which shops: the ones that stock what runs short** (the user, 2026-10-30, fact #1025: the shops we frequent that
+  have valuable stuff, not shops picked for cheap points; asked again 2026-11-16). Potions and scrolls aren't short (stock.py ships the excess every
+  visit); the waivers are: fireproof blankets (98 rows to run 49) and lockpicks (52). Both turn up at random in general
+  stores and the thieves' shop: Sesa and Sayig (Aquli Teola, never invested), Gizbird (Mysilia), Tarraf (Palmia), Kerona
+  (Derphy B1). A store taken from 1 to 10 shows about twice the items a visit, so about twice the chance of either.
+- **Low-level shops first among those, then the rest** (run 29; G50's How): a level 1 shop cost 143 orens for +6, level 2 504 for +7, level 7-10
   3,000-4,800. Run 43: Ilass 2 -> 11 and Diefon 1 -> 12 at 158-245 orens a point, against 375-440 at levels 13-14. Runs
   44-45: Palmia's and Derphy B1's shops 7 -> 10 at ~220-225 a point. **Every shop we use is at 10+ now** (run 45: the next
   step ~3,900 for 16 points, ~245 a point): price a point before paying, and look for never-invested shops (guild
