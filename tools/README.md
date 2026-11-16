@@ -723,8 +723,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/stopjob.py NAME [--wait SECONDS=600] [--no-kill]
     --no-kill asks and checks, and says what step 2 would end without ending it.
 - **`summary_page.py`**: Render a run summary (runs/<run>-summary.md) as the page published with the Artifact tool.
-    usage: python -I tools/summary_page.py runs/2026-10-16-05-summary.md [OUT.html] [--standalone]
+    usage: python -I tools/summary_page.py runs/2026-10-16-05-summary.md [OUT.html] [--standalone] [--early-ok 'user: QUOTE']
            (default OUT: runs/pages/<same name>.html, gitignored)
+      Refused (exit 1) while the play window (session_end.py) has over 30 minutes left, unless the user ended it: their word
+      logged by `bridge.py quit --early-ok 'user: ...'`, or given here (run 50: the paperwork ran while the game sat idle).
       --standalone  a page that needs no Artifact host, for any browser and any LLM: a complete document with the diagrams drawn as
                     plain SVG (flowsvg.py), no script. Without it the diagrams are Mermaid source, for a host that draws them.
 - **`talk.py`**: Advance an open dialog with Confirm, printing each new line, until it offers choices, closes, or `max` steps pass. Never picks a choice itself.

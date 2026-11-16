@@ -254,6 +254,14 @@ def main():
                     k = over_gate(hi, r)
                     hint = (f"; {k} nefias within {r} tiles are over danger {hi}: sell fame twice (Gizon in Olvina, 2 rations "
                             "by Fast Travel, or Ishbear in Palmia; facts #1067, #1078)") if k >= 3 else ""
+                    # run 50: this stop at 14:24 of a window to 15:54 became the end of play; while the window has time
+                    # left, it names what comes next
+                    from session_end import ends_at, now as clock
+                    end = ends_at()
+                    left = int((end - clock()).total_seconds()) // 60 if end else 0
+                    if left > 30:
+                        hint += (f"; the play window has {left} minutes left: Fast Travel to a region not circuited lately, "
+                                 "a fame sale, or the dummy (elin-train), never the close-out (run 50)")
                     stop(f"no unconquered nefia of danger {lo}-{hi} within {r} tiles (places); the refill only tops the region "
                          f"up to 70, so the near ones change as the old ones expire (about a week){hint}")
                 # run 34: a deliberate crossing above route_max (elin-play's route rule) is passed through, never assumed

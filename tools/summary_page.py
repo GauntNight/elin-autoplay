@@ -13,8 +13,10 @@ summaries use (headings, paragraphs, tables, lists, code fences) and fills summa
   "%% legend: done=done; todo=binding" (class names from its classDef lines) and "%% note: TEXT".
 - A table column whose separator is "---:" is right-aligned as numbers.
 
-usage: python -I tools/summary_page.py runs/2026-10-16-05-summary.md [OUT.html] [--standalone]
+usage: python -I tools/summary_page.py runs/2026-10-16-05-summary.md [OUT.html] [--standalone] [--early-ok 'user: QUOTE']
        (default OUT: runs/pages/<same name>.html, gitignored)
+  Refused (exit 1) while the play window (session_end.py) has over 30 minutes left, unless the user ended it: their word
+  logged by `bridge.py quit --early-ok 'user: ...'`, or given here (run 50: the paperwork ran while the game sat idle).
   --standalone  a page that needs no Artifact host, for any browser and any LLM: a complete document with the diagrams drawn as
                 plain SVG (flowsvg.py), no script. Without it the diagrams are Mermaid source, for a host that draws them.
 """
@@ -240,9 +242,17 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     global STANDALONE
     STANDALONE = "--standalone" in sys.argv
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    argv = sys.argv[1:]
+    if "--early-ok" in argv:
+        i = argv.index("--early-ok")
+        argv = argv[:i] + argv[i + 2:]
+    args = [a for a in argv if not a.startswith("--")]
     if not args:
         sys.exit(__doc__)
+    from session_end import closeout_refusal
+    why = closeout_refusal(sys.argv[1:])
+    if why:
+        sys.exit(why)
     src = Path(args[0]).resolve()
     out = Path(args[1]) if len(args) > 1 else ROOT / "runs" / "pages" / (src.stem + ".html")
     page = render(src.read_text(encoding="utf-8"), src.relative_to(ROOT).as_posix())

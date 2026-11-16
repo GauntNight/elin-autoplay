@@ -95,8 +95,9 @@ towns refuse to trade and their guards attack.
   level L costs about 2,500 (L 8), 3,050 (9), 3,600 (10), 4,450 (11), 5,350 (12), 6,350 (13), 7,450 (14), 8,600 (15),
   9,450 (16) and pays 5 + L + 1; capped at ~7,600-8,700 a step it came to ~330 orens a point over 17 shops. **Shops at 14-17
   now:** Palmia (Tarraf 18, Eligin, Monashy, Kazretta, Koflord, Shuzastan, Semnof), Aquli Teola (Sesa, Sayig, Esdor), Derphy
-  (Siyun, Kerona, Leoban, Erobird, Fortoli 17), Lumiest (Robean, Vuten 16, Tomyin 13), Noyel (Bethberk 14, Alecgan 12). Never
-  invested (G58's cheap points): Noyel's Ceshed, Oldotta, Teoyan, Miscold, Nuwert; Lumiest's Teolarg and Raydorre; Mysilia,
+  (Siyun, Kerona, Leoban, Erobird, Fortoli 17), Lumiest (Robean, Vuten 16, Tomyin 13), Noyel (Bethberk 14, Alecgan 12), Willow (Chim 12:
+  8 -> 12 for 2,485, 2,840, 3,388, 4,159, a few percent under the table above at 9-12, fact #1480). Never
+  invested (G58's cheap points): Willow's Agasard (the butcher; fact #1481 lists the town); Noyel's Ceshed, Oldotta, Teoyan, Miscold, Nuwert; Lumiest's Teolarg and Raydorre; Mysilia,
   Tinker's Camp, Yowyn and Olvina shops (their levels unread since runs 21-43). Monazess's guild shop takes no investment.
 - **Never a town secretary:** that investment pays the guild nothing (fact #1336).
 - **The budget:** only orens above the six-bill reserve; G58 (rank 6, 2,600) takes what the circuits and the chest bring in.

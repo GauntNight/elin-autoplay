@@ -29,6 +29,7 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 ## Promoted (where the older lessons live now)
 
+- Play stopped 90 minutes early when the near nefias ran out (50) -> summary_page.py refuses the close-out while over 30 minutes are left without the user's word (session_end.closeout_refusal); circuit.py names the fallbacks.
 - The shipping chest's refusals (50) -> fact #1479 and elin-home 2, the user's rule: it takes anything, valued or not; a refusal means it is full for the day; a container ships only empty.
 - Spare kit in the grid (47, 50) -> elin-pack 2 "Spare kit"; the identification pile in the bags (48, 50) -> elin-pack 2 and circuit.py's full-bags stop before every walk.
 - Names written into tools (47-50) -> elin-play's hard rule "A thing's kind comes from the game's table or its uid".

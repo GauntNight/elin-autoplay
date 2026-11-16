@@ -49,6 +49,10 @@ layers stand in this order: `knowledge/risk.md` (the user, run 16). Kit: **elin-
   Ishbear in Palmia: ~1,040 -> ~665 brought danger 3-7; run 42: 263 + 210 + 168 and 191 + 153 orens), half the tax bill is
   fame x 2, and since the refill scales with fame, new nefias come back under the gate. After a day passes, enter and leave
   a local map, then `places` again. `circuit.py`'s "no nefia" stop names the fame sale.
+- **None left in reach is not the end of play** (run 50: 20 conquests in 156 days emptied home, Olvina, Willow, Derphy and
+  Noyel, fact #1482; play stopped 90 minutes early). With time in the window: Fast Travel to a region not circuited lately
+  (Mysilia, Yowyn, Tinker's Camp, the Merchants Guild), or the dummy (elin-train); the stop names them while the window has
+  over 30 minutes, and `summary_page.py` refuses the close-out until its last 30 or the user's word.
 - **Which danger** (the user asked, run 28: "what Nefia level is good for us"): `runs/nefias.csv` holds each conquest's
   base danger, master floor and boss chest. Through run 28 (19 conquests) the chest averaged 579 at base 3, ~760 at 4-5 and
   ~890 at 6-7, platinum 1-3 at every level; masters sit on B2-B4, so the band's top stays under the gate by the floors

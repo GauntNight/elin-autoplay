@@ -121,7 +121,10 @@ Mermaid rules (each one cost a re-render on 2026-10-17):
 1. `python -I tools/kb.py embed`, then `kb.py stats`; put the numbers into the summary, and embed
    again (editing the notes moves the count by a few; it settles on the second pass).
 2. `python -I tools/summary_page.py runs/<run>-summary.md` writes `runs/pages/<run>-summary.html`
-   (gitignored: the md is the source).
+   (gitignored: the md is the source). **It refuses while the play window has over 30 minutes left** unless the user's
+   word is on record (`bridge.py quit --early-ok 'user: ...'` logs it) or given as `--early-ok 'user: QUOTE'` (run 50:
+   play stopped at 14:24 of a window to 15:54 when the near nefias ran out, and the paperwork ran while the game sat idle;
+   the summary md may be drafted beside play, the close-out itself waits).
    **No Artifact tool (another LLM, or a player who'd rather keep it local):** use **elin-summary** for steps 2-4 and the tracker in step 6.
 3. Publish it with the Artifact tool: a new artifact per run (`icon` "map", a one-sentence
    `description`); a later fix republishes the same file path, or passes the run's `url`.
