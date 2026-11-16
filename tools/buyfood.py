@@ -47,6 +47,29 @@ def price(b):
     return None, None
 
 
+_REFUSED = {}
+
+
+def edible_kind(base):
+    """False for a dish the loops will never eat because of what it is made of (run 49: 7 fried eggs of public
+    performer bought at Erobird's; items.meals refuses a human's or a cat's flesh, run 44). The shop grid shows names
+    only, so the dish's creature is read from the game's thing table by its name ("fried egg" + "of public
+    performer" -> the creature id) through items._flesh; an unknown creature counts as human there."""
+    if base in _REFUSED:
+        return not _REFUSED[base]
+    m = re.search(r" of (.+)$", base)
+    bad = None
+    if m:
+        from items import _flesh, _table
+        who = m.group(1).lower()
+        ids = [c["id"] for c in _table("charas") if (c.get("name") or "").lower() == who]
+        bad = _flesh(ids[0]) if ids else None
+    _REFUSED[base] = bad
+    if bad:
+        print(f"skipped {base}: made of a {bad} (never eaten: items.meals)")
+    return not bad
+
+
 def main():
     setup()
     a = sys.argv[1:]
@@ -83,6 +106,8 @@ def main():
         if ratio < MIN_RATIO:  # a stew at 119 for 63: not while bread exists (run 46: --min-ratio 0 for a stock-up)
             continue
         base = re.sub(r"^(\d+|an?) ", "", card)
+        if not edible_kind(base):
+            continue
         while gold() - p >= keep:
             hit = [b for b in grid() if re.sub(r"^(\d+|an?) ", "", b["card"]) == base]
             if not hit:
