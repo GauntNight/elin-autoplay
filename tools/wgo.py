@@ -6,6 +6,7 @@ doesn't resume after an ambush (run 08: a leftover goto walked me 14 game hours 
 usage: python -I tools/wgo.py NAME [--weak-ok] [--ambush]   a place from `bridge.py places` (name or id)
        python -I tools/wgo.py X Z [--weak-ok] [--ambush]    an absolute world-map cell
   --near N   stop for a hostile within N cells (default 4)
+  --walk-ok  walk home although it is over 10 tiles away (run 49: refused otherwise: a return scroll is ~15 turns)
   --weak-ok  keep walking past hostiles 3+ levels below me (a lone crab kept stopping the walk;
              if one ambushes, the fight is easy); anything stronger still stops it
   --ambush   handle an ambush map instead of handing back (the review of 2026-10-23: travel was the
@@ -285,7 +286,7 @@ def main():
     near = int(sys.argv[sys.argv.index("--near") + 1]) if "--near" in sys.argv else 4
     if "--near" in sys.argv:
         del sys.argv[sys.argv.index("--near"):sys.argv.index("--near") + 2]
-    a = [x for x in sys.argv[1:] if x not in ("--weak-ok", "--breathe", "--ambush", "--danger-ok", "--enter")]
+    a = [x for x in sys.argv[1:] if x not in ("--weak-ok", "--breathe", "--ambush", "--danger-ok", "--enter", "--walk-ok")]
     s0 = call("state")["data"]
     z = s0.get("zone") or {}
     on_world = z["region"] if "region" in z else "ntyris" in str(z.get("full") or "")
@@ -318,6 +319,14 @@ def main():
         if ("underwater" in p["name"].lower() or "water" in str(p.get("id") or "")) and "--breathe" not in sys.argv:
             refuse(f"{p['name']} is an underwater dungeon: suffocation (the user, run 17); --breathe only with water breathing")
         tx, tz, label = mx + p["dx"], mz + p["dz"], p["name"]
+    # run 49: a walk home from 24,149 went by 47,133 and 49,128 round fields over the route limit, ten ambushes and 17 game
+    # days in all with the nefia it chased, while a scroll of return takes ~15 turns. Home over 10 tiles away is a recall
+    # (enter any local map, recall.py), never a walk, unless --walk-ok (no return scroll, or the walk is the point)
+    home = next((p for p in rep["data"]["places"] if p.get("id") == "startSite"), None)
+    if home and (tx, tz) == (mx + home["dx"], mz + home["dz"]) and max(abs(tx - mx), abs(tz - mz)) > 10 \
+            and "--walk-ok" not in sys.argv:
+        refuse(f"home is {max(abs(tx - mx), abs(tz - mz))} tiles away: a scroll of return takes ~15 turns (act.py 0 0 Enter on "
+               "any tile, then recall.py); run 49 walked 17 game days of detours and ambushes (--walk-ok to walk anyway)")
     worst, at = route_danger(tx - mx, tz - mz)
     # the new-game test: Lefess, Lv1 with 10 HP, walked a route of ambush level 4 under the limit of 5 and a level 1 puppy
     # killed her walking off the map; route_max was tuned on a sturdier character. A new one's limit grows with her level.

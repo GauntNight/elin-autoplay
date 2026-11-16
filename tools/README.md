@@ -849,6 +849,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/wgo.py NAME [--weak-ok] [--ambush]   a place from `bridge.py places` (name or id)
            python -I tools/wgo.py X Z [--weak-ok] [--ambush]    an absolute world-map cell
       --near N   stop for a hostile within N cells (default 4)
+      --walk-ok  walk home although it is over 10 tiles away (run 49: refused otherwise: a return scroll is ~15 turns)
       --weak-ok  keep walking past hostiles 3+ levels below me (a lone crab kept stopping the walk;
                  if one ambushes, the fight is easy); anything stronger still stops it
       --ambush   handle an ambush map instead of handing back (the review of 2026-10-23: travel was the
