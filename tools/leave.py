@@ -40,14 +40,25 @@ def carried(match):
     return count(data("stock")["pack"], match)
 
 
-def edible(match):
-    """Pieces eat_one can reach: the pack's own grid and the Cooler Box (run 34: 24 herbs and 6 milks in the backpack
-    passed the meal count, and on the road eat_one found "nothing edible" at hunger 60)."""
-    from common import data
-    pack = data("stock")["pack"]
-    top = [it for it in pack if not it.get("items") and not it.get("equipped")]
-    cooler = [it for it in pack if "cooler box" in it["name"].lower()]
-    return count(top, match) + sum(count(it.get("items") or [], match) for it in cooler)
+def trip_meals():
+    """Meals for the trip, counted by the same reader the eating does (items.meals, by kind at any depth). Run 49: the
+    old count went by farmday's name list and passed six "meals" while eat_one had nothing it would eat (5 travel
+    rations, all of them the Fast Travel reserve), and the first nefia stopped Hungry on B1. Rations count only above
+    the reserve; run 36: stale food doesn't count (it rots on the road); run 44: three mini salads are one meal."""
+    from items import RATION_RESERVE, meals
+    whole = minis = 0
+    for it in meals(0):
+        name = (it.get("name") or "").lower()
+        n = it.get("num") or 1
+        if "stale" in name:
+            continue
+        if it.get("kind") == "ration":
+            n = max(0, n - RATION_RESERVE)
+        if re.search(r"\bmini\b", name):
+            minis += n
+        else:
+            whole += n
+    return whole + minis // 3
 
 
 def blanket(name):
@@ -182,13 +193,7 @@ def main():
     # run 32: the Upkeep block's food rule was only a line in goals.md; the night's first nefia began at hunger 68
     # with nothing eat_one would take (the bread was in the loot bag, the Cooler Box held raw fish and corpses)
     if at_base and "--food-ok" not in sys.argv:
-        from farmday import is_meal
-        # run 36: 65 "stale mushrooms" counted as 65 meals at 490-06-10; seven game days on they were 61 rotten ones and
-        # the ladder stopped Hungry on Unknown Grassland B1 with only milk and the travel rations left: stale doesn't count
-        meals = edible(lambda n: is_meal(n) and "rotten" not in n.lower() and "stale" not in n.lower()
-                       and not re.search(r"\bmini\b", n.lower()))
-        # run 44: 24 mini salads passed the count as 24 meals and lasted about an hour (~2-6 hunger each): three count as one
-        meals += edible(lambda n: is_meal(n) and bool(re.search(r"\bmini\b", n.lower())) and "rotten" not in n.lower()) // 3
+        meals = trip_meals()
         if meals < MIN_MEALS:
             refuse(f"leaving home refused: {meals} meals carried, under {MIN_MEALS} (3 days): restock the Cooler Box "
                    "(food in the bags doesn't count: eat_one never looks there) from the harvest box or a pantry, or --food-ok")
