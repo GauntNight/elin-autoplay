@@ -126,7 +126,7 @@ the stairs ignores far weaker foes.
 | burden phase 2 or 3 | shed weight before any zone change (`purge.py --heavy`, section 7) |
 | "Enemy spotted" with nobody in view | an invisible foe beside me (run 41: a walk to the stairs ended four times): See Invisible (`ladder.see_unseen` does it once a floor), then fight what it shows |
 | a window, a dialog | read it first (`talk.py`, `read.py`), then `close.py` |
-| a neutral Evolved creature ends the exploring | a known gap (the review of 2026-11-11: delve lists it as a foe and fight.py answers "target not in view" without `--force`): decide by hand |
+| a neutral Evolved creature ends the exploring | **leave it alone when it is within 5 levels of mine: take the stairs on (or `circuit.py --skip NAME`)**, never `fight.py --force` (run 48: a neutral Evolved Wasp out-traded me to 57% over 12 rounds; run 49: a neutral Evolved Candle Ghost Lv42 at my Lv43 hit back for 41% in its first round, a teleport and the nefia lost; fact #1448). One far under my level may be fought for its gene. Why delve stops: it lists the creature as a foe, and fight.py answers "target not in view" without `--force` |
 
 ## 5. The floor gate, and how it moves
 
