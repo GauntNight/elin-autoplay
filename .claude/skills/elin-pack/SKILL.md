@@ -52,6 +52,12 @@ count), so a boss chest and a floor of loot fit before loot.py's 42-stack bag ro
 - Books that aren't spellbooks for the trip: ancient books (decode at home: knowledge facts), journals.
 - Materials (skins, stones, ores, logs, bones), spare weapons and armour, quest papers.
 - Throwing pebbles once better throwables exist (mica daggers, the Putit).
+- **Spare kit** (runs 47, 50): the kit's count rides in the pack, its spares in the yard's storage chests (63,46 and 64,46 since
+  run 50's wrenches; 68,44 is full): spare cure and teleport rods, a second arrow stack, a plain bow. Run 47's ladder refused at the
+  door four times with a third of the grid in spares; run 50 boxed six rods for the same reason.
+- **The identification pile** (runs 48, 50): unidentified and ☆ pieces ride only from a nefia to Aliyun (or SpIdentify, 192 casts:
+  picker.py reaches the pack's grid, not the bags) and on to the shipping chest. With them in the bags every floor's drops land in
+  the grid and the ladder stops at 42+ stacks (run 50: seven floors); circuit.py refuses to start with the bags full since run 50.
 
 ## 3. Triage, every time
 

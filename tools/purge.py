@@ -132,9 +132,16 @@ def shed_heavy(dry):
     game = Path(__file__).resolve().parent.parent / "knowledge" / "game" / "things.json"
     table = {t["id"]: t for t in json.loads(game.read_text(encoding="utf-8"))}
     heavy = []
+    # run 50: in Derphy at phase 3 this dropped a stolen mirror table, a theft's contribution lost: stolen goods are
+    # the haul the heavy walk is for (steal.py --burden-phase 3 beside the fence), so they never go
+    try:
+        import items as inv
+        stolen = {it.get("uid") for it in inv.inventory() if it.get("stolen")}
+    except Exception:  # noqa: BLE001 (an older mod: no flag to read)
+        stolen = set()
     for i in data("inv")["items"]:
         t = table.get(i.get("id")) or {}
-        if i.get("equipped") or re.search("★|☆", i["name"]) or t.get("category") not in FURNITURE:
+        if i.get("equipped") or re.search("★|☆", i["name"]) or t.get("category") not in FURNITURE or i.get("uid") in stolen:
             continue
         if (t.get("weight") or 0) >= HEAVY:
             heavy.append(((t.get("weight") or 0) * (i.get("num") or 1), i["name"]))

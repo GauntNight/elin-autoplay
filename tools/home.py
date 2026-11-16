@@ -24,7 +24,10 @@ HARVEST_BOX = (60, 44)     # run 18: in the Farmhouse; shared, food only, priori
 HARVEST_FRIDGE = (60, 43)  # run 33 (G3 M6, the user): Hill Cave's fridge (16 slots, 5 MW), shared, food, priority 20 over the
                            # harvest box's 10, so Delegated Farming's crops land where they don't rot; grain and seasonings stay in 60,44
 FARM_SIGN = (51, 47)
-FIELD = [(x, z) for z in range(43, 50) for x in range(48, 55)]  # tilled rectangle, 38 field cells
+FARM_SIGNS = [(51, 47), (51, 43)]  # run 50 (G56 M4): the spare sign from the Storehouse's doorstep (66,43) covers the south half
+FIELD = [(x, z) for z in range(43, 50) for x in range(49, 54) if (x, z) not in FARM_SIGNS]  # run 50 (G56 M4): one 5x7
+# rectangle 49-53 x 43-49 under the two signs, 33 field cells (was 48-54, 38 ragged cells); the six cells outside and the
+# sign's own cell 51,43 are lawn floor (flooring workshop, 1 grass each: a floor laid over a tilled cell replaces it)
 LAKE_STAND, LAKE_WATER = (48, 41), (47, 40)
 PASTURE_SPOT = (57, 47)
 
@@ -46,7 +49,8 @@ STATIONS = {"loom": (47, 60), "wall workshop": (48, 60), "spinner": (49, 60), "d
             "signboard workshop": (52, 60), "mason's table": (53, 60), "stonecutter": (54, 60),
             "tinker's table": (55, 60), "carpenter's table": (50, 56), "sawmill": (47, 56), "workbench": (49, 56),
             "kiln": (59, 60), "smelter": (60, 60), "blacksmith's table": (61, 60),  # the Forge (run 18)
-            "millstone": (58, 44), "ration maker": (60, 42)}  # run 18: in the Kitchen; G56 M2 (run 48): into the Farmhouse beside the grain
+            "millstone": (58, 44), "ration maker": (60, 42),  # run 18: in the Kitchen; G56 M2 (run 48): into the Farmhouse beside the grain
+            "flooring workshop": (55, 58)}  # run 50 (G56 M4): lawn and soil floors for the field's edge; stepping stones (G30 M4)
 WOOD_BOX = (48, 57)        # logs, planks, branches, sticks, bark, resin (run 18: into the Workshop)
 STONE_BOX = (61, 57)       # run 18: in the Forge (stone house 58-62 x 55-61, door 60,55); stones, cut stone, soil, glass, bricks, ores, ingots
 STONE_BOX_2 = (52, 58)     # run 20: a wooden box 'Stone 2' beside the Forge's (61,56); G56 M2 (run 48): moved into the Workshop by the stonecutter and the mason's table: stone, cut stone, bricks

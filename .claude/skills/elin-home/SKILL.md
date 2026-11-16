@@ -63,11 +63,22 @@ run 45's G54). `tools/town.py` checks the town against the game's own rooms (G12
 | **The big wagons** (south-west of the Storehouse; G54, run 45; 96 slots each on 4x4 cells) | | BIG_WAGONS[0] 54,38 (cells x 51-54, z 38-41): the overflow and valuables of the five retired mystic chests, books; BIG_WAGONS[1] 58,35 (cells x 55-58, z 35-38): the armory overflow, the bag parts (threads, fiber, strings, ropes, skins, bolts), the valuables overflow, and the second-last stop of every chain. **Run 48: both lay uninstalled all run** ("Pick (a big wagon)", no Open act: every route through them refused); `town.py --storage` fails on a loose container now; the fix is pickup.py and place.py on the same anchor (Squashed for a moment, no walk) |
 | **Residence** (grass rooms: mine 59-62 x 51-53, door 60,51; the residents' 62-68 x 49-53, door 65,49) | | ARMORY 66,51 (shared, priority 5, weapons and armour: residents take what beats theirs); my pine bed 60,52 |
 
-Outside on purpose (the office): mail post 61,50 (bills and salary parcels land on 59,49 and 60,49; pay at the **tax
-chest 62,49**), the labelled mail package 60,50 (no Grab), shipping chest 56,52 (empties every morning), trash can 58,51,
-the home, quest and resident boards 54,50-52, the hearth stone 55,50, Fiama's lock-50 quest chest 54,50, the dummy 60,46
-and practice chest 61,46. The field 48-54 x 43-49 and the lake (stand at 48,41) stay unroofed. The Mining strip for
-`tools/minewalls.py` is 47-50 x 52-53.
+Outside on purpose (the office, since G56 M3 in run 49): mail post 62,47, tax chest 63,47, house board 58,48, the labelled
+mail package 60,50 (no Grab), shipping chest 56,52 (empties every morning), trash can 58,51, the home, quest and resident
+boards 54,50-52, the hearth stone 55,50, Fiama's lock-50 quest chest 54,50, the dummy 60,46 and practice chest 61,46; the
+sitting corner 55-57 x 48-49 (G56 B, run 50). **The field is 49-53 x 43-49, 33 cells under two farm signs (51,47 and 51,43)**
+(G56 M4, run 50; home.FIELD); its edge cells and the old dig scars are lawn floor. The lake (stand at 48,41) stays unroofed;
+the four graves of Rolord stand in a row at 43-46 x 43 by it (G56 C). **Flower beds by all seven houses' doors** (yellow
+flowers from Gikrak's seeds, Yowyn; `town.py --garden` checks them): they are seed crops, so winter (months 12-2) likely
+takes them, as run 32's went; 3 spare seeds wait in the Farm box for a spring replant (hold the seed, `act.py DX DZ Plant right`
+on grass beside the door: farm.py plants field cells only).
+
+**Floors without a shovel (run 50, facts #1457-#1458):** a floor item laid on a cell replaces its floor, crops included:
+lawn floor (flooring workshop, 1 tuft of grass, 0 SP) turns a tilled cell or a bare-soil scar into lawn; soil floor (1 tuft of
+soil) on grass, then the hoe's Plow, makes a field cell. Grass comes from wild weeds on nefia floors (`runs/jobs/gather.txt`
+"weed grass N" makes the ladder cut them; every weed at home is an edge cell). **Storage wrenches** (Miral, 4 medals each, +20
+slots): held (`item.py "wrenches" Grab`), then `act.py DX DZ Upgrade right` beside a ★Storage Chest, one per wrench; run 50 put
+five on 64,46 and five on 63,46.
 
 **Where a kind goes** (packcheck's ROUTES, first match wins; each chain is tried in order): seeds and farm tools -> the
 Farm box, Farm box 2; wood and building parts -> the wood box; stone, ore, ingots, glass -> the two stone boxes; treasure
@@ -280,7 +291,8 @@ with `stopjob.py springday` only.
 
 **Why the field stays** (the user, 2026-11-14): "Farming is only useful if our crops are particularly high quality which,
 after many cycles, they are" (the seeds in the boxes run +13 to +24). The field is kept for that quality, not for
-rations, which are bought (G14 dropped); G56 M4 reshapes it into one rectangle under the farm signs.
+rations, which are bought (G14 dropped); G56 M4 (run 50) made it one rectangle under two farm signs, and the user called the
+town good (G56 done 495-08-23).
 
 **A day:** `springday.py 1 UNTIL --once` after 06:00: mushrooms reaped and cut, ripe crops reaped
 (seeds) or harvested (food), stubs cut, every bare cell replanted from the Farm box, the field

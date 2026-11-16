@@ -119,11 +119,16 @@ def main():
         refuse("at home only")
     if not dry:
         from_bags()
+    # run 50: a refused empty chest (the shipping chest full after a day's ☆) stopped the loop with three full chests behind it,
+    # all of one name; each chest is now taken by its uid, and an empty one the chest refuses rides on while the rest are emptied
+    skip = set()
     for _ in range(12):
-        if not carried():
-            print("no chest left in the pack")
+        todo = [i for i in carried() if i.get("uid") not in skip]
+        if not todo:
+            print("no chest left in the pack" + (f" ({len(skip)} empty ones ride: the shipping chest refused them)" if skip else ""))
             return
-        NAME = carried()[0]["name"]  # run 41: "a madam's favorite mystic treasure chest" too
+        UID = todo[0].get("uid")
+        NAME = f"uid:{UID}" if UID else todo[0]["name"]  # run 41: "a madam's favorite mystic treasure chest" too
         out = run("bag.py", NAME)
         items = split_listing(last(out))
         print(f"chest: {', '.join(items) or 'empty'}")
@@ -138,6 +143,9 @@ def main():
                 import purge
                 purge.unclutter()
                 run("close.py")
+                # run 50: the unclutter bagged the chest itself, the take then found nothing and the full chest went to the
+                # shipping chest's refusal as "empty": bring it back out before going on
+                from_bags()
             if free_cards() < min(3, len(items)):
                 stop(f"{free_cards()} free cards for {len(items)} stacks: a chest stays closed in the pack")
             out = run("bag.py", NAME)
@@ -153,13 +161,15 @@ def main():
             print("  stacks left inside: " + last(run("packcheck.py", "--move", timeout=300)))
             continue
         run("item.py", NAME, "Close")
-        if twin_locked(NAME):
+        if not UID and twin_locked(NAME):
             stop(f"{NAME}: a locked chest has the same name: unlock.py first (a lockpick), or box.py would ship the locked one")
         out = run("box.py", "shipping chest", NAME)
         print("  " + last(out))
         # run 42: a full shipping chest (40 stacks after stock --ship) refused the empty chest and this loop walked packcheck 12 times, 7 game hours
         if out.rc or "did not move" in out:
-            stop("the shipping chest refused the empty chest (full until morning?): leave it, or drop it by the chest")
+            print("  the shipping chest refused the empty chest (full until morning?): it rides; on to the next")
+            skip.add(UID)
+            continue
         if "--no-sort" not in sys.argv:  # run 42: five chests in a row need one sort at the end, not five
             out = run("packcheck.py", "--move", timeout=300)
             print("  " + last(out))

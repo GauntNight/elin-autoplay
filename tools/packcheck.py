@@ -64,6 +64,7 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "banana", "stir-fry", "stir-fries", "manju", "croquette", "pizza",  # run 24: Tiguen's foods had no route
            "rice", "cheese", "jerky", "jerkies", "pie",  # run 19: "4 jerkies" had no route
            "sashimi", "sandwich", "onigiri",
+           "stir fried", "gourd", "curry", "curries",  # run 50: Erobird's stir fried gourds (kind meal) had no route
            "lunch box", "mousse", "shortcake", "mochi", "avocado", "watermelon", "sack", "dumpling",  # run 41: Semnof's stock had no route
              # run 39: palulu shortcakes had no route
             # run 36: an ally's lunch box (CHA, MAG, STR) and a mousse had no route
@@ -98,7 +99,7 @@ ROUTES = [
     (("treasure map",), BOX_STR(home.MAPS_BOX), "the shared Maps box (the Workshop)"),
     (("thread", "fiber", "string", "rope", "skin", "big leaf", "big leaves", "needle", "texture", "bolt"),
      "|".join(BOX_STR(b) for b in home.BAG_PARTS) + "|" + BOX_STR(home.ARMORY5) + "|" + BOX_STR(home.SPARES), "Bag parts box (the Workshop; the yard's wagon when full, run 42; the yard's chest last, run 44)"),
-    (("bone", "nail", "battery", "batteries", "microchip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5) + "|" + "|".join(BOX_STR(w) for w in home.BIG_WAGONS) + "|" + BOX_STR(home.SPARES), "Parts box (the Workshop; the yard's wagon, then the big wagons and the yard chest when full: run 45, a bone charm refused by the two full boxes)"),  # run 30: queen bees (a beehive part)
+    (("bone", "nail", "battery", "batteries", "microchip", "memory chip", "scrap", "fang", "horn", "queen bee"), BOX_STR(home.PARTS_BOX) + "|" + BOX_STR(home.ARMORY5) + "|" + "|".join(BOX_STR(w) for w in home.BIG_WAGONS) + "|" + BOX_STR(home.SPARES), "Parts box (the Workshop; the yard's wagon, then the big wagons and the yard chest when full: run 45, a bone charm refused by the two full boxes)"),  # run 30: queen bees (a beehive part)
     (("leaf", "leaves", "tuft of", "tufts of", "grass wall"), BOX_STR(home.FODDER_BOX), "the fodder box (the Farmhouse)"),
     (("corpse",), "ship", "the shipping chest (a fresh corpse; cook it first if food is short)"),
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
@@ -115,17 +116,20 @@ ROUTES = [
     (("oil", "ale", "butter", "chili", "ketchup", "salt", "sugar", "mayo", "mayonnaise", "spice", "beer", "wine",
       "sake", "sauce", "sesame", "flour", "vinegar", "tea", "cappuccino",
       "herb", "coffee", "preservative", "seasoning", "pepper", "protein", "miso", "soft drink", "jam", "gelatin", "catechin",
-      "glutamine", "honeycomb", "honey", "yeast", "juice", "crim powder"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
+      "glutamine", "honeycomb", "honey", "yeast", "juice", "crim powder", "wasabi"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
     (("grave of",), "ship", "the shipping chest (a boss's grave: junk, value 0-ish)"),
     (("Scrubber", "charm ("), "ship", "the shipping chest (☆The Scrubber, a boss-chest regular, and plain charms: run 30)"),
     # run 34: four "decide" stacks held up leave.py twice (loot from Rustic Forest and run 33's chests)
-    (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a dish", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern",
+    (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern",
       # run 46: boss-chest and floor odds with no rule (a plate, hanging pots, sea pants, the rest)
       "tableware", "trash bin", "pot of water", "gamble chest", "a plate", "hanging pots", "sea pants", "cobweb", "moon chakram",
       "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu",
       # run 48: a boss chest's skull, the loot bag's odds (the dried mandrake is a currency: valuables, above)
       "skull", "iron scale", "a junk", "towel", "anchor", "assorted vegetable", "broken barrel", "a cup", "small window", "dirty dish",
-      "a cabinet"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
+      "a cabinet",
+      # run 50: a saddle and a cushion had no rule ("a dish" left this list: the chest refused it twice, and the game's
+      # category, junk, sends it to the trash can below)
+      "saddle", "cushion"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
     # organs: board supply and gift jobs ask for them (a heart, grotesque offal; run 08, run 12)
     # run 15 (G14): ration grain waits by the millstone's stock: the harvest box keeps it (never shipped)
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),

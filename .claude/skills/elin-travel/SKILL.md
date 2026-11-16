@@ -172,7 +172,13 @@ minutes paid 75,600 orens an hour against a circuit's 9,345 (run 41).
   nothing on the world map), then Enter, `chests.py --field` (it takes chests out of the bags since run 47), and on.
   Unload at home before a circuit: the bars and medals.
 - Every boss chest's map gets dug on the way when its spot is near; the rest wait in the shared Maps box for Poppy
-  (elin-home).
+  (elin-home). **A far map barely pays its walk** (run 50, fact #1476: 73 tiles, ten game days for 2,356 orens and 3 bars,
+  about its own rent; the 1-9-tile maps paid 1,269-2,913 in hours): dig what lies within a day or two, and ride a far one
+  only on a trip already going that way. 12 maps in run 50: ~27,000 orens, ~30 gold bars, ~20 medals.
+- **digmap's meal and unload steps Enter the tile they stand on**; on a nefia's tile that is the nefia (run 50: twice, once
+  a danger-14 B1 beside a kamikaze samurai). `digmap.off_nefia()` steps one tile aside first since run 50.
+- **Fame sales away from Palmia and Olvina:** Noyel's informer is Ras (fact #1477; Noyel's guard lists an inn, a mage and
+  seven shops).
 - **A background dig is running until its task says it ended** (run 44: digmap walked on after a hunger stop while I
   drove the game by hand): its stop lines can be steps it handles itself.
 - **Far maps** (the user, 2026-11-06: "You can cross those fields, with teleport, return, et. it is safe I think.

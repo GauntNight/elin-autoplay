@@ -180,6 +180,10 @@ deep water (`why: water`, before the first step). `force=1` bypasses a guard on 
 - **Names in full.** Tools refuse a name that fits two things ("rod of" fits two rods) and match whole words; a `craft.py
   --use` material that fills no slot is refused (run 11's threads, run 12's carbon log). Give the full name, with its count
   and charges when two differ only there. Pickers (identify, shrines, blending) are drag grids: `picker.py`, never a `click`.
+- **A thing's kind comes from the game's table or its uid, never a word in its name** (runs 47-50): "iron shovel" refused a pine
+  shovel, "ring" matched Ring Mail in gearcheck (48) and in item.py's two-rings guard (50), a meal list by name ate nothing (49), and
+  "stir fried gourds" had no food word (50). Two tools deciding the same thing read the same table (items.meals, items.kind, the
+  category in things.json); a container is named by `uid:N` when two share a name (chests.py since run 50).
 - **Frame rate:** after many hours Elin fell to ~4 fps and every script timed out. If `ping` frames crawl, quit through the
   bridge and relaunch (run 06: back to ~58).
 - **Quick-save after milestones and right after any big haul:** `python -I tools/bridge.py act QuickSave` (the log shows

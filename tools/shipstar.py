@@ -19,7 +19,9 @@ from job import JOBS  # noqa: E402
 CHEST_MAX = 40  # fact #1001: the shipping chest's stacks
 # Run 44: Queen's Victory went into the chest. It was off its finger only because the Fighting Bull (thief protection) is
 # worn in Derphy, and gearcheck had recorded it there as a candidate. Pieces kept for a swap never ship.
-KEPT = ("The Fighting Bull", "Queen's Victory")
+# Run 50: the Godbane Breastplate (blindness negated) rides as the swap for the Brilliant Ring Mail (PV 35, confusion
+# negated) on a floor whose foes blind
+KEPT = ("The Fighting Bull", "Queen's Victory", "Bad West")
 
 
 def pieces(keep):

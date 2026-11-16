@@ -45,8 +45,33 @@ def date_now():
     return pc().get("date") or ""
 
 
+def nefia_here():
+    """The nefia (or any 'Danger Lv.' place) on this world-map tile, else None."""
+    for p in (call("places", r=0).get("data") or {}).get("places") or []:
+        if p.get("dist") == 0 and "Danger Lv." in (p.get("name") or ""):
+            return p.get("name")
+    return None
+
+
+def off_nefia():
+    """Run 50: a meal stop and the unload each 'entered this tile' on a nefia's tile, which is the nefia itself: once the
+    conquered Mystical Cave (2B), once Tangled Cave's danger-14 B1 beside an electric cloud and a kamikaze samurai Lv13 at
+    3 cells. Step one tile aside first, so Enter opens a field map."""
+    name = nefia_here()
+    for way in ("e", "w", "n", "s"):
+        if not name:
+            return
+        print(f"  {name} is on this tile: one step {way} before entering", flush=True)
+        call("move", dir=way)
+        wait_until("frames", n=30, timeout=3000)
+        name = nefia_here()
+    if name:
+        stop(f"every tile beside me holds {name}: no field map to enter here")
+
+
 def enter_and_eat():
     """A local map for a meal: Enter on this tile, eat, leave. Exit 3 of eat.py passes up."""
+    off_nefia()
     out = run("act.py", "0", "0", "Enter")
     if world_ok():
         out = run("act.py", "0", "0", "Enter")  # lessons run 38: the first Enter is sometimes ignored
@@ -268,6 +293,8 @@ def unload():
     pack = data("stock").get("pack") or []
     if not any("treasure chest" in (x.get("name") or "").lower() for i in pack for x in [i] + (i.get("items") or [])):
         return
+    if nefia_here():  # run 50: the unload's Enter on a nefia's tile went into Tangled Cave's B1 (danger 14)
+        off_nefia()
     acts = call("acts", dx=0, dz=0, mode="all").get("data", {}).get("acts") or []
     enter = [a for a in acts if a["text"] == "Enter"]
     if not enter:

@@ -314,6 +314,30 @@ def scrap_walls():
     print(f"  scrap: {have()} of {want} ({last(out)[:70]})", flush=True)
 
 
+def gather_jobs():
+    """Small gathering targets for home projects (run 50, G56 D: grass for 25 lawn floors; every weed on the home map is an edge
+    cell, fact #1459): each line of runs/jobs/gather.txt is 'OBJECT ITEM TARGET' (e.g. 'weed grass 22'); on an explored floor with
+    nothing near, gather.py cuts the floor's reachable OBJECTs until the pack holds TARGET of ITEM. Delete the file when done."""
+    from pathlib import Path as _P
+    try:
+        lines = [ln.split() for ln in (_P(__file__).resolve().parent.parent / "runs" / "jobs" / "gather.txt").read_text().splitlines()
+                 if ln.strip() and not ln.lstrip().startswith("#")]
+    except OSError:
+        return
+    if hostile_near(8) or pc().get("sp", 0) < 40 or (pc().get("burdenPhase") or 0) >= 1:
+        return
+    for parts in lines:
+        if len(parts) < 3 or not parts[-1].isdigit():
+            continue
+        obj, item, target = parts[0], " ".join(parts[1:-1]), parts[-1]
+        hits = [h for h in data("find", name=obj, r=30, n=30)["hits"] if h.get("kind") == "obj" and not h.get("edge")]
+        if not hits:
+            continue
+        out = run("gather.py", obj, item, target, "40", "30", "--weak-ok", timeout=300)
+        run("hotbar.py", "--deselect", timeout=30)
+        print(f"  gather: {obj} -> {item} {target}: {len(hits)} seen ({last(out)[:70]})", flush=True)
+
+
 def explore_floor(solo):
     spot = None
     thrown = 0
@@ -1035,6 +1059,7 @@ def floors_loop(max_danger, floors, solo):
         clear_view(solo)
         wood()
         scrap_walls()
+        gather_jobs()
         # run 28: the pack and all three bags filled within two nefias, and a boss chest's treasure map stayed
         # behind ("LEFT (pack full?)"): drop the junk (purge.py's rules) before the loot and the chests
         # run 33: and free 3 grid cards (cheap stacks dropped) so the meals and the chests' books have room

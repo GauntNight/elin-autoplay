@@ -250,9 +250,18 @@ def use(it, verb, items=None, *flags):
 def carry_list():
     """runs/carry.txt: the errand items (one per line; '#' comments). A line is a kind ("potion:SpCureCorruption"),
     an id ("id:lockpick"), a uid ("uid:123456") or, as before, words that must all be in the name."""
-    if not CARRY.exists():
-        return []
-    return [ln.strip() for ln in CARRY.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
+    out = []
+    if CARRY.exists():
+        out = [ln.strip() for ln in CARRY.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
+    # run 50: what a ladder gather job is collecting (runs/jobs/gather.txt 'OBJECT ITEM TARGET') is carried on purpose;
+    # purge dropped the 22-24 tufts of grass on four floors in a row (runs/tx/items.log), and the job cut them again each floor
+    jobs = CARRY.parent / "jobs" / "gather.txt"
+    if jobs.exists():
+        for ln in jobs.read_text(encoding="utf-8").splitlines():
+            parts = ln.split()
+            if len(parts) >= 3 and not ln.lstrip().startswith("#"):
+                out.append(" ".join(parts[1:-1]))
+    return out
 
 
 def protected(it, items=None, carry=None, kit=True):

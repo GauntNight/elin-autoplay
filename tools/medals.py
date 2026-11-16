@@ -64,7 +64,10 @@ def why_not(h, ci):
 
 
 def medal_count():
-    return sum(int(i.get("num") or 1) for i in data("inv")["items"] if "small medal" in i["name"].lower())
+    # run 50: the pack grid only (`inv`) missed the stack in the backpack, so 7 taken in Yowyn read "picked up 0";
+    # items.py reads every depth by kind
+    import items
+    return items.count(kind="medal", usable_only=False)
 
 
 def pick_here():

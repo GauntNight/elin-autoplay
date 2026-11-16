@@ -153,9 +153,10 @@ def main():
         # copper ring instead (PV 54 -> 44): with both fingers taken the game swaps the first ring, so it's refused
         # unless --finger-ok (take the one to replace off first, and gate that step on its exit code)
         card0 = (chosen.get("card") or "").lower()
-        if re.search(r"\bring\b", card0) and "--finger-ok" not in sys.argv:
+        # run 50: "Ring Mail" is body armour (gearcheck had the same gap in run 48): a ring is "ring" not followed by "mail"
+        if re.search(r"\bring\b(?! mail)", card0) and "--finger-ok" not in sys.argv:
             rings = [i["name"] for i in call("inv")["data"]["items"]
-                     if i.get("equipped") and re.search(r"\bring\b", i["name"].lower())]
+                     if i.get("equipped") and re.search(r"\bring\b(?! mail)", i["name"].lower())]
             if len(rings) >= 2:
                 refuse(f"both fingers are taken ({' | '.join(rings)}): the game would replace the first ring; "
                        "Unequip the one to replace first (gate on its exit code), or --finger-ok")

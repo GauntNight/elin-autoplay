@@ -7,7 +7,7 @@ description: Guild work in Elin - the user's guild rule (every guild keeps risin
 
 **The rule (the user, 2026-11-01):** "all guilds should keep increasing until they are max rank". Rank 6 is the game's
 cap. A guild goal done sets the next rank as a goal at once (elin-goals); the goals and their milestones are in
-`knowledge/goals.md` (G57 Thieves rank 5, G49 Mages rank 4, G50 Merchants rank 5 at this writing; G53, Thieves rank 4, done in run 48; the Fighters are done).
+`knowledge/goals.md` (G57 Thieves rank 5, G49 Mages rank 4, G58 Merchants rank 6 at this writing; G50, Merchants rank 5, done in run 50; the Fighters are done).
 The review of 2026-11-11: the three ride along with the circuits and the trips, without a plan slot of their own.
 
 **Read the number:** `python -I tools/journal.py guilds` prints each guild's rank and contribution from the journal
@@ -91,11 +91,15 @@ towns refuse to trade and their guards attack.
   (Derphy B1). A store taken from 1 to 10 shows about twice the items a visit, so about twice the chance of either.
 - **Low-level shops first among those, then the rest** (run 29; G50's How): a level 1 shop cost 143 orens for +6, level 2 504 for +7, level 7-10
   3,000-4,800. Run 43: Ilass 2 -> 11 and Diefon 1 -> 12 at 158-245 orens a point, against 375-440 at levels 13-14. Runs
-  44-45: Palmia's and Derphy B1's shops 7 -> 10 at ~220-225 a point. **Every shop we use is at 10+ now** (run 45: the next
-  step ~3,900 for 16 points, ~245 a point): price a point before paying, and look for never-invested shops (guild
-  offices, camps, villages) first.
+  44-45: Palmia's and Derphy B1's shops 7 -> 10 at ~220-225 a point. **Run 50's all-in (G50 done, rank 5):** a step from
+  level L costs about 2,500 (L 8), 3,050 (9), 3,600 (10), 4,450 (11), 5,350 (12), 6,350 (13), 7,450 (14), 8,600 (15),
+  9,450 (16) and pays 5 + L + 1; capped at ~7,600-8,700 a step it came to ~330 orens a point over 17 shops. **Shops at 14-17
+  now:** Palmia (Tarraf 18, Eligin, Monashy, Kazretta, Koflord, Shuzastan, Semnof), Aquli Teola (Sesa, Sayig, Esdor), Derphy
+  (Siyun, Kerona, Leoban, Erobird, Fortoli 17), Lumiest (Robean, Vuten 16, Tomyin 13), Noyel (Bethberk 14, Alecgan 12). Never
+  invested (G58's cheap points): Noyel's Ceshed, Oldotta, Teoyan, Miscold, Nuwert; Lumiest's Teolarg and Raydorre; Mysilia,
+  Tinker's Camp, Yowyn and Olvina shops (their levels unread since runs 21-43). Monazess's guild shop takes no investment.
 - **Never a town secretary:** that investment pays the guild nothing (fact #1336).
-- **The budget:** only orens above the six-bill reserve (G50); all of it until rank 5 (the user, 2026-11-16: "go all in").
+- **The budget:** only orens above the six-bill reserve; G58 (rank 6, 2,600) takes what the circuits and the chest bring in.
 - The guild's informers buy fame: `famesale.py` (elin-delve 2: a sale also pulls the nefia refill back under the gate).
 
 ## Mages (G34, G36, G43, G49)

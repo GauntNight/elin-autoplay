@@ -88,7 +88,16 @@ def bag_haul():
 
 def junk(name):
     n = name.lower()
-    return any(j in n for j in JUNK)
+    if any(j in n for j in JUNK):
+        return True
+    # run 50: purge dropped 522 things in one run (23 hearts, 18 offals, 13 copper ores, 12 magic-map scrolls, harmful
+    # potions...) that the floor-end loot had just picked up, and the grid hit 42+ stacks after every delve: what purge
+    # would drop is never picked up (one rule for both)
+    try:
+        import purge
+        return purge.junk(name)
+    except Exception:  # noqa: BLE001
+        return False
 
 
 def worth(name):

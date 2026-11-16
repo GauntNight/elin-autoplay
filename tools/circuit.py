@@ -229,6 +229,14 @@ def main():
         while done < n:
             if stop_requested("circuit") or (deadline and _dt.datetime.now() >= deadline):
                 stop(f"asked to stop between nefias ({until or 'circuit.stop'}): {done} conquered")
+            # run 50: the full-bags stop ran only after a conquest, so circuits started with every bag full of unidentified
+            # and ☆ pieces and stalled on "42+ stacks" floor after floor (Damp Forest four times; lesson 48 repeated):
+            # check before walking to the next nefia as well
+            if not resume:
+                bags = [i for i in data("stock", r=0)["pack"] if i.get("name") in ("a backpack", "a loot bag", "a spoils bag", "a haul bag")]
+                if bags and all(len(b.get("items") or []) >= bag_slots(b["name"]) - BAG_FULL for b in bags):
+                    stop(f"go home first: the bags are full ({', '.join(str(len(b.get('items') or [])) for b in bags)} stacks): "
+                         "identify (Aliyun, or SpIdentify) and ship, then circuit.py again")
             if not resume:
                 cands = candidates(lo, hi, r, skip)
                 # run 40 (fact: "nefia list refills on a sleep"): 2 nefias within 42 tiles of Palmia, then 23 within 28 after one
