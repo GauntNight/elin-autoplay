@@ -170,6 +170,14 @@ def main():
             print(r)
             refuse("leaving home refused: the pack holds items off the trip kit (packcheck.py --move, "
                    "then leave again; --pack-ok only for a deliberate haul)")
+    # runs 48-49: snow putits join the party at home on their own; solo is the rule (run 38) and Lonely Soul pays per
+    # empty slot (run 49: max HP 396 -> 363 through four conquests): at home they are sent back first
+    if at_base and "--party-ok" not in sys.argv and (s.get("party") or []):
+        r = run("sendhome.py", timeout=300)
+        print(r)
+        if r.rc != 0:
+            refuse("leaving home refused: a party member wasn't sent home (sendhome.py; --party-ok to keep one)")
+        s = call("state")["data"]
     # run 35: three allies over a cap of 2 (CHA 18) slowed the whole party 20% for half of run 34 (fact #1093)
     if "--party-ok" not in sys.argv:
         from common import party_cap

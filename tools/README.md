@@ -627,6 +627,9 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/scrap.py [--dry] [NAME ...]
       NAME  break these pack items too, by name (e.g. "strange silver coin": a gacha coin, ['scrap'],
             silver 27; not broken by default because the coins are currency)
+- **`sendhome.py`**: Send every party member home: walk beside it, Talk, "Wait at your home", close (fact #1435).
+    usage: python -I tools/sendhome.py [--dry]
+    Exit 0 the party is empty, 1 refused (a member not in view, no Talk, no "Wait at your home"), 2 the bridge.
 - **`seq.py`**: Run tool calls one after another and stop at the first that doesn't exit 0 (the review of 2026-11-11).
     usage: python -I tools/seq.py "TOOL ARGS" "TOOL ARGS" ...
       each argument is one call without the `python -I tools/` prefix, quoted as one string:
