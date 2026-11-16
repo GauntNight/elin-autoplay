@@ -74,7 +74,7 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "sand borer", "sardine", "scad", "sea urchin", "shark", "striped jack", "sunfish",
            "sweetfish", "tadpole", "tilefish", "tuna", "turtle", "whale")
 JUNK = ("rotten", "garbage", "empty bottle", "shit", "salt water", "remnant of what once was", "remnants of what once was",
-        "pair of sandal", "exotic teapot", "cluttered book", "a stain")  # run 49: the game files these as junk (box.py refuses them for the chest); run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
+        "pair of sandal", "exotic teapot", "cluttered book", "a stain", "ragged cloth")  # run 49: the game files these as junk (box.py refuses them for the chest); run 39: remnants (dattamono: a meat worth 50, CHA -20) had no route; run 13: cans are scrap; run 17: no vomit
 # (a "Return request" quest item is a vomit: packcheck dumped Casaneck's, so it is never auto-junk)
 
 # Where each kind of item lives at home (elin-home section 2 and 2a). First match wins.
@@ -122,7 +122,7 @@ ROUTES = [
     (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a dish", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern",
       # run 46: boss-chest and floor odds with no rule (a plate, hanging pots, sea pants, the rest)
       "tableware", "trash bin", "pot of water", "gamble chest", "a plate", "hanging pots", "sea pants", "cobweb", "moon chakram",
-      "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu", "ragged cloth",
+      "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu",
       # run 48: a boss chest's skull, the loot bag's odds (the dried mandrake is a currency: valuables, above)
       "skull", "iron scale", "a junk", "towel", "anchor", "assorted vegetable", "broken barrel", "a cup", "small window", "dirty dish",
       "a cabinet"), "ship", "the shipping chest (odd loot nothing uses: run 34)"),
