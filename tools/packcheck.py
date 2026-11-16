@@ -279,6 +279,12 @@ def route(name):
     if has_word(low, ("torch",)):  # run 38: spare torches (seven rode along); the residents can carry them
         return ARMORY
     if has_word(low, ("book", "spellbook", "recipe")):  # run 12: "lightning bolt" matched the bolts
+        if spell_over_cap(low):
+            # run 49: over-cap spellbooks were filed into the library and every box of the chain filled; stock.py shipped
+            # the excess back out 33 a morning while each arrival filed more. Past the cap they ship first now; the
+            # library only when the chest is full for the day
+            return ("shipping chest|" + "|".join(BOX_STR(b) for b in home.LIBRARY),
+                    "the shipping chest (a spellbook past its cast cap: stock.py), else the library")
         return "|".join(BOX_STR(b) for b in home.LIBRARY), "the library (the Storehouse)"
     for keys, where, label in ROUTES:
         if has_word(low, keys):
@@ -365,9 +371,11 @@ def check():
             if is_kit(low):
                 bad.append((haul, n, "pack", "the pack (trip kit)"))
             elif is_food(low):
-                # the review of 2026-10-23: a looted sandwich went to the stone box through "sand";
-                # food comes out into the pack, where it is food (then bag.py "Cooler Box")
-                bad.append((haul, n, "pack", "the pack (food: then bag.py \"Cooler Box\" or the fridge)"))
+                # the review of 2026-10-23: a looted sandwich went to the stone box through "sand": food is never
+                # routed to a box. Run 49: it no longer comes out into the pack either: items.meals eats from any
+                # depth since the review of 2026-11-11, and the pulled stacks filled the grid (35 -> 41 cards) while
+                # the bags held room; food rots in a bag as in the pack (only the Cooler Box keeps it)
+                continue
             else:
                 bad.append((haul, n, *route(n)))
     for n in bag_items("Cooler Box"):
@@ -380,6 +388,30 @@ def check():
         if not is_food(low):
             bad.append(("Cooler Box", n, *route(n)))
     return bad, unid
+
+
+_CASTS = {}
+
+
+def spell_over_cap(low):
+    """True for a spellbook stock.py would call excess: a cursed one, a hostile summon, or a spell at its cast cap
+    (run 49). The casts are read once a run of packcheck (bridge `power`); any failure reads as not over the cap."""
+    try:
+        from stock import SPELL_CAP, base, spell_names
+        b = base(low)
+        if not b or b[0] != "spellbook":
+            return False
+        if b[2] == "cursed" or b[1] in ("summon monster",):
+            return True
+        alias = spell_names().get(b[1])
+        if alias is None:
+            return False
+        if not _CASTS:
+            from common import data
+            _CASTS.update({s["spell"]: s["stock"] for s in data("power")["party"][0].get("spells") or []})
+        return (_CASTS.get(alias) or 0) >= SPELL_CAP
+    except Exception:  # noqa: BLE001 (the library then, as before)
+        return False
 
 
 GRID_CARDS = 35   # the pack grid's card count (bag.py's refusal line, run 22)
