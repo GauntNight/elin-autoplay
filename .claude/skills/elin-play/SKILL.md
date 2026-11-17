@@ -133,7 +133,9 @@ deep water (`why: water`, before the first step). `force=1` bypasses a guard on 
   after a failed pick-up, a wasted 25-game-hour leg). Use `python -I tools/seq.py "act.py 0 0 'Pick all'" "leave.py" "wgo.py
   12 34"`: each argument is one tool call without the `python -I tools/` prefix; it stops at the first non-zero exit and
   exits with that code. **No shell loops over game actions** either (run 19: a `for` loop of tool calls ran on under a
-  shipping report window): the loop tools check windows and stops themselves. With a pipe, `set -o pipefail` (run 21: `tool |
+  shipping report window; run 51: a `for` loop of fight.py over six foes): the loop tools check windows and stops
+  themselves. The user's PreToolUse hook (the chain check in `.claude/hooks/`, its loop rule installed 2026-11-17) refuses both: two acting
+  tools in one line, and one inside a `for`/`while`/`until`/`foreach`/`xargs` loop. With a pipe, `set -o pipefail` (run 21: `tool |
   tail -1 && next` gated on tail).
 - **Read the exit code, not the text:** 0 done, 1 refused, 2 the bridge, 3 stopped for a decision. A tool that moves items
   prints everything it moved: never pipe it through `tail`.
