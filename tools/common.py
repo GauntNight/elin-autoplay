@@ -369,7 +369,10 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 20,       # run 51 (G59 M2, G59 done): raised 19 -> 20 at Lv45, unattended limit 18 -> 19: Old Grassland B4, danger
+    "max_danger": 21,       # 2026-11-17, the user after run 51 ("Let's step to 21"): 20 -> 21 at Lv45, unattended limit 19 -> 20, on
+                            # Chilly Cave B4, danger 19 (the unattended limit at 20), 30 fights, lowest 81%, no drink (fact #1499,
+                            # held back for the user to see first; superseded by the raise's fact).
+                            # run 51 (G59 M2, G59 done): raised 19 -> 20 at Lv45, unattended limit 18 -> 19: Old Grassland B4, danger
                             # 18 (the limit), its master killed, 24 fights, lowest 82%, no drink (fact #1496; run 46's precedent: 86%).
                             # run 51 (G59 M1): raised 18 -> 19 at Lv45 / HP 432 / PV 85 / speed 215, unattended limit 17 -> 18: Old
                             # Grassland B3, danger 17 (the limit), 25 fights, lowest HP 100%, no drink (fact #1495). Mystical

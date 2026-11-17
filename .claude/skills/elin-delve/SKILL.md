@@ -136,8 +136,8 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **20** at Lv45, run 51, G59 done); `ladder.py` takes
-the same number for every floor and **19** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **21** at Lv45, the user's step after run 51); `ladder.py` takes
+the same number for every floor and **20** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
 
@@ -163,8 +163,10 @@ mine is a threat flag now, not a reason to lower the gate), **18 at Lv44** (run 
 same run (G59 M1: Old Grassland B3 at danger 17, the unattended limit, 25 fights at a lowest 100%, no drink; Mystical
 Grassland B3 at 17 the same day fell to 67% on the chip of ~30 fights and was not counted: a clear under the drink line is
 not evidence), and **20** an hour later (G59 M2: Old Grassland B4 at danger 18, the new unattended limit, its master killed in
-24 fights at a lowest 82%, no drink; run 46's precedent counted 86%). The circuits take `--danger 2-15` once the unattended
-limit is 17+ (a base-15 nefia's B3 is the limit), `2-16` at 19. The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
+24 fights at a lowest 82%, no drink; run 46's precedent counted 86%), and **21** by the user's call after the run
+(2026-11-17: "Let's step to 21"; Chilly Cave B4 at danger 19, the unattended limit at 20, 30 fights at a lowest 81%, no
+drink: the evidence the run held back for the user, fact #1499). The circuits take `--danger 2-15` once the unattended
+limit is 17+ (a base-15 nefia's B3 is the limit), `2-16` at 19, `2-17` at 20. The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
 most floors sit far under the gate.
 
 ## 6. Fights on a floor
@@ -259,8 +261,12 @@ code's `kamikaze_dist`: **5 cells** (3 until run 40, 4 until run 41).
   furniture goes by `purge.py --heavy`. Furniture worth taking: `valuables.py` (elin-pack 4).
 - **An ether disease is weighed, not assumed bad** (the user's rule, 2026-11-02): the Single Ether Wing takes the back
   slot (the cloak falls into a bag) for speed: PV 88 -> 80, speed 132 -> 151 at Lv37, so it stays; `ladder.ether_check`
-  allows Gravity Point, Hunger for Slaughter and the Wing. The next disease strikes at corruption 200: an antibody
-  (Miral, 10 medals) before then.
+  allows the ones with no HP or attribute cost: Gravity Point, Hunger for Slaughter, the Wing, Third Eye, Mana Battery
+  and Hoof Transformation (FEAT.cs; the ids and reasons are in its comments). A disease strikes at every 100 corruption;
+  an antibody (Miral, 10 medals; Gikrak in Yowyn, 4,200 ecopos) takes the newest first, one per 100 boundary its drop
+  crosses (fact #982). **A slot disease is weighed against the goal it blocks** (the user, 2026-11-17: "I think we should
+  get the Ether antibody"): Hoof Transformation's speed (166 -> 215 at Lv45) lost to the boots' PV and DV once G60 (PV 100)
+  was the goal.
 - Quick-save after a conquest or a big haul (elin-play); every death or near-death gets its cause in the run log and a
   line here or in the table.
 

@@ -164,7 +164,9 @@ def ether_check():
     # run 47: Third Eye (etherEye, 1553) is FEAT.cs ModBase(PER, +a x (5 + n/3)) and ModBase(CHA, -a x (5 + n/3)): no HP, END
     # or STR; PER helps to-hit and ranged, CHA sets only the party cap and prices, and the circuits run solo; same rule
     # run 51: Hoof Transformation (etherFeet, 1552) is FEAT.cs ModBase(SPD 79, a x min(30 + LV/5, 100)) and UnequipAll(feet):
-    # at Lv45 speed 166 -> 215 for the boots' PV 8 / DV 12 (PV 91 -> 83); no HP or attribute (fact #1489); same rule
+    # at Lv45 speed 166 -> 215 for the boots' PV 8 / DV 12 (PV 91 -> 83); no HP or attribute (fact #1489); same rule.
+    # The user, 2026-11-17: cure it (the antibody, run 52's first errand): the boots count toward G60 (PV 100). Still
+    # allowed here, so a short antibody stock never stops the circuits
     eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1552, 1553, 1554, 1556, 1564)}
     if eth:
         refuse("an ether disease: " + ", ".join(f"{v.get('name')} Lv{v.get('lv')}" for v in eth.values())
