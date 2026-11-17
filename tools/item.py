@@ -19,6 +19,7 @@ Refusals (exit 1), each with the flag that overrides it (the review of 2026-10-2
   --force        a food listed as harmful, with a harmful trait in its tooltip, or rotten (run 27)
 Before a Buy with a shop open it prints what is carried already (the pack, and each open bag).
 """
+import os
 import re
 import sys
 from pathlib import Path
@@ -101,6 +102,18 @@ def main():
         if action and any(a["text"].lower().startswith(action) for a in r["data"]["acts"]):
             rep, chosen = r, s
             break
+    if action == "buy" and (rep is None or not any(a["text"].lower().startswith("buy") for a in rep["data"]["acts"])):
+        # run 51: "travel ration" matched my own "a travel ration" at the exact level and never reached the shop's
+        # "2 travel rations" (a plural one level down), so Buy was refused three times: for a Buy, look at the shop's side
+        # of the grid with the plural too
+        bs = call("buttons", all=True)["data"]["buttons"]
+        theirs = [b for b in bs if b.get("card") and "ButtonGrid inventory" in b["name"]
+                  and not (b["mine"] if "mine" in b else "UIInventory/List" in (b.get("path") or ""))]
+        for b in matches(name, theirs) or matches(name + "s", theirs):
+            r = call("invacts", i=b["i"])
+            if r.get("ok") and any(a["text"].lower().startswith("buy") for a in r["data"]["acts"]):
+                rep, chosen = r, b
+                break
     if rep is None:
         sys.exit("no usable slot")
     slots = [chosen]
@@ -195,7 +208,8 @@ def main():
         # run 46: 【Waking】 Anti Sleep keeps me awake; it harms only a loop that sleeps next (trainday, music, a road nap),
         # and a nefia floor is never slept on: there it's food (a Hungry stop on Capricious Ruin with nine such dishes)
         zone = (call("state").get("data") or {}).get("zone") or {}
-        if zone.get("nefia") or str(zone.get("full") or "").startswith("Zone_dungeon"):
+        # run 51: circuit.fed_nap eats on a nefia's B1 and naps outside right after: ELIN_NAP_NEXT keeps Waking refused
+        if (zone.get("nefia") or str(zone.get("full") or "").startswith("Zone_dungeon")) and not os.environ.get("ELIN_NAP_NEXT"):
             risky = [t for t in risky if not re.search(r"anti sleep|waking", t, re.I)]
         if risky and "--force" not in sys.argv:
             sys.exit(f"refusing: a harmful trait in the tooltip: {risky}")

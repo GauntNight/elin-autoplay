@@ -56,7 +56,9 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
 6. **The fence's hours:** Siyun traded about 15:40-21:40 and slept at night in run 44 (run 43: asleep at 05:37 and
    13:04, trading at 19:37 and 23:56); run 45 sold at 20:25, 20:17 and also 10:42: her hours vary. A theft batch at night
    (sleepers can't witness), the sale in the afternoon or evening; **try the sale and read fence.py's result** rather
-   than write down "asleep" unchecked (run 45). Leoban on B1 refuses a high-karma buyer ("a straight-laced adventurer").
+   than write down "asleep" unchecked (run 45). Leoban on B1 refuses a high-karma buyer ("a straight-laced adventurer", karma 73)
+   but **bought a night batch at 01:00 with karma at the floor 20** (run 51, fact #1492): end a batch at the floor and sell to
+   him at once (`bridge.py walkto 63 65`, `fence.py Leoban`), no wait for Siyun.
 
 Yield: about 4 contribution a theft at DEX 61 (run 44), about 2.9 once sold in run 45 (0 -> 310/1,000 over two visits,
 105 thefts). `steal.py [R]` alone lists the marks in reach (weight against Pickpocket x 200 + STR x 100 + 1000, the

@@ -32,6 +32,18 @@ def worn(target):
     return any(i.get("equipped") for i in hits)
 
 
+def worn_uid(target):
+    """The uid of the worn thing that TARGET names, or None (run 51: the re-equip went by a name read from the log)."""
+    for i in (call("stock", r=0)["data"].get("pack") or []):
+        if i.get("equipped") and matches(target, [i], key="name"):
+            return i.get("uid")
+    return None
+
+
+def is_worn(uid):
+    return any(i.get("uid") == uid and i.get("equipped") for i in (call("stock", r=0)["data"].get("pack") or []))
+
+
 def main():
     if len(sys.argv) < 4:
         sys.exit(__doc__)
@@ -40,6 +52,7 @@ def main():
     was_worn = worn(target)
     if was_worn is None:
         sys.exit(f"no {target!r} in the pack or worn")
+    uid = worn_uid(target) if was_worn else None
     # run 40: three plain scrolls of enchant weapon read on an axe at +3 only "resisted" and were used up. The code (ActEffect): the
     # cap is 2, great 4, +1 when blessed. A piece at its cap is refused before the read
     if "enchant" in item.lower() and "--force" not in sys.argv:
@@ -50,7 +63,6 @@ def main():
         m = re.search(r" \+(\d+)", now[0]) if now else None
         if m and int(m.group(1)) >= cap:
             sys.exit(f"refused: {now[0]} is at +{m.group(1)}: {item} caps at +{cap}; it would resist and be used up (--force)")
-    log0 = call("state")["data"].get("log") or []
     if action.lower() == "cast":
         # run 45: 16 Miracle pieces rode in the bags while Aliyun slept; the Identify spell (195 casts in stock) opens the same
         # picker grid as the scroll. ITEM is the spell's alias (power.py lists them: SpIdentify, SpUncurse)
@@ -83,22 +95,16 @@ def main():
         tool("hotbar.py", "--deselect")
     log = call("state")["data"].get("log") or []
     print("log:", " / ".join(log[-3:]))
-    if was_worn and not worn(target):
-        # the target may have been renamed by identification: equip by the new name if it changed
-        # run 22: log[-4:] still held the last scroll's "is identified as ☆The Tough Light Cloak", so
-        # an enchanted Mass Hand Axe was "re-equipped" as the cloak and two nefias went by without it:
-        # only the lines this action wrote count
-        new = log[len(log0):] if log[:len(log0)] == log0 else [l for l in log if l not in log0]
-        name = target
-        for l in new:
-            m = re.search(r"is identified as (.+?)\.$", l)
-            if m:
-                name = m.group(1)
+    if uid is not None and not is_worn(uid):
+        # The thing itself, by its uid (run 51): an identification renames it and an enchant changes its +N, and the
+        # old way read the new name from the log, a fixed-size ring: run 22 re-equipped the cloak for an axe, and run 51
+        # tried a shipped shield for an enchanted ring (an older "is identified as" line counted as new), leaving the ring off
+        name = f"uid:{uid}"
         print("re-equip:", last(tool("item.py", name, "Equip")))
-        again = worn(name)
+        again = is_worn(uid)
         print("worn again:", again)
         if not again:
-            sys.exit(f"!! {name!r} is off: equip it by hand (item.py NAME Equip) before going on")
+            sys.exit(f"!! {target!r} ({name}) is off: equip it by hand (item.py {name} Equip) before going on")
 
 
 if __name__ == "__main__":

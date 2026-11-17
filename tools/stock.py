@@ -236,13 +236,15 @@ def ship(plan, d, limit):
                 batch = names[:min(room, limit - moved)]
                 r = run("bag.py", bag, "--take", *batch) if bag else run("box.py", where, "--take", *batch)
                 print(r)
-                if r.rc != 0:
+                # run 51 (twice): two rods of one name in a batch, the second "not in the bag", and the stop here left the
+                # taken ones stranded in the pack (34 stacks): ship what came out, stop only when nothing did
+                if r.rc != 0 and ": moved" not in str(r):
                     stop(f"{'bag.py ' + bag if bag else 'box.py ' + where} --take refused (rc {r.rc})")
             else:
                 batch = names[:limit - moved]
             r = run("box.py", BOX_STR(SHIPPING), *batch)
             print(r)
-            if r.rc != 0:
+            if r.rc != 0 and ": moved" not in str(r):
                 stop(f"box.py shipping refused (rc {r.rc}): is the shipping chest full?")
             moved += len(batch)
             names = names[len(batch):]

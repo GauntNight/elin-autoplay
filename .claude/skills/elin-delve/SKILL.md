@@ -136,8 +136,8 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **17** at Lv42, the user's call after run 46); `ladder.py` takes
-the same number for every floor and **16** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **20** at Lv45, run 51, G59 done); `ladder.py` takes
+the same number for every floor and **19** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
 
@@ -158,7 +158,13 @@ danger-12 floors at the unattended limit cleared without a drink), 15 at Lv38 (r
 86%, no drink; the first raise read from runs/conquests.csv), **back to 16 at Lv42** the same run (Guiding Cave B4 at
 danger 13: HP 354 -> 42 on a mine its master, a mine dog, had laid; the rule's step down, though the mine and not the
 floor's danger was the cause), and **17 again** by the user's call after the run (2026-11-13: "we can try 16+ again"; a
-mine is a threat flag now, not a reason to lower the gate). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
+mine is a threat flag now, not a reason to lower the gate), **18 at Lv44** (run 51: run 50's Arcane Forest B4 at danger
+16, the unattended limit, lowest HP 97%, no drink; PV 74 -> ~88 from seven enchant scrolls the same day), **19 at Lv45** the
+same run (G59 M1: Old Grassland B3 at danger 17, the unattended limit, 25 fights at a lowest 100%, no drink; Mystical
+Grassland B3 at 17 the same day fell to 67% on the chip of ~30 fights and was not counted: a clear under the drink line is
+not evidence), and **20** an hour later (G59 M2: Old Grassland B4 at danger 18, the new unattended limit, its master killed in
+24 fights at a lowest 82%, no drink; run 46's precedent counted 86%). The circuits take `--danger 2-15` once the unattended
+limit is 17+ (a base-15 nefia's B3 is the limit), `2-16` at 19. The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
 most floors sit far under the gate.
 
 ## 6. Fights on a floor
@@ -206,8 +212,10 @@ A mine dog buries mines as it fights; a laid mine does (50 + TrapLv x 2 + rnd 15
 42 in one step; run 47, Ominous Cave B2, 280 -> 106 (fact #1413). **A levitating chara ignores a mine**, so the Levitate
 spell is the counter: `delve.py` casts it the moment a mine-layer becomes the target (run 47, Tainted Cave B2: "Levitate
 on", the dog killed at full HP) and `ladder.levitate_over_mines` between passes when a laid mine is on the floor. My
-Casting fails some casts (it retries 4 times). The dog also casts Gravity (ConGravity); whether that cancels levitation is
-unread. Hurt among mines: stand still (a mine fires on a step), drink, then teleport off the area.
+Casting fails some casts (it retries 4 times). **Gravity cancels it** (run 51, fact #1486: "Gravity nullifies your
+levitation", and every cast failed under ConGravity): with Gravity on, don't step; kill the dog where it stands or from
+range, and walk only cells already crossed. Hurt among mines: stand still (a mine fires on a step), drink, then teleport off
+the area.
 
 ### Exploders (suicide attackers)
 

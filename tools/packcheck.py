@@ -119,6 +119,7 @@ ROUTES = [
       "glutamine", "honeycomb", "honey", "yeast", "juice", "crim powder", "wasabi"), BOX_STR(home.PANTRY) + "|" + BOX_STR(home.PANTRY_2) + "|" + BOX_STR(home.PANTRY_3) + "|" + "|".join(BOX_STR(w) for w in home.WAGONS), "Pantry (the Kitchen; the yard's wagons when full, run 43)"),  # run 14: a purple herb and coffee had no route; run 15: a preservative, pepper
     (("grave of",), "ship", "the shipping chest (a boss's grave: junk, value 0-ish)"),
     (("Scrubber", "charm ("), "ship", "the shipping chest (☆The Scrubber, a boss-chest regular, and plain charms: run 30)"),
+    (("small plant", "guitar stand"), "ship", "the shipping chest (floor decorations the loot picks up: run 51)"),
     # run 34: four "decide" stacks held up leave.py twice (loot from Rustic Forest and run 33's chests)
     (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern",
       # run 46: boss-chest and floor odds with no rule (a plate, hanging pots, sea pants, the rest)

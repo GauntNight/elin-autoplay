@@ -90,8 +90,15 @@ def fed_nap():
     three times in one evening; sleep.py won't nap hungry and the world map has no Eat). wgo.meal_stop enters the local map
     under me (a nefia's tile goes in and back up its stairs), eats to the mark, and comes back up."""
     if ((state().get("pc") or {}).get("hunger") or 0) >= 50:
+        import os
         import wgo
-        why = wgo.meal_stop()
+        # run 51: the meal stop ate six 【Waking】 coffee-bean pies on Traditional Ruin's B1 (item.py allows them on a nefia
+        # floor) and the nap that followed was refused "not sleepy": a nap follows this meal, so item.py refuses them here
+        os.environ["ELIN_NAP_NEXT"] = "1"
+        try:
+            why = wgo.meal_stop()
+        finally:
+            os.environ.pop("ELIN_NAP_NEXT", None)
         print(f"  a meal before the nap: {why or 'fed'}", flush=True)
         # run 44 (Savage Ruin): the meal stop ate on B1 with a drone in view and its stairs up didn't take, so the nap was
         # refused "in a nefia" and the circuit looked for the world map's Enter from inside the floor

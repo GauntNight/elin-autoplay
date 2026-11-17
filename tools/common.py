@@ -369,7 +369,14 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 17,       # 2026-11-13, the user overruled run 46's step back ("we can try 16+ again"): the near-death
+    "max_danger": 20,       # run 51 (G59 M2, G59 done): raised 19 -> 20 at Lv45, unattended limit 18 -> 19: Old Grassland B4, danger
+                            # 18 (the limit), its master killed, 24 fights, lowest 82%, no drink (fact #1496; run 46's precedent: 86%).
+                            # run 51 (G59 M1): raised 18 -> 19 at Lv45 / HP 432 / PV 85 / speed 215, unattended limit 17 -> 18: Old
+                            # Grassland B3, danger 17 (the limit), 25 fights, lowest HP 100%, no drink (fact #1495). Mystical
+                            # Grassland B3 (17) the same day went to 67% on chip damage and was not counted.
+                            # run 51: raised one step at Lv44 / HP 415 / PV ~88, unattended limit 16 -> 17: run 50's Arcane Forest B4,
+                            # danger 16 (the unattended limit), cleared at a lowest 97% with no drink (runs/conquests.csv; fact #1484).
+                            # 2026-11-13, the user overruled run 46's step back ("we can try 16+ again"): the near-death
                             # came from a laid mine, not the floor's danger. 17 at Lv42 / HP 354, unattended limit 16.
                             # run 46: lowered one step again at Lv42 (the rule: a near-death at or under the limit): Guiding Cave B4,
                             # danger 13, HP 354 -> 42 (12%) on a mine its master (a mine dog) had laid; the cause was the mine, not
@@ -572,8 +579,11 @@ def empty_slots():
     # slot as the Ether Wing blocks the back (left out of GEAR_SLOTS since run 29): a blocked slot isn't empty
     blocked = set()
     try:
-        if "etherNeck" in (data("skills").get("ether") or {}):
+        eth = data("skills").get("ether") or {}
+        if "etherNeck" in eth:
             blocked.add(31)
+        if "etherFeet" in eth:  # run 51: Hoof Transformation (FEAT.cs 1552: UnequipAll(39)) blocks the feet
+            blocked.add(39)
     except Exception:  # noqa: BLE001 (an older bridge: count the slot)
         pass
     return [name if need == 1 else f"{name} ({worn.get(sid, 0)} of {need})"

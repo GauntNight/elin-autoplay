@@ -312,10 +312,17 @@ def unclutter():
     movable = [n for n in by["pack"] if not re.search(PACK_KEEP, n.lower()) or re.search(r"\((miracle|godly)\)", n.lower())]
     # run 39 (Rustic Grassland): the kit alone took 33 grid cards (five rods of teleport, four of cure minor wound),
     # the ladder refused at 2 free and purge found "nothing cheap": the rods past the two with most charges move
-    for kind in ("rod of teleport", "rod of cure minor wound"):
+    for kind in ("rod of teleport", "rod of cure minor wound", "rod of cure critical wound"):  # cure critical: run 51 (four in the grid)
         rods = [n for n in by["pack"] if kind in n.lower() and "blessed" not in n.lower() and n not in movable]
         rods.sort(key=lambda n: -int((re.search(r"\((\d+) charges?\)", n.lower()) or [0, 0])[1]))
         movable += rods[2:]
+    # run 51: the kit pattern kept every stack of arrows and every long bow in the grid (a ☆ spare bow from a chest and a
+    # second arrow stack), and the ladder refused two doors at 1 free card: one of each stays, the largest stack or the
+    # first bow (the worn or hotbar one comes first), the rest move to a bag
+    for kind in (r"\barrows?\b", r"\blong bow\b"):
+        dup = [n for n in by["pack"] if re.search(kind, n.lower()) and n not in movable]
+        dup.sort(key=lambda n: -int((re.match(r"(\d+) ", n) or [0, 1])[1]))
+        movable += dup[1:]
     room = {b: bag_slots(b) - len(by.get(b) or []) for b in BAGS if b in by}
     plan = {}
     # run 39: the meals bought at Olvina (roasts, shortcakes, cheese, imos) went into the backpack and the spoils bag,
