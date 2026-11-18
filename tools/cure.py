@@ -66,7 +66,13 @@ def main():
             break
         if mp < min_mp:
             stop(f"MP {mp} under {min_mp} at HP {hp}/{mx} after {casts} casts")
-        if not fight_ok and hostiles():
+        # run 52, a Machinarium B3: bleeding at 69% with a Lv5 beth failure, then a Lv5 drone in view: fight.py refused
+        # under 70% and this refused with a hostile in view, so the ladder stopped. A foe 20+ levels under mine and not
+        # beside me doesn't block a cast
+        hs = hostiles()
+        blocking = [c for c in hs if not (isinstance(c, dict) and (c.get("lv") or 99) <= p.get("lv", 0) - 20
+                                          and (c.get("dist") or 0) >= 2)] if isinstance(hs, list) else hs
+        if not fight_ok and blocking:
             stop(f"hostile in view at HP {hp}/{mx} after {casts} casts: fight or leave first")
         i = button()
         mp_before = mp

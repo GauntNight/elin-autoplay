@@ -209,7 +209,11 @@ def main():
         # and a nefia floor is never slept on: there it's food (a Hungry stop on Capricious Ruin with nine such dishes)
         zone = (call("state").get("data") or {}).get("zone") or {}
         # run 51: circuit.fed_nap eats on a nefia's B1 and naps outside right after: ELIN_NAP_NEXT keeps Waking refused
-        if (zone.get("nefia") or str(zone.get("full") or "").startswith("Zone_dungeon")) and not os.environ.get("ELIN_NAP_NEXT"):
+        # run 52: Hungry (76) on a road with three coffee bean pies the only meal left: the refusal stopped wgo, which won't
+        # walk Hungry, and the pie went down by hand (--force). At Hungry and not Sleepy, the hunger outweighs a nap's delay
+        pc = (call("state").get("data") or {}).get("pc") or {}
+        hungry_awake = (pc.get("hunger") or 0) >= 70 and not (pc.get("sleepPhase") or 0)
+        if ((zone.get("nefia") or str(zone.get("full") or "").startswith("Zone_dungeon")) or hungry_awake) and not os.environ.get("ELIN_NAP_NEXT"):
             risky = [t for t in risky if not re.search(r"anti sleep|waking", t, re.I)]
         if risky and "--force" not in sys.argv:
             sys.exit(f"refusing: a harmful trait in the tooltip: {risky}")

@@ -167,7 +167,14 @@ def ether_check():
     # at Lv45 speed 166 -> 215 for the boots' PV 8 / DV 12 (PV 91 -> 83); no HP or attribute (fact #1489); same rule.
     # The user, 2026-11-17: cure it (the antibody, run 52's first errand): the boots count toward G60 (PV 100). Still
     # allowed here, so a short antibody stock never stops the circuits
-    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1552, 1553, 1554, 1556, 1564)}
+    # run 52: Enemy of All Living Things (etherProvoke, 1563) struck at corruption 400: FEAT.cs ModBase(77 CHA, -a x (3 + n/4)),
+    # CHA 14 lower at Lv45, nothing else in the feat; CHA sets the ally cap and Lonely Soul (1646) adds max HP per empty ally
+    # slot (Chara.MaxHP), so max HP 438 -> 403 and MP 215 -> 197. A cost with no gain: cured at the next antibody (newest
+    # first), allowed here meanwhile because what it does is known and the HP rules read the new maximum
+    # run 52: Thick Neck (etherNeck, 1555) struck at corruption 500: FEAT.cs ModBase(65 PV, a x (12 + n)) and ModBase(77 CHA,
+    # -a x (5 + n/5)), UnequipAll(neck): at Lv46 PV 100 -> 150 for the necklace's PV 4, DEX 5 and crits, and the CHA cost
+    # through Lonely Soul (speed 197 -> 172, max HP 407 -> 389). Kept by the user's keep-while-worth-it rule (fact #1513)
+    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1552, 1553, 1554, 1555, 1556, 1563, 1564)}
     if eth:
         refuse("an ether disease: " + ", ".join(f"{v.get('name')} Lv{v.get('lv')}" for v in eth.values())
                + ": max HP or attributes may be down; the ether antibody cures it (Miral 10 medals, Yowyn's Ecopo shop)")
@@ -176,6 +183,19 @@ def ether_check():
 def spell_heal():
     """Cure Minor Wound to 85% when nothing hostile is in view (cure.py stops on one itself, and at its MP
     floor). True when HP is back over 70%: delve goes on. Run 28: Damp Machinarium B2's Imp stop."""
+    # run 52, Warped Ruin B1: a wyvern Lv26 at 28% stood beside me at 69% HP; delve stopped on the HP rule, cure.py on the
+    # hostile, fight.py on its 70% floor, and the circuit ended. Foes 15+ levels under mine are fought first, at a 55% floor
+    for _ in range(3):
+        s = state()
+        me = s.get("pc") or {}
+        foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
+        if not foes or any((c.get("lv") or 99) > (me.get("lv") or 0) - 15 for c in foes) or me.get("hp", 0) * 2 < me.get("maxHp", 1):
+            break
+        f = min(foes, key=lambda c: c.get("dist", 99))
+        r = run("fight.py", f.get("id") or f["name"], "55", timeout=300)  # 50 took Tragedic Ruin B4 to 45% (a cursed sword missing)
+        print(f"  heal: fought {f['name']} Lv{f.get('lv')} first (fight.py rc {r.rc})", flush=True)
+        if r.rc != 0:
+            break
     out = run("cure.py", "85", timeout=300)
     p = call("state")["data"]["pc"]
     if p["hp"] * 100 < 70 * p["maxHp"] and ("vanished" in out or "no 'Cure Minor Wound' button" in out):
@@ -996,6 +1016,12 @@ def fight_nearest(max_fights=4):
         f = min(foes, key=lambda c: c.get("dist", 99))
         r = run("fight.py", f.get("id") or f["name"], timeout=300)
         print(f"  fight_nearest: {f['name']} Lv{f.get('lv')} at {f.get('dist')}: fight.py rc {r.rc}", flush=True)
+        if r.rc == 1 and (f.get("lv") or 99) <= me - 10:
+            # run 52, Warped Cave B1: fight.py refused a slime Lv10 beside me while Dim, so condition_wait stopped the
+            # circuit; the Putit thrown killed it in three throws (no acid on gear, no melee). A far weaker foe gets the throw
+            name = f["name"].split(" ", 1)[-1] if f["name"].startswith(("a ", "an ")) else f["name"]
+            r = run("throw.py", name, "Putit In Amber", "8", "55", timeout=300)
+            print(f"  fight_nearest: threw at {f['name']}: throw.py rc {r.rc}", flush=True)
         if r.rc != 0:
             return False
     return not any(c.get("hostile") for c in state().get("nearby") or [])

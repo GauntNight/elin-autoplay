@@ -29,7 +29,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import call, data, ready, refuse, setup, stop, wait_idle, walk_beside  # noqa: E402
+from common import call, data, last, ready, refuse, run, setup, stop, wait_idle, walk_beside  # noqa: E402
 
 SKIP = False  # --skip: pass over a watched mark instead of stopping the batch
 TAKEN = 0     # thefts this run (the activity mark, run 33)
@@ -107,6 +107,22 @@ def take(uid, max_lv):
     if not p["liftable"]:
         return refuse(f"{p['name']} weighs {p['weight']}, over the steal limit {d['limit']}")
     why = ready()
+    # run 52: with Enemy of All Living Things (1563) Derphy's townsfolk came at me one after another (Dincess, Evolard,
+    # Cerotuen, Lv2-6) and every batch stopped before a theft; the same disease cuts a kill's karma loss to 30% (fact
+    # #1505). A hostile 20+ levels under mine, with no stronger one in view, is fought here, once each, and the batch goes on
+    for _ in range(4):
+        if not why or "hostile" not in why:
+            break
+        s = data("state")
+        me = s["pc"]
+        weak = [c for c in s.get("nearby") or [] if c.get("hostile") and c["lv"] <= me["lv"] - 20]
+        if not weak or len(weak) < len([c for c in s.get("nearby") or [] if c.get("hostile")]):
+            break
+        c = min(weak, key=lambda c: c.get("dist", 99))
+        name = c["name"].split(" ", 1)[-1] if c["name"].startswith(("a ", "an ")) else c["name"]
+        out = run("fight.py", name, "60", "--town-ok", "--melee", timeout=180)
+        print(f"  fought {c['name']} Lv{c['lv']} (hostile in town): {last(out)[:80]}", flush=True)
+        why = ready()
     if why:
         stop(f"not now: {why}")
     walk_beside(p["x"], p["z"], r=0, timeout=60000)

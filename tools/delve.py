@@ -302,6 +302,12 @@ def main():
                 if c["lv"] > p["lv"]:
                     halt(f"{c['name']} Lv{c['lv']} d{c['dist']} is Evolved (its gene, a superior one half the time) and "
                          "above my level: decide by hand (QuickSave, buffs, fight.py NAME 70 --force with the crew)")
+                # run 52, Arcane Cave B2: an Evolved Yeek Archer Lv28 reached the unreachable list ("left alone for this
+                # floor") and this branch put it back among the foes, so delve stopped on "no progress" until the circuit
+                # ended: the list holds here too, unless it comes adjacent
+                zone_now = str((s.get("zone") or {}).get("full") or "")
+                if unreachable(zone_now).get(str(c.get("uid")), 0) >= UNREACH_AFTER and c.get("dist", 9) > 1:
+                    continue
                 if c not in foes:
                     foes.append(c)
         if foes:

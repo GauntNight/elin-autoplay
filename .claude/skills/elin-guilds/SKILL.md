@@ -7,7 +7,7 @@ description: Guild work in Elin - the user's guild rule (every guild keeps risin
 
 **The rule (the user, 2026-11-01):** "all guilds should keep increasing until they are max rank". Rank 6 is the game's
 cap. A guild goal done sets the next rank as a goal at once (elin-goals); the goals and their milestones are in
-`knowledge/goals.md` (G57 Thieves rank 5, G49 Mages rank 4, G58 Merchants rank 6 at this writing; G50, Merchants rank 5, done in run 50; the Fighters are done).
+`knowledge/goals.md` (G62 Thieves rank 6, G63 Mages rank 5, G58 Merchants rank 6 at this writing; G57 and G49 done in run 52; the Fighters are done).
 The review of 2026-11-11: the three ride along with the circuits and the trips, without a plan slot of their own.
 
 **Read the number:** `python -I tools/journal.py guilds` prints each guild's rank and contribution from the journal
@@ -58,7 +58,10 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
    (sleepers can't witness), the sale in the afternoon or evening; **try the sale and read fence.py's result** rather
    than write down "asleep" unchecked (run 45). Leoban on B1 refuses a high-karma buyer ("a straight-laced adventurer", karma 73)
    but **bought a night batch at 01:00 with karma at the floor 20** (run 51, fact #1492): end a batch at the floor and sell to
-   him at once (`bridge.py walkto 63 65`, `fence.py Leoban`), no wait for Siyun.
+   him at once (`bridge.py walkto 63 65`, `fence.py Leoban`), no wait for Siyun. **Run 52: he bought at karma 45 too**, and Siyun at 06:14 and 17:32. A stolen "cargo" container sells
+   for ~120 (a few points): fence.py sells it now, though runs/carry.txt keeps it from being dropped or shipped.
+7. **An ether disease can end a theft night** (run 52, fact #1512): with Enemy of All Living Things every townsperson turns hostile
+   on sight; steal.py fights those 20+ levels under mine and goes on, but a second night got 0 thefts. Cure it before a batch.
 
 Yield: about 4 contribution a theft at DEX 61 (run 44), about 2.9 once sold in run 45 (0 -> 310/1,000 over two visits,
 105 thefts). `steal.py [R]` alone lists the marks in reach (weight against Pickpocket x 200 + STR x 100 + 1000, the
@@ -118,7 +121,8 @@ towns refuse to trade and their guards attack.
   under half MP: below that the mana drain overflows into HP** (run 33: 199 -> 109 at MP 7), never reads confused, and
   stops on any hostile in view.
 - **The clerk's place:** Lovashy on Lumiest B1, near 40,93 beside Fleaun (not found on three visits; the fourth found
-  her, run 39). To Lumiest by Fast Travel, never a walk (fact #1168). Rank 4: salary 400 a month.
+  her, run 39; run 52: asleep at ~05:40, at her desk by ~08:40). To Lumiest by Fast Travel, never a walk (fact #1168). Rank 4
+  done in run 52 (G49); rank 5 is G63.
 
 ## Fighters (G31, G37, G40: done)
 

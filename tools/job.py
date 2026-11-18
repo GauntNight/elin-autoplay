@@ -20,6 +20,8 @@ def register(name):
     f = JOBS / f"{name}.json"
     f.write_text(json.dumps({"pid": os.getpid(), "started": time.time(), "argv": sys.argv}),
                  encoding="utf-8")
+    # run 52: the job's own children inherit this, so bridge.call can tell them from a second client (bridge.py)
+    os.environ["ELIN_JOB"] = name
     atexit.register(lambda: f.unlink(missing_ok=True))
 
 

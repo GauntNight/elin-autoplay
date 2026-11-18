@@ -202,6 +202,14 @@ def handle_ambush(_retry=False):
         # to the edge: fight it and leave again (once), rather than stop the trip
         print(f"  ambush: {last(out)[:80]}: fighting again")
         return handle_ambush(_retry=int(_retry) + 1)
+    if out.rc != 0 and "could not find an exit" in last(out):
+        # run 52: two lake ambushes in a row east of home; leave.py stops at every "water" floor not named shallow
+        # (its drowning rules), and wade.py (run 29) crossed both, checking each next cell's suffocate flag itself
+        w = run("wade.py", timeout=300)
+        print(f"  ambush: no exit by land: wade.py: {last(w)[:100]}")
+        if w.rc == 0:
+            return "cleared"
+        return "wade.py: " + last(w)
     if out.rc != 0:
         return "leave.py: " + last(out)
     return "cleared"

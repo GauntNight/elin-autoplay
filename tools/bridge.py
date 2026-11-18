@@ -76,9 +76,11 @@ World ops (goto, move, step, do, walkto) are refused by the bridge while a dialo
 open ("window open: LayerX"); read it with talk.py, or read.py then close.py.
 """
 import json
+import os
 import re
 import socket
 import sys
+from pathlib import Path
 
 ADDR = ("127.0.0.1", 47323)
 
@@ -123,7 +125,18 @@ def blocking_window():
 GUARD_PREFIXES = ("window open", "context menu open", "drama open", "a return is pending", "Squashed")
 
 
+READ_OPS = ("ping", "state")
+
+
 def call(op, **kw):
+    # run 52 (elin-play's hard rule: one bridge client at a time, runs 42, 45): a wgo walk started by hand while a
+    # circuit was still planning its routes timed out on the bridge. While runs/jobs/circuit.json names a running
+    # circuit, only its own children (job.register sets ELIN_JOB) act; others get ping and state (pulse.py, look)
+    if op not in READ_OPS and not os.environ.get("ELIN_JOB") and not os.environ.get("ELIN_JOB_OK"):
+        jf = Path(__file__).resolve().parent.parent / "runs" / "jobs" / "circuit.json"
+        if jf.exists():
+            return {"ok": False, "error": f"a circuit is running (runs/jobs/circuit.json): '{op}' would be a second "
+                    "bridge client; wait for its end, or runs/jobs/circuit.stop (ELIN_JOB_OK=1 if the file is left over)"}
     reply = _send(op, kw)
     err = reply.get("error") or ""
     if not reply.get("ok") and err.startswith("window open"):

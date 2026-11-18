@@ -369,7 +369,18 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 21,       # 2026-11-17, the user after run 51 ("Let's step to 21"): 20 -> 21 at Lv45, unattended limit 19 -> 20, on
+    "max_danger": 25,       # run 52 (G61 M4, G61 done): 24 -> 25 at Lv45, unattended limit 23 -> 24: Traditional Ruin B4, danger 23
+                            # (the limit), its master 『Stalker』 Lv34 killed in ~15 fights, lowest 100%, no drink (fact #1509).
+                            # run 52 (G61 M3): 23 -> 24 at Lv45, unattended limit 22 -> 23: Traditional Ruin B3, danger 22 (the
+                            # limit), explored at 400/400 with no drink (a king scorpion Lv21, a living armor, a slime, a sea snail;
+                            # a minotaur warrior Lv25 came into view at the end and left) (fact #1508).
+                            # run 52 (G61 M2): 22 -> 23 at Lv45, unattended limit 21 -> 22: Traditional Ruin B2, danger 21 (the
+                            # limit), 8 fights (a fire ent Lv20, a fire centipede Lv18, a self propelled gun Lv18), lowest 94%, no
+                            # drink, explored after tunnel.py opened one wall (fact #1507).
+                            # run 52 (G61 M1): 21 -> 22 at Lv45, unattended limit 20 -> 21: Traditional Ruin B1, danger 20 (the
+                            # limit), explored at full HP (400/400) with no drink: an asura Lv22 killed, kamikaze yeeks (one out of
+                            # reach); a thin floor (few fights), counted by the rule as written (fact #1506).
+                            # 2026-11-17, the user after run 51 ("Let's step to 21"): 20 -> 21 at Lv45, unattended limit 19 -> 20, on
                             # Chilly Cave B4, danger 19 (the unattended limit at 20), 30 fights, lowest 81%, no drink (fact #1499,
                             # held back for the user to see first; superseded by the raise's fact).
                             # run 51 (G59 M2, G59 done): raised 19 -> 20 at Lv45, unattended limit 18 -> 19: Old Grassland B4, danger

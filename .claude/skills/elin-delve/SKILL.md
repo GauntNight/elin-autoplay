@@ -136,8 +136,8 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **21** at Lv45, the user's step after run 51); `ladder.py` takes
-the same number for every floor and **20** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **25** at Lv45, G61 done in run 52); `ladder.py` takes
+the same number for every floor and **24** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
 
@@ -165,8 +165,12 @@ Grassland B3 at 17 the same day fell to 67% on the chip of ~30 fights and was no
 not evidence), and **20** an hour later (G59 M2: Old Grassland B4 at danger 18, the new unattended limit, its master killed in
 24 fights at a lowest 82%, no drink; run 46's precedent counted 86%), and **21** by the user's call after the run
 (2026-11-17: "Let's step to 21"; Chilly Cave B4 at danger 19, the unattended limit at 20, 30 fights at a lowest 81%, no
-drink: the evidence the run held back for the user, fact #1499). The circuits take `--danger 2-15` once the unattended
-limit is 17+ (a base-15 nefia's B3 is the limit), `2-16` at 19, `2-17` at 20. The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
+drink: the evidence the run held back for the user, fact #1499), and **22** in run 52 (G61 M1: Traditional Ruin B1 at
+danger 20, the unattended limit, explored at full HP with no drink: an asura Lv22 and kamikaze yeeks, few fights, fact #1506), and **23** the same
+night (G61 M2: its B2 at danger 21, 8 fights, lowest 94%, no drink, explored after tunnel.py opened a wall, fact #1507), and **24** (G61 M3: its B3 at danger 22, explored at full HP, no
+drink: a king scorpion Lv21, a living armor, fact #1508), and **25** (G61 M4, G61 done: its B4 at danger 23, the master
+『Stalker』 Lv34 killed in ~15 fights at a lowest 100%, no drink, fact #1509). The circuits take `--danger 2-15` once the unattended
+limit is 17+ (a base-15 nefia's B3 is the limit), `2-16` at 19, `2-17` at 20, `2-18` at 21 (a base-20 nefia's B1 or a base-18's B3 is the limit then), `2-19` at 22, `2-20` at 23, `2-22` at 24 (run 52: base-23 nefias, Capricious Ruin and Warded Forest, kept their masters past B2 at 24: explored, not conquered). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
 most floors sit far under the gate.
 
 ## 6. Fights on a floor
@@ -262,7 +266,10 @@ code's `kamikaze_dist`: **5 cells** (3 until run 40, 4 until run 41).
 - **An ether disease is weighed, not assumed bad** (the user's rule, 2026-11-02): the Single Ether Wing takes the back
   slot (the cloak falls into a bag) for speed: PV 88 -> 80, speed 132 -> 151 at Lv37, so it stays; `ladder.ether_check`
   allows the ones with no HP or attribute cost: Gravity Point, Hunger for Slaughter, the Wing, Third Eye, Mana Battery
-  and Hoof Transformation (FEAT.cs; the ids and reasons are in its comments). A disease strikes at every 100 corruption;
+  and Hoof Transformation (FEAT.cs; the ids and reasons are in its comments); since run 52 also Enemy of All Living Things
+  (1563: CHA -14, so Lonely Soul's empty-slot HP falls, 438 -> 403; it turns townsfolk hostile and cuts a kill's karma loss to 30%:
+  facts #1504, #1505, #1512), allowed for nefias, a reason to cure before any town or guild night. **Thick Neck** (1555, fact #1513) came back at
+  corruption 500 in run 52: PV +(12 + Lv) (100 -> 150) for the neck slot and CHA -(5 + Lv/5) (speed 197 -> 172 through Lonely Soul): kept. A disease strikes at every 100 corruption;
   an antibody (Miral, 10 medals; Gikrak in Yowyn, 4,200 ecopos) takes the newest first, one per 100 boundary its drop
   crosses (fact #982). **A slot disease is weighed against the goal it blocks** (the user, 2026-11-17: "I think we should
   get the Ether antibody"): Hoof Transformation's speed (166 -> 215 at Lv45) lost to the boots' PV and DV once G60 (PV 100)

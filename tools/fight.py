@@ -192,7 +192,10 @@ def ranged_round(t, s, min_hp):
     party = [c for c in s.get("party") or [] if not c.get("pc")]
     if pc.get("mp", 0) >= RANGED_MP_FLOOR:
         stock = {x["spell"]: x["stock"] for x in call("power")["data"]["party"][0].get("spells") or []}
-        if party:
+        # run 52, Derphy: a Fire Bolt at an evasive townsman passed through and set Oforse the magnate alight beside
+        # him ("Something is destroyed"): in a town a bolt's line holds bystanders and property, so an arrow there
+        in_town = bool(((s.get("zone") or {}).get("town")))
+        if party or in_town:
             spell = max(("arrow_Nerve", "arrow_Magic", "arrow_Cold", "arrow_Poison"), key=lambda k: stock.get(k, 0))
         else:
             spell = "bolt_Fire" if stock.get("bolt_Fire", 0) > 0 else max(("arrow_Nerve", "arrow_Magic", "arrow_Cold"),

@@ -32,6 +32,11 @@ def goods(carried):
         # run 47: 8 stolen wall lamps were held back as "kit (light)": a thing the game marks stolen was taken minutes ago and
         # is never my kit (the worn torch is the light); the other guards (worn, unidentified, the carry list) still hold
         why = inv.protected(it, carried, kit=False)
+        # run 52: runs/carry.txt's "cargo" line (run 44: "unsold stolen goods for Siyun") is there so nothing drops or
+        # ships the stolen cargo before the sale; it held seven cargo containers (20 kg each) back from the fence itself
+        # for runs, and their weight sat in the bags. A stolen thing on the carry list for that reason is sold here
+        if why == "on the carry list (cargo)":
+            why = None
         if why:
             held.append((it, why))
         else:

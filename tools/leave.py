@@ -74,7 +74,10 @@ def pick_charges(items):
     n = 0
     for it in items or []:
         low = it["name"].lower()
-        if "lockpick" in low and "cursed" not in low and "doomed" not in low:
+        # run 52: "a specialized book of 「Lockpicking」" in Library 5 read as a stored pick and refused the door: the kind
+        # comes from the game's id (elin-play's hard rule), the name only when a row has no id
+        is_pick = it.get("id") == "lockpick" if it.get("id") else "lockpick" in low
+        if is_pick and "cursed" not in low and "doomed" not in low:
             m = re.search(r"\((\d+) charges?\)", low)
             n += (int(m.group(1)) if m else MIN_PICK_CHARGES) * (it.get("num") or 1)
         n += pick_charges(it.get("items"))
