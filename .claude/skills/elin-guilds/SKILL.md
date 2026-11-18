@@ -62,6 +62,8 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
    for ~120 (a few points): fence.py sells it now, though runs/carry.txt keeps it from being dropped or shipped.
 7. **An ether disease can end a theft night** (run 52, fact #1512): with Enemy of All Living Things every townsperson turns hostile
    on sight; steal.py fights those 20+ levels under mine and goes on, but a second night got 0 thefts. Cure it before a batch.
+   Incognito (scroll or spell) is no cure (fact #1514): a read calms everyone once, but the disease's roll ignores my disguise,
+   so it buys a quick sale or shop visit, never a batch.
 
 Yield: about 4 contribution a theft at DEX 61 (run 44), about 2.9 once sold in run 45 (0 -> 310/1,000 over two visits,
 105 thefts). `steal.py [R]` alone lists the marks in reach (weight against Pickpocket x 200 + STR x 100 + 1000, the
