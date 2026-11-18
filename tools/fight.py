@@ -195,7 +195,9 @@ def ranged_round(t, s, min_hp):
         # run 52, Derphy: a Fire Bolt at an evasive townsman passed through and set Oforse the magnate alight beside
         # him ("Something is destroyed"): in a town a bolt's line holds bystanders and property, so an arrow there
         in_town = bool(((s.get("zone") or {}).get("town")))
-        if party or in_town:
+        # run 53, Boring Ruin B1 (danger 7): Fire Bolt at an adjacent evasive bee Lv9 set me alight: 443 -> 245 and a rod
+        # of cure critical wound and a rod of teleport turned to dust. A fire bolt never goes at a target within 2 cells
+        if party or in_town or (t.get("dist") or 99) <= 2:
             spell = max(("arrow_Nerve", "arrow_Magic", "arrow_Cold", "arrow_Poison"), key=lambda k: stock.get(k, 0))
         else:
             spell = "bolt_Fire" if stock.get("bolt_Fire", 0) > 0 else max(("arrow_Nerve", "arrow_Magic", "arrow_Cold"),
@@ -257,6 +259,17 @@ def _fight(trk):
         refuse("in a town: a townsperson's death costs karma (run 48: Anastazija, -5): walk away, take the stairs or leave "
                "the map; --town-ok for a monster that came into town")
     foes0 = [c for c in s0.get("nearby") or [] if match(c, name, force)]
+    # run 53, Guiding Cave B1: a neutral Evolved Goblin Wizard fought with --force for its gene stole 3,249 orens and died
+    # with nothing dropped. A neutral thief kind (threat.py's "steals") stays neutral unless --thief-ok says the gold is boxed
+    if foes0 and force and "--thief-ok" not in sys.argv:
+        t0 = min(foes0, key=lambda c: c["dist"])
+        if not t0.get("hostile"):
+            import threat
+            prof = threat.profile(t0.get("id") or t0["name"]) or {}
+            seen = threat.seen_specials(prof.get("name") or re.sub(r"^(Evolved |an? )", "", t0["name"]).lower())
+            if "steals" in (prof.get("flags") or []) or "steals" in seen:
+                refuse(f"{t0['name']} is neutral and its kind steals (threat.py; run 53: 3,249 orens gone): leave it, "
+                       "or --thief-ok with the gold boxed")
     if foes0 and not force:
         t0 = min(foes0, key=lambda c: c["dist"])
         if t0["lv"] > s0["pc"]["lv"] + 2:

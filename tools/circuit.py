@@ -378,8 +378,14 @@ def main():
             for _ in range(2):
                 if ev.rc != 1 or "hostile" not in str(ev):
                     break
-                t = run("item.py", "scrolls of teleport", "Read", timeout=60)
-                print(f"  a foe in view at the evacuation: teleport ({last(t)[:40]})", flush=True)
+                # run 53 (Guiding Cave B5): a hot guy at 2 and no plain "scrolls of teleport" left (the kit's teleports are the
+                # spell and a rod): the read did nothing and the circuit stopped. The Short Teleport spell first, then a scroll
+                r = call("cast", spell="SpTeleportShort")
+                if r.get("ok") and (r.get("data") or {}).get("cast"):
+                    print("  a foe in view at the evacuation: Short Teleport (the spell)", flush=True)
+                else:
+                    t = run("item.py", "scroll of teleport", "Read", timeout=60)
+                    print(f"  a foe in view at the evacuation: teleport ({last(t)[:40]})", flush=True)
                 wait_until("frames", n=15, timeout=2000)
                 ev = run("evac.py", timeout=900)
             if ev.rc != 0 or not on_world():
