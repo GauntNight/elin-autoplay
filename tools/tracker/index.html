@@ -42,7 +42,7 @@
     <h1>Elin Run Tracker</h1>
     <p class="rt-take dash-skeleton" id="take" data-source="latest">&nbsp;</p>
     <div class="rt-key">
-      <span><i></i>The 2026-10-19 review: the system refactored by Claude Fable 5.1 between runs 12 and 13</span>
+      <span><i></i>The four review refactors (after runs 12, 20, 33 and 45) mark the epochs 0-4</span>
       <span>Hover a chart for each run's numbers and the model that played it</span>
     </div>
   </header>
@@ -53,13 +53,13 @@
   </section>
 
   <section class="rt-sec" id="refactor">
-    <h2>Before and after the refactor</h2>
+    <h2>By refactor epoch</h2>
     <div class="rt-card">
       <h3>Average per run</h3>
-      <div class="n">Runs 01–12 on the first system against runs 13 and later on the refactored one. Two runs after is a small sample.</div>
+      <div class="n" id="cmp-note">The mean per run of each measure in each refactor epoch: epoch 0 is the first system, and each review refactor starts the next (the user, 2026-11-18). The last column is the latest epoch against the one before it. An epoch of a few runs is a small sample.</div>
       <div class="rt-tablebox">
         <table class="rt-table" id="cmp" data-source="refactor" data-row-key="metric">
-          <thead><tr><th class="l" data-field="metric">Measure</th><th data-field="before">Runs 01–12</th><th data-field="after">Runs 13+</th><th data-field="change">Change</th></tr></thead>
+          <thead></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -101,10 +101,24 @@ dash.calc('latest', {
 
 dash.calc('refactor', {
   inputs: ['stats'],
-  title: 'Before and after the refactor',
-  description: 'The mean per run of each measure: runs 01-12 against runs 13 and later.',
+  title: 'By refactor epoch',
+  description: 'The mean per run of each measure in each refactor epoch (epoch 0 before the first review; each review row starts the next), and the latest epoch against the one before it.',
   fn: (stats) => {
+    // the user, 2026-11-18: "break it up by Refactor Epoc, we can have 0, 1, 2, 3, and 4": stats.csv lists the rows in play
+    // order with the reviews between, so a run's epoch is the count of review rows before it (metrics and tooling rows
+    // change no system and start no epoch)
+    let epoch = 0;
+    const epochOf = new Map();
+    for (const x of stats) {
+      if (x.kind === 'review') epoch += 1;
+      else if (x.kind === 'run') epochOf.set(x.point, epoch);
+    }
     const runs = stats.filter((x) => x.kind === 'run');
+    const ids = [...new Set(runs.map((x) => epochOf.get(x.point)))].sort((a, b) => a - b);
+    const epochs = ids.map((e) => {
+      const pts = runs.filter((x) => epochOf.get(x.point) === e).map((x) => x.point);
+      return { e, runs: pts, label: `Epoch ${e}`, span: pts.length > 1 ? `runs ${pts[0]}–${pts[pts.length - 1]}` : `run ${pts[0]}` };
+    });
     const val = (x) => (x === '' || x == null ? null : +x);
     const mean = (xs) => { const v = xs.filter((x) => x !== null); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null; };
     const round = (x, d) => (x === null ? null : Math.round(x * 10 ** d) / 10 ** d);
@@ -116,10 +130,13 @@ dash.calc('refactor', {
       ['Game errors', 'errors', 1, false], ['Errors per hour', 'errors_per_hour', 2, false],
       ['Deaths', 'deaths', 1, false], ['Near deaths', 'near_deaths', 1, false], ['Tool files changed', 'tool_files', 0, null]];
     return measures.map(([metric, f, digits, better]) => {
-      const before = round(mean(runs.filter((x) => +x.point < 13).map((x) => val(x[f]))), digits);
-      const after = round(mean(runs.filter((x) => +x.point >= 13).map((x) => val(x[f]))), digits);
+      const values = epochs.map((ep) => round(mean(runs.filter((x) => epochOf.get(x.point) === ep.e).map((x) => val(x[f]))), digits));
+      const before = values.length > 1 ? values[values.length - 2] : null;
+      const after = values.length ? values[values.length - 1] : null;
       const change = before && after !== null ? Math.round(((after - before) / before) * 100) / 100 : null;
-      return { metric, before, after, change, digits, better };
+      const row = { metric, change, digits, better, epochs: epochs.map(({ label, span }) => ({ label, span })) };
+      epochs.forEach((ep, i) => { row[`e${ep.e}`] = values[i]; });
+      return row;
     });
   },
 });
@@ -377,15 +394,30 @@ const TEXT = new Set(['point', 'date', 'model', 'character']);
 dash.onData(() => {
   const R = dash.data('refactor');
   cmp.innerHTML = '';
-  if (R.status === 'ok') {
+  const chead = document.querySelector('#cmp thead');
+  chead.innerHTML = '';
+  if (R.status === 'ok' && R.data.length) {
+    const eps = R.data[0].epochs;
+    const keys = eps.map((ep) => `e${ep.label.split(' ')[1]}`);
+    const htr = document.createElement('tr');
+    const cols = [['metric', 'Measure', 'l']].concat(eps.map((ep, i) => [keys[i], `${ep.label} (${ep.span})`]),
+      [['change', eps.length > 1 ? `Change, ${eps[eps.length - 2].label.toLowerCase()} → ${eps[eps.length - 1].label.split(' ')[1]}` : 'Change']]);
+    for (const [field, label, cls] of cols) {
+      const th = document.createElement('th'); th.textContent = label; th.dataset.field = field;
+      if (cls) th.className = cls;
+      htr.appendChild(th);
+    }
+    chead.appendChild(htr);
     for (const r of R.data) {
       const tr = document.createElement('tr');
-      const f = (x) => (x === null ? '' : d3.format(`,.${r.digits}f`)(x));
+      const f = (x) => (x === null || x === undefined ? '' : d3.format(`,.${r.digits}f`)(x));
       const ch = r.change === null ? '' : (r.change > 0 ? '+' : r.change < 0 ? '−' : '±') + d3.format('.0%')(Math.abs(r.change));
-      [r.metric, f(r.before), f(r.after), ch].forEach((v, i) => {
+      const cells = [r.metric].concat(keys.map((k) => f(r[k])), [ch]);
+      const last = cells.length - 1;
+      cells.forEach((v, i) => {
         const td = document.createElement('td'); td.textContent = v;
         if (i === 0) td.className = 'l';
-        if (i === 3 && r.change && r.better !== null) {
+        if (i === last && r.change && r.better !== null) {
           const good = r.better ? r.change > 0 : r.change < 0;
           td.style.color = good ? 'var(--color-ok)' : 'var(--color-bad)';
         }

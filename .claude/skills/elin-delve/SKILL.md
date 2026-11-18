@@ -136,7 +136,7 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **25** at Lv45, G61 done in run 52); `ladder.py` takes
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **25** at Lv45, G61 done in run 52; **G64 Floor gate 30** set by the user after run 53: five more steps by the same rule, the evidence floors a base 22-24 nefia's B1-B3); `ladder.py` takes
 the same number for every floor and **24** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
