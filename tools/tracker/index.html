@@ -193,20 +193,37 @@ const SECTIONS = [
   ] },
 ];
 
+// the user, 2026-11-18: "Can you give me a graph of that with the Epochs over time": the epoch means of the headline rates,
+// drawn over the runs (each run a faint dot, each epoch's mean a step across its runs), above the table in "By refactor epoch"
+SECTIONS.unshift({ id: 'epochs', into: 'refactor', charts: [
+  { id: 'ep-points', f: ['points_per_hour'], t: 'Points per hour, by epoch', n: 'Each dot a run; the line is each epoch\'s mean (E0-E4: the system between review refactors). Runs before 26 scored the same way afterwards.', kind: 'epoch', fmt: ',.0f' },
+  { id: 'ep-exp', f: ['exp_per_hour'], t: 'Exp per hour, by epoch', n: 'Character exp gained ÷ real hours; each dot a run, the line each epoch\'s mean.', kind: 'epoch', fmt: ',.0f' },
+  { id: 'ep-orens', f: ['orens_per_hour'], t: 'Gross orens per hour, by epoch', n: 'Gross income ÷ real hours (blank where the log gave no income); each dot a run, the line each epoch\'s mean.', kind: 'epoch', fmt: ',.0f' },
+  { id: 'ep-errors', f: ['errors_per_hour'], t: 'Game errors per hour, by epoch', n: 'errors.csv rows ÷ real hours (lower is better); each dot a run, the line each epoch\'s mean.', kind: 'epoch', fmt: ',.2f' },
+] });
+
 const host = document.getElementById('sections');
 for (const s of SECTIONS) {
-  const sec = document.createElement('section');
-  sec.className = 'rt-sec'; sec.id = s.id;
-  const h = document.createElement('h2'); h.textContent = s.title; sec.appendChild(h);
-  const grid = document.createElement('div'); grid.className = 'rt-grid'; sec.appendChild(grid);
+  let grid;
+  if (s.into) {
+    // charts that join an existing section: a grid under its heading, above what the section already holds
+    const sec = document.getElementById(s.into);
+    grid = document.createElement('div'); grid.className = 'rt-grid'; grid.id = s.id;
+    sec.insertBefore(grid, sec.querySelector('.rt-card'));
+  } else {
+    const sec = document.createElement('section');
+    sec.className = 'rt-sec'; sec.id = s.id;
+    const h = document.createElement('h2'); h.textContent = s.title; sec.appendChild(h);
+    grid = document.createElement('div'); grid.className = 'rt-grid'; sec.appendChild(grid);
+    host.appendChild(sec);
+  }
   for (const c of s.charts) {
-    const card = document.createElement('div'); card.className = 'rt-card'; card.id = 'c-' + c.f[0];
+    const card = document.createElement('div'); card.className = 'rt-card'; card.id = 'c-' + (c.id || c.f[0]);
     const t = document.createElement('h3'); t.textContent = c.t; card.appendChild(t);
     const n = document.createElement('div'); n.className = 'n'; n.textContent = c.n; card.appendChild(n);
     const box = document.createElement('div'); box.className = 'rt-chart dash-skeleton'; box.setAttribute('data-source', 'stats');
     card.appendChild(box); grid.appendChild(card); c.box = box;
   }
-  host.appendChild(sec);
 }
 
 const colorOf = (spec) => (typeof spec === 'string' ? `var(${spec})` : dash.colors[spec || 0]);
@@ -268,11 +285,40 @@ function draw(c, rows) {
   for (const ev of rows.filter((r) => r.kind !== 'run')) {
     g.append('line').attr('x1', cxOf(ev.point)).attr('x2', cxOf(ev.point)).attr('y1', 12).attr('y2', H - 22)
       .attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
-    g.append('text').attr('x', cxOf(ev.point)).attr('y', 7).attr('text-anchor', 'middle').attr('font-size', 10)
-      .attr('fill', 'var(--color-fg-muted)').text('refactor');  // only reviews reach here: the metrics rows are filtered out
+    // only reviews reach here: the metrics rows are filtered out; an epoch chart names the epochs instead
+    if (c.kind !== 'epoch') g.append('text').attr('x', cxOf(ev.point)).attr('y', 7).attr('text-anchor', 'middle').attr('font-size', 10)
+      .attr('fill', 'var(--color-fg-muted)').text('refactor');
+  }
+  // the refactor epoch of each run (a review row starts the next) and each epoch's mean of the measure
+  const epOf = new Map(), epMean = new Map();
+  if (c.kind === 'epoch') {
+    let e = 0;
+    for (const r of rows) { if (r.kind === 'review') e += 1; else if (r.kind === 'run') epOf.set(r.point, e); }
   }
   const mk = g.append('g').attr('class', 'mk');
-  if (c.kind === 'bar') {
+  if (c.kind === 'epoch') {
+    const s = series[0].filter((d) => d.v !== null && d.r.kind === 'run');
+    mk.selectAll('circle').data(s).join('circle').attr('cx', (d) => cxOf(d.p)).attr('cy', (d) => y(d.v)).attr('r', 2.5)
+      .attr('fill', 'var(--cds-chart-muted)');
+    const steps = [];
+    const byEp = new Map();
+    for (const d of s) { const k = epOf.get(d.p); if (!byEp.has(k)) byEp.set(k, []); byEp.get(k).push(d); }
+    for (const [ep, ds] of byEp) {
+      const m = ds.reduce((t, d) => t + d.v, 0) / ds.length;
+      epMean.set(ep, m);
+      const inEp = rows.filter((r) => r.kind === 'run' && epOf.get(r.point) === ep);
+      const x0 = x(inEp[0].point), x1 = x(inEp[inEp.length - 1].point) + x.bandwidth();
+      steps.push([x0, y(m)], [x1, y(m)]);
+      g.append('text').attr('x', (x0 + x1) / 2).attr('y', 7).attr('text-anchor', 'middle').attr('font-size', 10)
+        .attr('fill', 'var(--color-fg-muted)').text('E' + ep);
+      // a halo in the card's own colour keeps the mean readable over the run dots (both themes)
+      mk.append('text').attr('x', (x0 + x1) / 2).attr('y', y(m) - 6).attr('text-anchor', 'middle').attr('font-size', 10)
+        .attr('fill', 'var(--color-fg)').attr('stroke', 'var(--color-panel)').attr('stroke-width', 3)
+        .attr('stroke-linejoin', 'round').attr('paint-order', 'stroke').text(fmt(m));
+    }
+    mk.insert('path', 'text').datum(steps).attr('d', d3.line()).attr('fill', 'none').attr('stroke', dash.colors[0])
+      .attr('stroke-width', 2).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+  } else if (c.kind === 'bar') {
     const k = series.length;
     const bw = Math.min(32, x.bandwidth() / k);
     series.forEach((s, i) => {
@@ -311,6 +357,11 @@ function draw(c, rows) {
         line.textContent = `${c.names ? c.names[i] + ': ' : ''}${v === null ? 'not recorded' : fmt(v) + (c.unit || '')}${died(r) ? ' (died)' : ''}`;
         tip.appendChild(line);
       });
+      if (c.kind === 'epoch' && epOf.has(r.point) && epMean.has(epOf.get(r.point))) {
+        const line = document.createElement('div');
+        line.textContent = `Epoch ${epOf.get(r.point)} mean: ${fmt(epMean.get(epOf.get(r.point)))}`;
+        tip.appendChild(line);
+      }
       tip.hidden = false;
       const scale = box.clientWidth / W;
       const tw = tip.offsetWidth;
