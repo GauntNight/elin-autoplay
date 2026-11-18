@@ -294,7 +294,12 @@ def main():
                 # alone; the code fought it with --force, and an Evolved Electric Cloud Lv44 at my Lv45 stalled Old Ruin B2
                 # ("no progress", no attack reached it): neutral and within 5 levels below me is walked past too
                 near = c["lv"] >= p["lv"] - 5
-                if (c["lv"] > p["lv"] + 3 or (hard and c["lv"] > p["lv"]) or near) and not c.get("hostile"):
+                # run 53: a neutral Evolved Goblin Wizard Lv36 (at my Lv46) stopped two circuits on "no progress" (no throw
+                # targets a neutral one), and fought by hand it stole 7,567 orens and blinked off before it died (fact #1531):
+                # a neutral thief kind (threat.py flags or the fight log's tricks) is walked past, as fight.py now refuses it
+                prof_c = threat.profile(c.get("id") or c["name"]) or {}
+                thief = "steals" in (prof_c.get("flags") or []) or "steals" in threat.seen_specials(prof_c.get("name") or "")
+                if (c["lv"] > p["lv"] + 3 or (hard and c["lv"] > p["lv"]) or near or thief) and not c.get("hostile"):
                     if c.get("uid") not in EVOLVED_SKIPPED:
                         EVOLVED_SKIPPED.add(c.get("uid"))
                         print(f"  left alone: {c['name']} Lv{c['lv']} (neutral, {c['lv'] - p['lv']:+d} levels from mine)")

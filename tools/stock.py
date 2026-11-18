@@ -245,6 +245,11 @@ def ship(plan, d, limit):
             r = run("box.py", BOX_STR(SHIPPING), *batch)
             print(r)
             if r.rc != 0 and ": moved" not in str(r):
+                # run 53: the chest was full for the morning (40 stacks) after a batch came out of a box, and the rods and
+                # scrolls stayed in the pack (the next decode found no free card): what was taken goes back where it was
+                if where != "pack" or bag:
+                    back = run("bag.py", bag, *batch) if bag else run("box.py", where, *batch)
+                    print(f"  the chest refused: back to {bag or where}: {last(back)[:80]}")
                 stop(f"box.py shipping refused (rc {r.rc}): is the shipping chest full?")
             moved += len(batch)
             names = names[len(batch):]

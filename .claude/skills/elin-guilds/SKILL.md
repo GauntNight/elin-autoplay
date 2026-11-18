@@ -107,9 +107,11 @@ towns refuse to trade and their guards attack.
   9,450 (16) and pays 5 + L + 1; capped at ~7,600-8,700 a step it came to ~330 orens a point over 17 shops. **Shops at 14-17
   now:** Palmia (Tarraf 18, Eligin, Monashy, Kazretta, Koflord, Shuzastan, Semnof), Aquli Teola (Sesa, Sayig, Esdor), Derphy
   (Siyun, Kerona, Leoban, Erobird, Fortoli 17), Lumiest (Robean, Vuten 16, Tomyin 13), Noyel (Bethberk 14, Alecgan 12), Willow (Chim 12:
-  8 -> 12 for 2,485, 2,840, 3,388, 4,159, a few percent under the table above at 9-12, fact #1480). Never
-  invested (G58's cheap points): Willow's Agasard (the butcher; fact #1481 lists the town); Noyel's Ceshed, Oldotta, Teoyan, Miscold, Nuwert; Lumiest's Teolarg and Raydorre; Mysilia,
-  Tinker's Camp, Yowyn and Olvina shops (their levels unread since runs 21-43). Monazess's guild shop takes no investment.
+  8 -> 12 for 2,485, 2,840, 3,388, 4,159, a few percent under the table above at 9-12, fact #1480). **Run 53 read
+  and raised:** Noyel Miscold 3 -> 9, Nuwert 1 -> 4; Olvina Wyward 9 -> 12, Hesbald 2 -> 8, Vanloot 3 -> 7, Raiyas 5 -> 6,
+  Iofael 9 (fact #1528); **Lumiest's Teolarg and Raydorre were already 13** (this list had them as never invested);
+  Sayig 15. Still unread (G58's possible cheap points): Willow's Agasard (the butcher; fact #1481 lists the town); Noyel's
+  Ceshed, Oldotta, Teoyan; Mysilia, Tinker's Camp and Yowyn shops (levels from runs 21-43). Monazess's guild shop takes no investment.
 - **Never a town secretary:** that investment pays the guild nothing (fact #1336).
 - **The budget:** only orens above the six-bill reserve; G58 (rank 6, 2,600) takes what the circuits and the chest bring in.
 - The guild's informers buy fame: `famesale.py` (elin-delve 2: a sale also pulls the nefia refill back under the gate).

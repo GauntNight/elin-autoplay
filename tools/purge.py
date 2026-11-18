@@ -78,7 +78,26 @@ def junk(name):
     if any(re.search(k, n) for k in KEEP):
         # a cursed or doomed copy of a kit item is still junk (stock.py's rule)
         return bool(re.search(r"\b(cursed|doomed)\b", n)) and not re.search(r"\(miracle\)|\(godly\)|☆|★", n)
+    # run 53: "6 sesame pasta salads" (bought at Upan for the trip) matched the DROP word "sesame" and were dropped on a
+    # field: what items.meals would eat is food by the game's table, never junk by a word in its name
+    if not re.search(r"\b(cursed|doomed|rotten)\b", n) and n in _meal_names():
+        return False
     return any(re.search(d, n) for d in DROP)
+
+
+_MEALS = None
+
+
+def _meal_names():
+    """The names (lower case) of what items.meals would eat now, read once a run (the game's food categories)."""
+    global _MEALS
+    if _MEALS is None:
+        try:
+            import items as _items
+            _MEALS = {(it.get("name") or "").lower() for it in _items.meals(hunger=100)}
+        except Exception:  # noqa: BLE001 - the word rules still run
+            _MEALS = set()
+    return _MEALS
 
 
 def stacks():

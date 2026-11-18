@@ -195,7 +195,11 @@ def auto(target, r):
     try:
         while got < target:
             before = TAKEN
-            ps = [p for p in props(r)["props"] if p.get("liftable") and p.get("contribution", 0) >= 2 and p["uid"] not in tried]
+            # run 53: a batch walked into Vanlot's animal pen and stole one of its gates; afterwards no walk left the pen (the
+            # game's AI_Goto stopped at once, steps and Short Teleport stayed inside) until a full Teleport: gates and doors
+            # shape the paths, so they are never marks
+            ps = [p for p in props(r)["props"] if p.get("liftable") and p.get("contribution", 0) >= 2 and p["uid"] not in tried
+                  and not re.search(r"\b(gate|door)s?\b", p.get("name") or "", re.I)]
             me = data("state")["pc"]
             if BURDEN_STOP >= 3 and (me.get("burdenPhase") or 0) >= 2:
                 ps = [p for p in ps if max(abs(p["x"] - start[0]), abs(p["z"] - start[1])) <= NEAR_START]
