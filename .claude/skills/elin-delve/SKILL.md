@@ -269,11 +269,13 @@ code's `kamikaze_dist`: **5 cells** (3 until run 40, 4 until run 41).
   and Hoof Transformation (FEAT.cs; the ids and reasons are in its comments); since run 52 also Enemy of All Living Things
   (1563: CHA -14, so Lonely Soul's empty-slot HP falls, 438 -> 403; it turns townsfolk hostile and cuts a kill's karma loss to 30%:
   facts #1504, #1505, #1512), allowed for nefias, a reason to cure before any town or guild night. **Thick Neck** (1555, fact #1513) came back at
-  corruption 500 in run 52: PV +(12 + Lv) (100 -> 150) for the neck slot and CHA -(5 + Lv/5) (speed 197 -> 172 through Lonely Soul): kept. A disease strikes at every 100 corruption;
+  corruption 500 in run 52: PV +(12 + Lv) (100 -> 150) for the neck slot and CHA -(5 + Lv/5) (speed 197 -> 172 through Lonely Soul): kept in run 52, cured in run 53 by the user's call ("we have to cure that"). A disease strikes at every 100 corruption;
   an antibody (Miral, 10 medals; Gikrak in Yowyn, 4,200 ecopos) takes the newest first, one per 100 boundary its drop
   crosses (fact #982). **A slot disease is weighed against the goal it blocks** (the user, 2026-11-17: "I think we should
   get the Ether antibody"): Hoof Transformation's speed (166 -> 215 at Lv45) lost to the boots' PV and DV once G60 (PV 100)
-  was the goal.
+  was the goal. **Run 53:** one antibody (power 100) took 513 -> 313, Thick Neck and Enemy of All Living Things gone (fact
+  #1517); with G60 done, Hoof's +39 speed outweighs the boots' PV 8 / DV 12, and a second drink would have crossed 200 too
+  (the Wing's +14 speed): both kept, 4 antibodies carried for the next disease (the carry list keeps them).
 - Quick-save after a conquest or a big haul (elin-play); every death or near-death gets its cause in the run log and a
   line here or in the table.
 

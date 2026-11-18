@@ -252,6 +252,22 @@ def is_food(low):
     return is_meal(low)
 
 
+_KINDS = None
+
+
+def _junk_kind(name):
+    """True when the carried thing of this name is in the game's junk category (box.py's rule for the shipping chest),
+    never a ☆ piece (run 49: ☆The Scrubber ships). One inventory read per run."""
+    global _KINDS
+    if _KINDS is None:
+        try:
+            import items as _items
+            _KINDS = {(i.get("name") or "").lower(): i.get("kind") or "" for i in _items.inventory()}
+        except Exception:  # noqa: BLE001 - the word rules still route it
+            _KINDS = {}
+    return _KINDS.get(name.lower(), "").startswith("junk") and not name.startswith("☆")
+
+
 def route(name):
     low = norm_name(name)
     from common import hammer_scrap
@@ -264,6 +280,10 @@ def route(name):
     unidentified = bool(re.match(r"^(an? |\d+ )?[A-Z]", re.sub(r"^(A |An )", lambda m: m.group(1).lower(), name.strip())))
     if has_word(low, JUNK) and not unidentified and not GEAR.search(name)             and not re.search(r"\(miracle\)|\(godly\)|\(superior\)|\[-?\d+, -?\d+\]|\(\d+d\d+", low):
         return "trash", "the trash can (trash.py dump)"
+    # run 53: an iron scale and a paper pile were routed to the shipping chest by name and box.py refused both there
+    # (the game's category is junk: the user's run-08 rule), so they rode in the pack: the category decides here too
+    if _junk_kind(name):
+        return "trash", "the trash can (trash.py dump; the game files it as junk)"
     # run 33 (the user: "sell those 0 rods as well for sure"): an empty rod ships (it still sells); dropping one in a
     # nefia wasted it, and the spares boxes filled with them
     if re.search(r"\brod\b.*\(0 charges?\)", low):
@@ -413,6 +433,14 @@ def check():
                 continue
             else:
                 bad.append((haul, n, *route(n)))
+    # run 53: 7 coffee beans tiramisus taken for the trip were counted by leave.py (items.meals: kind "meal" in the game's
+    # table) and sent back to the Pantry here (no MEALS word), so leave refused both ways. What items.meals would eat is
+    # Cooler Box food: the one table decides.
+    try:
+        import items as _items
+        eatable = {(it.get("name") or "").lower() for it in _items.meals(hunger=100)}
+    except Exception:  # noqa: BLE001 - the name rule below still runs
+        eatable = set()
     for n in bag_items("Cooler Box"):
         low = norm_name(n)
         # run 11: the godly Raw Food Necklace (made of food, kept cool to slow its rot) was routed
@@ -420,7 +448,7 @@ def check():
         if any(q in low for q in UNID_TAGS):
             unid.append(n)
             continue
-        if not is_food(low):
+        if not is_food(low) and n.lower() not in eatable:
             bad.append(("Cooler Box", n, *route(n)))
     return bad, unid
 

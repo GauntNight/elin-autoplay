@@ -68,10 +68,25 @@ def meal_stop():
         return "a hostile on the meal stop's map"
     fed = None
     # run 44: two mini salads (about 6 hunger each) left me at 60, still Hungry, and the walk stopped anyway: eat to the mark
+    # run 53: a cobra Lv10 and an emperor penguin Lv18 walked into view after the check above (at Lv46); eat_one refused
+    # with a hostile in view and leave.py refused for the same reason, so the circuit stopped "nothing eaten" on the field.
+    # Weak hostiles that turn up during the meal are fought the same way, then the meal is tried again
     for _ in range(6):
-        fed = farmday.eat_one() or fed
+        got = farmday.eat_one()
+        fed = got or fed
+        if not got:
+            s = call("state")["data"]
+            foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
+            if foes and all(c.get("lv", 99) <= me - 10 for c in foes):
+                run("fight.py", re.sub(r"^(a|an) ", "", foes[0].get("name") or ""), "60", timeout=300)
+                continue
+            if foes:
+                break
         if call("state")["data"]["pc"]["hunger"] < THRESHOLDS["eat_at"] - 15:
             break
+    if any(c.get("hostile") for c in call("state")["data"].get("nearby") or []):
+        run("leave.py", "--force", "--riding-ok", timeout=300)
+        return "a hostile on the meal stop's map" if not fed else None
     # run 43: a meal stop on a conquered nefia's tile went down its stairs, and leave.py found no edge: "not moving", a stopped circuit
     if (call("state")["data"].get("zone") or {}).get("nefia"):
         run("stairs.py", "up", timeout=300)

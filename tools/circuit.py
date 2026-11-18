@@ -229,6 +229,17 @@ def main():
         deadline = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
         if deadline <= now:
             deadline += _dt.timedelta(days=1)
+    # run 53 (the user: "Boots/Cloak/Necklace are all empty"): an antibody drunk on the road freed the neck slot, and the
+    # Dreadbane Necklace sat in a home box; leave.py's gear check runs only at home. Name an empty, unblocked slot here
+    # (a warning: the piece is usually at home, so the circuit goes on and the next home stop wears it)
+    try:
+        from common import empty_slots
+        gaps = empty_slots()
+        if gaps:
+            print("  WARNING: empty gear slot(s): " + ", ".join(gaps) + " (wear the best piece in hand; at home leave.py "
+                  "refuses until it is filled)", flush=True)
+    except Exception as e:  # noqa: BLE001 - a warning only
+        print(f"  (gear check skipped: {e})", flush=True)
     register("circuit")
     mark("circuit", "start", note=f"{n} nefias, danger {lo}-{hi}, r {r}")
     done = 0

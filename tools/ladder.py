@@ -846,6 +846,13 @@ def shrines():
             p = pc()  # run 28: every walk ended on "hostile" (a hot guy), so p was never read: a crash
             print(f"  shrine {name}: no Use act from {p['x']},{p['z']}")
             continue
+        # run 53: the neck sat empty before the shrine (an antibody freed it on the road, the necklace at home) and the
+        # check below stopped the circuit on it: only a slot the shrine emptied is a stop
+        from common import empty_slots
+        try:
+            gaps_before = set(empty_slots())
+        except Exception:  # noqa: BLE001 - count every gap afterwards
+            gaps_before = set()
         call("do", i=use[0]["i"])
         wait_until("frames", n=30, timeout=3000)
         if (state().get("layers") or {}).get("top") == "LayerDragGrid":
@@ -880,9 +887,9 @@ def shrines():
                 if gone:
                     out = run("item.py", gone[0]["name"], "Equip")
                     print(f"  re-equipped after the shrine: {gone[0]['name']} ({last(out)[:60]})")
-                from common import empty_slots
-                if empty_slots():
-                    stop(f"an empty gear slot after the Armor shrine: {', '.join(empty_slots())} (the user's full-set rule)")
+                new_gaps = [g for g in empty_slots() if g not in gaps_before]
+                if new_gaps:
+                    stop(f"an empty gear slot after the Armor shrine: {', '.join(new_gaps)} (the user's full-set rule)")
         print(f"  shrine used: {name}: " + " / ".join((state().get("log") or [])[-2:]))
 
 
