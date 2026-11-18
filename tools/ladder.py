@@ -258,7 +258,10 @@ def condition_wait():
     False (stop) on a hostile, HP under 70%, or 30 turns."""
     from common import BAD_CONDITIONS
     step_off()  # run 41: a Wait on the arrival stairway takes it (out and back in, the turn count standing still, in a storm's confusion)
-    for _ in range(30):
+    # run 53 (Lively Forest B3): a crowd of weak foes (a cupid, a gnome, a performer, ...) each took one of the 30 turns, and
+    # the wait gave up with Dim still on: fights have their own count, the 30 are waits
+    waits = fights = 0
+    while waits < 30 and fights < 20:
         s = state()
         p = s["pc"]
         if not [c for c in p.get("conditions") or [] if c in BAD_CONDITIONS]:
@@ -267,10 +270,12 @@ def condition_wait():
         foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
         # run 41: a Lv5 gangster ended the wait and the circuit at ConDim: foes 10+ levels under me get fought through it
         if foes and p["hp"] * 100 >= 70 * p["maxHp"] and all((c.get("lv") or 99) <= p["lv"] - 10 for c in foes):
+            fights += 1
             if fight_nearest(3):
                 continue
         if foes or p["hp"] * 100 < 70 * p["maxHp"]:
             return False
+        waits += 1
         call("act", action="Wait")  # queued: the turn passes over the next frames
         wait_until("frames", n=20, timeout=3000)
     return False

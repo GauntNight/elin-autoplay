@@ -328,6 +328,10 @@ def route(name):
             return "trash", "the trash can (the game's category: junk)"
         if cat in SHIP_CATS:
             return "ship", f"the shipping chest (loot {cat} by the game's category: run 49)"
+    # run 53: "a map" (thing map, TraitScrollMap) sat in a bag as "no rule" for runs; read, it marks nefias on the world map
+    # (Silent Ruin 13 and Dark Machinarium 7 from two): it is used where it is found, never boxed
+    if re.fullmatch(r"(an? |\d+ )?(blessed |cursed )?maps?", low.strip()):
+        return "decide", "decide: read it now (item.py NAME Read): a nefia map marks ruins and caves for the circuit"
     # run 12: the old default was the shipping chest, and a flower crown and the Border Watch plan
     # went in at 02:30, three hours before the 05:00 sale; nothing is shipped without a rule now
     return "decide", "decide: not moved (no rule for it: ship, install, or add a route)"

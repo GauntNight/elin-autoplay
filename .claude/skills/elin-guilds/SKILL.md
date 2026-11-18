@@ -48,7 +48,9 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
    and at burden phase 2 (`--burden-phase 3` only while staying for the sale) (run 44: run 43's batch ended Overweight
    with the fence asleep). **Phase 3 only with the fence open and a few cells away**: an Overweight walk costs HP on
    every step (run 49: furniture batches of cat statues and laundries, Siyun asleep, then 403 -> 277 over ~10 cells to
-   her; the heaviest non-stolen things dropped to get back to phase 2). Karma is the binding resource: -1 a theft, about +5 a conquest, so thefts alternate with
+   her; the heaviest non-stolen things dropped to get back to phase 2). **Start a phase-3 batch beside the fence:** past phase
+   1 `steal.py` takes only marks within 6 cells of where the batch began (run 53: a batch ended 17 cells off, ~23 HP a step;
+   hung meats, a sofa and side tables are the heavy marks). Karma is the binding resource: -1 a theft, about +5 a conquest, so thefts alternate with
    circuits (run 45: 60 thefts took karma 80 -> 20; ten conquests paid it back to 65 for 45 more).
 5. **Sell:** `python -I tools/fence.py Siyun` (Derphy ~95,81; Josotta or any prostitute gives directions). It sells what
    steal.py logged to `runs/stolen.txt`, pulls 8 stacks a bag a pass (run it two or three times), never sells kit items,
@@ -63,7 +65,9 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
 7. **An ether disease can end a theft night** (run 52, fact #1512): with Enemy of All Living Things every townsperson turns hostile
    on sight; steal.py fights those 20+ levels under mine and goes on, but a second night got 0 thefts. Cure it before a batch.
    Incognito (scroll or spell) is no cure (fact #1514): a read calms everyone once, but the disease's roll ignores my disguise,
-   so it buys a quick sale or shop visit, never a batch.
+   so it buys a quick sale or shop visit, never a batch. **Cured in run 53** (the antibody at Miral's): that night 69 thefts,
+   Thieves 42 -> 240; both fences ran out of money by morning (Siyun after ~33 sales, Leoban after ~20), so a big night
+   sells across both and the next afternoon.
 
 Yield: about 4 contribution a theft at DEX 61 (run 44), about 2.9 once sold in run 45 (0 -> 310/1,000 over two visits,
 105 thefts). `steal.py [R]` alone lists the marks in reach (weight against Pickpocket x 200 + STR x 100 + 1000, the

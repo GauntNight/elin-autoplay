@@ -36,6 +36,7 @@ TAKEN = 0     # thefts this run (the activity mark, run 33)
 STEEL_WORDS = ("alarm clock", "wall lamp", "pendant light", "monitor", "computer", "electronics", "training machine",
                "street lamp")  # steel by default (things.json defMat; fact #726): check the material once taken
 BURDEN_STOP = 2  # auto stops at this burden phase (run 44); --burden-phase 3 while the fence is in town and I stay until the sale
+NEAR_START = 6  # run 53: with --burden-phase 3, past phase 1 only marks this close to the batch's start (start beside the fence)
 KARMA_FLOOR = 20  # auto stops here (run 44): under 0 is a criminal, and the guild's stealing rank needs no more than this margin
 UNIQUE_LV = 15  # a named NPC: PER x 2.5 x 2 against Pickpocket + DEX; 6 until the 2026-10-30 review (the user agreed: 60% of marks
                 # were skipped, and the bridge sneak guard now cancels a theft the moment a witness comes within 5): run 34 tests 15
@@ -186,14 +187,25 @@ def auto(target, r):
     from activity import mark
     mark("thief", "start", note=f"auto {target}")
     got, tried = 0, set()
+    # run 53: a --burden-phase 3 batch wandered to 17 cells from the fence and the walk back at Overweight cost ~23 HP a
+    # step (446 -> 378 in three; stolen furniture dropped to get back to phase 1). Start it beside the fence: past phase 1
+    # it takes only marks within NEAR_START of where it began, so the walk to the sale stays short
+    start = data("state")["pc"]
+    start = (start["x"], start["z"])
     try:
         while got < target:
             before = TAKEN
             ps = [p for p in props(r)["props"] if p.get("liftable") and p.get("contribution", 0) >= 2 and p["uid"] not in tried]
+            me = data("state")["pc"]
+            if BURDEN_STOP >= 3 and (me.get("burdenPhase") or 0) >= 2:
+                ps = [p for p in ps if max(abs(p["x"] - start[0]), abs(p["z"] - start[1])) <= NEAR_START]
+                if not ps:
+                    print(f"stop: burden phase {me['burdenPhase']} and no mark within {NEAR_START} cells of the start "
+                          f"{start[0]},{start[1]}: sell first")
+                    break
             if not ps:
                 print("no marks left in reach")
                 break
-            me = data("state")["pc"]
             # run 44: nothing stopped a batch short of Karma 0 (a criminal under it); run 43's last batch ran to
             # Overweight 151% with the fence asleep. Each theft is Karma -1.
             if me.get("karma") is not None and me["karma"] <= KARMA_FLOOR:
@@ -206,8 +218,12 @@ def auto(target, r):
             # run 47: Eternal Traveler 「Wini」 (adv_wini, a Lv50 wandering adventurer, a wizard) discharged a vortex of magic
             # during a theft: HP ~350 -> 2. The witness check only looks within 4 of the mark; an adventurer anywhere in view,
             # or anyone above my level, ends the batch: one noticed theft turns them hostile, and they outclass me
+            # run 53: Mysmer, a Lv11 adventurer, followed me at Lv46 and ended two batches at 8 thefts; one 20+ levels under
+            # mine is no threat if she turns (steal.py already fights hostile townsfolk 20+ under), so only those within 20
+            mylv = me.get("lv") or 0
             big = [c for c in data("state").get("nearby") or [] if not c.get("party")
-                   and (str(c.get("id") or "").startswith("adv_") or (c.get("lv") or 0) > (me.get("lv") or 0))]
+                   and ((str(c.get("id") or "").startswith("adv_") and (c.get("lv") or 99) > mylv - 20)
+                        or (c.get("lv") or 0) > mylv)]
             if big:
                 print("stop: " + ", ".join(f"{c['name']} Lv{c.get('lv')} d{c.get('dist')}" for c in big)
                       + " in view: an adventurer or anyone above my level turns hostile on a noticed theft (run 47: Wini Lv50, HP 350 -> 2)")

@@ -83,7 +83,16 @@ def ship_deciphered():
         r = run("box.py", "shipping chest", name)
         print(r, flush=True)
         if r.rc != 0:
-            stop(f"box.py shipping chest refused (rc {r.rc}): is it full?")
+            # run 53: the chest takes 40 stacks a morning (fact #1001) and was full after a big unload, so the fetch stopped
+            # after one book; a deciphered copy waits on the library route (64,46, the big Storage Chest, has room) instead
+            import home
+            for x, z in [home.LIBRARY[2]] + [b for b in home.LIBRARY if b != home.LIBRARY[2]]:
+                r2 = run("box.py", f"{x},{z}", name)
+                if r2.rc == 0:
+                    print(f"  shipping chest full: {name} -> {x},{z} (ship it another morning)", flush=True)
+                    break
+            else:
+                stop(f"box.py shipping chest refused (rc {r.rc}) and no library box took it: is everything full?")
 
 
 def main(argv):
