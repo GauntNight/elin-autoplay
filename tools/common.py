@@ -373,7 +373,7 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 25,       # run 52 (G61 M4, G61 done): 24 -> 25 at Lv45, unattended limit 23 -> 24: Traditional Ruin B4, danger 23
+    "max_danger": 26,       # run 54 (G64 M1): 25 -> 26 at Lv47, unattended limit 24 -> 25: Unknown Cave B5, danger 24, lowest 91%, no drink, its master 『Asura』 Lv36; run 52 (G61 M4, G61 done): 24 -> 25 at Lv45, unattended limit 23 -> 24: Traditional Ruin B4, danger 23
                             # (the limit), its master 『Stalker』 Lv34 killed in ~15 fights, lowest 100%, no drink (fact #1509).
                             # run 52 (G61 M3): 23 -> 24 at Lv45, unattended limit 22 -> 23: Traditional Ruin B3, danger 22 (the
                             # limit), explored at 400/400 with no drink (a king scorpion Lv21, a living armor, a slime, a sea snail;

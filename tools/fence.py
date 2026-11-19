@@ -75,7 +75,7 @@ def main():
     out = run("shop.py", args[0], "--keep-open", timeout=300)
     if out.rc != 0:
         refuse(f"shop.py: {last(out) or out.rc}")
-    sold, left = [], []
+    sold, left, sold_items = [], [], []
     gold0 = data("state")["pc"].get("gold")
     for it in sell:
         bs = call("buttons", all=True)["data"]["buttons"]
@@ -92,12 +92,19 @@ def main():
         a = sells[-1]  # "Sell N" for the whole stack
         call("invdo", i=a["i"])
         sold.append(f"{it['name']} ({a['text']})")
+        sold_items.append(it)
         txlog("sold", it["name"], "pack", "the fence", a["text"])  # run 49: the run's item ledger
     run("close.py")
     run("talk.py")
     # run 43: 14 "sold" with the gold, the guild total and the pack unchanged: a sale counts only when the purse moved
     if sold and data("state")["pc"].get("gold") == gold0:
         stop(f"{len(sold)} Sell acts and the gold didn't move: the shopkeeper asleep or out of money? Nothing sold")
+    # run 54: Leoban ran out of money partway: "sold 15" was printed, the guild rose only +25, and seven of the "sold" stacks
+    # were still carried; a sale counts only for a stack that left the pack
+    still = {i.get("uid") for i in inv.inventory()}
+    kept = [k for k, it in enumerate(sold_items) if it.get("uid") in still]
+    left += [sold_items[k]["name"] + " (still carried: the shopkeeper ran out of money?)" for k in kept]
+    sold = [s for k, s in enumerate(sold) if k not in kept]
     print(f"sold {len(sold)}: " + "; ".join(sold))
     if left or stuck:
         print(f"not sold: {', '.join(left + stuck)} (not in the pack's grid: a full pack?)")

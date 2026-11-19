@@ -36,6 +36,8 @@ TAKEN = 0     # thefts this run (the activity mark, run 33)
 STEEL_WORDS = ("alarm clock", "wall lamp", "pendant light", "monitor", "computer", "electronics", "training machine",
                "street lamp")  # steel by default (things.json defMat; fact #726): check the material once taken
 BURDEN_STOP = 2  # auto stops at this burden phase (run 44); --burden-phase 3 while the fence is in town and I stay until the sale
+BLOCK_R = 12  # run 54: marks this close to where an adventurer or anyone above my level was seen are left alone (the witness check reaches 4)
+BLOCKERS = {}  # who was seen where during this batch: uid or name -> (x, z)
 NEAR_START = 6  # run 53: with --burden-phase 3, past phase 1 only marks this close to the batch's start (start beside the fence)
 KARMA_FLOOR = 20  # auto stops here (run 44): under 0 is a criminal, and the guild's stealing rank needs no more than this margin
 UNIQUE_LV = 15  # a named NPC: PER x 2.5 x 2 against Pickpocket + DEX; 6 until the 2026-10-30 review (the user agreed: 60% of marks
@@ -236,10 +238,21 @@ def auto(target, r):
             big = [c for c in data("state").get("nearby") or [] if not c.get("party")
                    and ((str(c.get("id") or "").startswith("adv_") and (c.get("lv") or 99) > mylv - 20)
                         or (c.get("lv") or 0) > mylv)]
-            if big:
-                print("stop: " + ", ".join(f"{c['name']} Lv{c.get('lv')} d{c.get('dist')}" for c in big)
-                      + " in view: an adventurer or anyone above my level turns hostile on a noticed theft (run 47: Wini Lv50, HP 350 -> 2)")
-                break
+            # run 54: Verna Lv55 stood by a cat tower, the best mark left, and three batches walked to it, saw her and stopped
+            # (2-3 thefts each): she notices only within 4 (the witness check), so the marks within BLOCK_R of where she was
+            # seen are left alone and the batch goes on elsewhere; it stops only when no mark is left away from her
+            for c in big:
+                BLOCKERS[c.get("uid") or c["name"]] = (me["x"] + (c.get("dx") or 0), me["z"] + (c.get("dz") or 0))
+            if BLOCKERS:
+                far = [q for q in ps if all(max(abs(q["x"] - bx), abs(q["z"] - bz)) >= BLOCK_R for bx, bz in BLOCKERS.values())]
+                if big:
+                    print("  " + ", ".join(f"{c['name']} Lv{c.get('lv')} d{c.get('dist')}" for c in big)
+                          + f" in view: the marks within {BLOCK_R} cells of them left alone ({len(far)} of {len(ps)} remain)", flush=True)
+                if not far:
+                    print("stop: every mark left lies within " + str(BLOCK_R) + " cells of an adventurer or someone above my "
+                          "level (run 47: Wini Lv50, HP 350 -> 2)")
+                    break
+                ps = far
             p = max(ps, key=lambda q: (q["contribution"], -max(abs(q["x"] - me["x"]), abs(q["z"] - me["z"]))))
             tried.add(p["uid"])
             take(p["uid"], 45)

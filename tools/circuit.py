@@ -134,14 +134,15 @@ def expire_here():
 
 def candidates(lo, hi, r, skip=()):
     rep = call("places", r=r)
-    for _ in range(3):  # run 54: "ArgumentException: Can not convert Object to Int32" once, just after an evacuation's landing; the same call answered seconds later
+    for i in range(6):  # run 54: "ArgumentException: Can not convert Object to Int32" twice, just after an evacuation's landing; the same call answered later (three tries 30 frames apart weren't enough)
         if rep.get("ok"):
             break
         print(f"  places: {rep.get('error')}: again", flush=True)
-        wait_until("frames", n=30, timeout=3000)
+        import time as _time
+        _time.sleep(2 + 2 * i)
         rep = call("places", r=r)
     if not rep.get("ok"):
-        refuse(str(rep.get("error")))
+        stop(f"places kept failing after the landing ({rep.get('error')}): run circuit.py again")
     try:  # the terrain grid for route(), read once here from where I stand (run 49)
         import wgo
         wgo._GRID.clear()
