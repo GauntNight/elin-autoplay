@@ -147,6 +147,15 @@ def feed(xy, act, key, pieces):
     name, num = stacks[0]["name"], stacks[0].get("num") or 1
     k = min(pieces, num)
     if xy is None:
+        # run 54: purge's unclutter tucks the butcher's tool into a bag (kit rides where it is), and item.py Uses only what
+        # the pack's grid holds: bring it out first
+        import items as _items
+        tools = [it for it in _items.inventory() if TOOL in (it.get("name") or "").lower()]
+        if not tools:
+            stop(f"no {TOOL} carried: make one at the tinker's table (3 barks + a dagger-class blade, fact #531)")
+        if tools[0].get("parent"):
+            must(run("bag.py", _items.where(tools[0], _items.inventory()).split(" > ")[-1], "--take",
+                     f"uid:{tools[0]['uid']}", timeout=120), f"the {TOOL} out of its bag")
         args = ["convert.py", "--tool", TOOL]
     else:
         dx, dz = beside(xy)

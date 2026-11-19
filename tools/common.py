@@ -333,6 +333,10 @@ def walk_beside(x, z, **kw):
         ci = info.get(c) or {}
         if ci.get("blocked") or ci.get("water") or not ci.get("floor"):
             continue
+        # run 54: a Derphy theft mark stood beside the pub's stairway, which reads as a free floor cell; the walk onto it took
+        # the stairs, and two batches went on on B1, the guild's floor: a stairway cell is never a place to stand
+        if any(str(t.get("trait") or "").startswith("TraitStairs") for t in ci.get("thingInfo") or []):
+            continue
         res = walk(c[0], c[1], **kw)
         if res.get("why") in ("arrived", "hostile", "hp", "window", "zone"):
             return res

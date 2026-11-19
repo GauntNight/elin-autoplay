@@ -49,7 +49,9 @@ def cure():
                 break
             if run("bag.py", bag, "--take", what).rc == 0:
                 r = run("item.py", what, "Drink")
-        done.append(f"{what} {'drunk' if r.rc == 0 else 'NOT FOUND: buy some (Minron, Mysilia)'}")
+        # run 54: "NOT FOUND" printed for 53 restore body and 6 restore mind carried (a scorpion stood in view on arrival):
+        # the line names item.py's own refusal now, and only says to buy when none is carried
+        done.append(f"{what} drunk" if r.rc == 0 else f"{what} NOT DRUNK (rc {r.rc}: {last(r)[:80]}; none carried? buy at Minron, Mysilia)")
     after = data("skills")
     return (f"drains {drains} -> {after.get('drains') or 'none'}; " + "; ".join(done)
             + f"; mutations left: {[m['name'] for m in (after.get('mutations') or {}).values() if m.get('neg')] or 'none'}")

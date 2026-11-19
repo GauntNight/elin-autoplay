@@ -134,6 +134,12 @@ def expire_here():
 
 def candidates(lo, hi, r, skip=()):
     rep = call("places", r=r)
+    for _ in range(3):  # run 54: "ArgumentException: Can not convert Object to Int32" once, just after an evacuation's landing; the same call answered seconds later
+        if rep.get("ok"):
+            break
+        print(f"  places: {rep.get('error')}: again", flush=True)
+        wait_until("frames", n=30, timeout=3000)
+        rep = call("places", r=r)
     if not rep.get("ok"):
         refuse(str(rep.get("error")))
     try:  # the terrain grid for route(), read once here from where I stand (run 49)

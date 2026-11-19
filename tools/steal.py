@@ -183,6 +183,8 @@ def auto(target, r):
     z = (data("state").get("zone") or {}).get("full") or ""
     if "derphy" not in z:
         refuse("--bold only in Derphy: no guards there; anywhere else a witness calls one (run 33: Olno, Lv40)")
+    if not z.endswith("@0"):
+        refuse(f"--bold only on Derphy's town map, not {z}: B1 is the guild's own floor (Monazess, run 43)")
     call("sneak", r=0)
     from activity import mark
     mark("thief", "start", note=f"auto {target}")
@@ -195,6 +197,12 @@ def auto(target, r):
     try:
         while got < target:
             before = TAKEN
+            # run 54: a walk to a mark by the pub crossed the stairway and the batch went on on B1, the guild's own floor
+            # (crowns and treasures beside Monazess, the unique who turned hostile in run 43): the town only (elin-guilds 1)
+            zf = (data("state").get("zone") or {}).get("full") or ""
+            if zf != z:
+                print(f"stop: the zone changed during the batch ({z} -> {zf}): thefts in Derphy town only")
+                break
             # run 53: a batch walked into Vanlot's animal pen and stole one of its gates; afterwards no walk left the pen (the
             # game's AI_Goto stopped at once, steps and Short Teleport stayed inside) until a full Teleport: gates and doors
             # shape the paths, so they are never marks

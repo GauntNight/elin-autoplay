@@ -37,6 +37,10 @@ def goods(carried):
         # for runs, and their weight sat in the bags. A stolen thing on the carry list for that reason is sold here
         if why == "on the carry list (cargo)":
             why = None
+        # run 54: the bow's own 28 stone arrows carried the game's stolen flag (a stolen stack merged into them once) and
+        # went on Leoban's sale list: ammo is the bow's kit and pays the guild next to nothing (sqrt of ~1 oren)
+        if not why and (it.get("kind") or inv.kind(it) or "").startswith("ammo"):
+            why = "ammo (the bow's kit, even when the game marks it stolen)"
         if why:
             held.append((it, why))
         else:

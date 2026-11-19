@@ -157,6 +157,10 @@ def main():
     if foes and "--force" not in sys.argv:
         refuse("hostiles in view: " + ", ".join(f"{c['name']} Lv{c['lv']} d{c['dist']}" for c in foes))
     zone = s["zone"]["full"]
+    # run 54: an Enter at home didn't land (the shipping report was open), and leave.py, run on the world map, read the
+    # map's bounds as a local map's and "walked toward the edge" across the world for two game days until an ambush
+    if "ntyris" in zone.lower() or (s.get("zone") or {}).get("region"):
+        refuse(f"already on the world map ({zone}): nothing to leave")
     # a new game has no base yet (tools/newgame.py): the rules about leaving one wait until there is one
     from common import base_ready
     at_base = zone.startswith("Zone_startSite") and base_ready()

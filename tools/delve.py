@@ -289,17 +289,16 @@ def main():
                 # a neutral one doesn't attack, so one that far above and not hostile is walked past (said once a floor)
                 # run 37: a neutral Evolved Goblin Wizard Lv36 (offense 1.28) at my Lv33 took 44% in one round with
                 # Holy Shield and Hero up and the stalker beside me: a hard hitter above my level is walked past too
-                hard =(threat.profile(c.get("id") or c["name"]) or {}).get("offense", 0) >= 1.0
                 # run 51: elin-delve's stop table (runs 48-49, fact #1448) leaves a neutral Evolved within 5 levels of mine
                 # alone; the code fought it with --force, and an Evolved Electric Cloud Lv44 at my Lv45 stalled Old Ruin B2
                 # ("no progress", no attack reached it): neutral and within 5 levels below me is walked past too
-                near = c["lv"] >= p["lv"] - 5
                 # run 53: a neutral Evolved Goblin Wizard Lv36 (at my Lv46) stopped two circuits on "no progress" (no throw
                 # targets a neutral one), and fought by hand it stole 7,567 orens and blinked off before it died (fact #1531):
                 # a neutral thief kind (threat.py flags or the fight log's tricks) is walked past, as fight.py now refuses it
-                prof_c = threat.profile(c.get("id") or c["name"]) or {}
-                thief = "steals" in (prof_c.get("flags") or []) or "steals" in threat.seen_specials(prof_c.get("name") or "")
-                if (c["lv"] > p["lv"] + 3 or (hard and c["lv"] > p["lv"]) or near or thief) and not c.get("hostile"):
+                # run 54: a neutral Evolved Goblin Shaman Lv36 at my Lv46 stopped Damp Machinarium B2 on "no progress" (no throw
+                # targets a neutral one, as in run 53); its gene was the only reason to fight it, and since G38 (solo, the crew
+                # done) packcheck ships plain genes as excess: a neutral Evolved is walked past at any level; a hostile one is fought
+                if not c.get("hostile"):
                     if c.get("uid") not in EVOLVED_SKIPPED:
                         EVOLVED_SKIPPED.add(c.get("uid"))
                         print(f"  left alone: {c['name']} Lv{c['lv']} (neutral, {c['lv'] - p['lv']:+d} levels from mine)")
