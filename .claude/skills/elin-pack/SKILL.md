@@ -32,8 +32,12 @@ lockpick and 29 for the blankets, because resupply was unplanned). **At every ho
 blankets and the lockpick charges in the pack, the bags and the boxes (`stock.py --find blanket`, `stock.py --find
 lockpick`). **Under a minimum (3 blankets; a lockpick with 5+ charges), the next trip's first stop is the source**,
 before any circuit:
-- **Blankets:** the loom first (5 textures + 4 carbon logs from the kiln); else a shop that has stocked them, at random,
-  ~360: Gizbird in Mysilia, Sesa or Sayig in Aquli Teola (`shop.py NAME` shows the stock).
+- **Blankets (G65, run 54):** `blanket.py` runs the whole chain from the boxes: skins (butcher's tool) -> hide fiber
+  (spinner) -> thread -> texture (loom) -> a blanket with 4 carbon logs (kiln), ~33 SP each, up to 6 (3 in the grid,
+  spares in the spoils bag). `arrive.py` runs it on every return and `leave.py` refuses to leave short while the stock can
+  make one. **Count the chain, not the textures** (runs 52-53 read "1 texture" while 145 skins and 55 fibers sat boxed).
+  Short of SP: sleep, then run it. A shop blanket is bought on sight while under 6, ~280-380: Gizbird in Mysilia, Sesa or
+  Sayig in Aquli Teola, Kerona (Derphy B1), Alecgan (Noyel) (`shop.py NAME` shows the stock).
 - **Lockpicks:** Kerona on Derphy B1 (~64,66: the surest, one on both visits of run 43, restocks every ~5 days); else
   the shops that have had one, at random, 330-780: Gizbird, Sesa or Sayig, Tarraf in Palmia, Alecgan in Noyel. A run
   spends about 15 charges: buy for the run, not for the minimum.

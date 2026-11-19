@@ -332,8 +332,10 @@ def unclutter():
     # run 39 (Rustic Grassland): the kit alone took 33 grid cards (five rods of teleport, four of cure minor wound),
     # the ladder refused at 2 free and purge found "nothing cheap": the rods past the two with most charges move
     for kind in ("rod of teleport", "rod of cure minor wound", "rod of cure critical wound"):  # cure critical: run 51 (four in the grid)
-        rods = [n for n in by["pack"] if kind in n.lower() and "blessed" not in n.lower() and n not in movable]
-        rods.sort(key=lambda n: -int((re.search(r"\((\d+) charges?\)", n.lower()) or [0, 0])[1]))
+        # run 54: blessed rods sat outside the count, so a blessed one and two plain ones of a kind all stayed (three cure
+        # critical, three teleport) and a boss chest's new rod refused the next door at 2 free: they count, kept first
+        rods = [n for n in by["pack"] if kind in n.lower() and n not in movable]
+        rods.sort(key=lambda n: ("blessed" not in n.lower(), -int((re.search(r"\((\d+) charges?\)", n.lower()) or [0, 0])[1])))
         movable += rods[2:]
     # run 51: the kit pattern kept every stack of arrows and every long bow in the grid (a ☆ spare bow from a chest and a
     # second arrow stack), and the ladder refused two doors at 1 free card: one of each stays, the largest stack or the

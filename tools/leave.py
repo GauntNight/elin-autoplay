@@ -223,6 +223,13 @@ def main():
             if stored:
                 refuse(f"leaving home refused: {have} fireproof blankets carried, under {MIN_BLANKETS}, and storage "
                        f"holds more: {', '.join(stored)} (box.py \"BOX\" --take \"fireproof blanket\"; --blanket-ok 'why')")
+            # G65 (run 54): runs 42-53 took this warning 160 times while the boxes held 145 skins and 55 hide fibers
+            from common import run as _run
+            dry = _run("blanket.py", "--dry", "--target", str(MIN_BLANKETS), "--floor", "20", timeout=120)
+            if dry.rc == 0 and "plan:" in str(dry):
+                refuse(f"leaving home refused: {have} fireproof blankets carried, under {MIN_BLANKETS}, and the home's "
+                       f"stock makes more: run blanket.py ({[ln for ln in str(dry).splitlines() if ln.startswith('plan:')][0]}); "
+                       "--blanket-ok 'why'")
             print(f"short of fireproof blankets: {have} carried, under {MIN_BLANKETS}, none in storage: make them at the "
                   "loom (5 textures + 4 carbon logs from the kiln), the sure source, or buy one (Sesa or Sayig in Aquli "
                   "Teola, Gizbird in Mysilia, ~360, stock at random)")

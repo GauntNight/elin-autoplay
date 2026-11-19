@@ -98,6 +98,14 @@ def wanted(card, extra):
         return False
     if any(k in c for k in DUMP):
         return True
+    # run 54: packcheck routed a paper scrap from the mail here by the game's junk category, and this name list didn't
+    # take it, so leave.py refused home on it: the same table decides both (elin-play: a kind from the game's table)
+    try:
+        from packcheck import _junk_kind
+        if _junk_kind(raw):
+            return True
+    except Exception:  # noqa: BLE001 - the name list above still works
+        pass
     bare = re.sub(r"^(an? |\d+ )", "", c)
     for e in extra:
         e = e.lower().strip()

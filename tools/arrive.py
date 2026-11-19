@@ -103,6 +103,11 @@ def main():
         print("packages: " + (run("box.py", "shipping chest", *["package"] * len(pk)).strip().splitlines() or ["?"])[-1])
     t = run("town.py")
     print("town: " + (t.strip().splitlines() or ["?"])[-1])
+    # G65 (the user, run 54: "keep Fireproof Blankets in stock ... it's clearly a frequent issue"): the loom chain from
+    # the boxes' skins and fiber up to 6 charged blankets, SP above the trip's floor; a short SP is a line, not a stop
+    b = run("blanket.py", timeout=1200)
+    print("blankets: " + " / ".join(ln.strip() for ln in str(b).splitlines()
+                                     if ln.startswith(("made:", "no blankets", "stop:", "plan:"))) + f" (rc {b.rc})")
     pc = state()["pc"]
     print(f"food: my hunger {pc['hunger']} ({pc.get('hungerText') or 'ok'}); feed the residents from the "
           f"Dishes box above (cookdishes.py), keep the stay short")

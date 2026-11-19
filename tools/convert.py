@@ -5,8 +5,11 @@ first (SP_EACH a piece, plus the reserve), fed one at a time, and waited out bef
 bridge's stamina floor (0.32.0) still cancels the task at SP 3. The grid closes at the end.
 
 usage: python -I tools/convert.py DX DZ ACT [--sp-each N] [--max N] STACK [STACK ...]
+       python -I tools/convert.py --tool "butcher's tool" [--max N] STACK [STACK ...]
   --max N  feed a bigger stack but stop after about N pieces: the bridge's stamina floor (spguard) is set
            to SP - N x sp-each for the task and put back to 3 after (run 28: 10 threads from 73 fibers)
+  --tool NAME  a converter carried in the pack, opened by its Use (G65: the butcher's tool turns skins into
+           2-3 hide fibers each, ~1 SP a skin, fact #1421)
   e.g. python -I tools/convert.py -1 1 Bake "6 pine logs" "5 palulu logs"     (kiln: log -> carbon log)
        python -I tools/convert.py -1 1 Spin --sp-each 1 "8 pieces of hide fiber"
   STACK  the pack stack's full name (whole-word matching; two candidates is a refusal)
@@ -28,8 +31,16 @@ def count(card):
     return int(m.group(1)) if m else 1
 
 
-def open_grid(dx, dz, act):
+def open_grid(dx, dz, act, tool=None):
     if top() == "LayerDragGrid":
+        return
+    if tool:  # a converter carried in the pack (the butcher's tool: skins -> hide fiber, G65): Use opens its grid
+        out = run("item.py", tool, "Use")
+        if out.rc != 0:
+            refuse(f"no {tool} to use: " + out.strip()[-120:])
+        call("wait", until="layer", timeout=5000)
+        if top() != "LayerDragGrid":
+            refuse(f"the {tool} grid did not open (top {top()})")
         return
     acts = call("acts", dx=dx, dz=dz, mode="all")["data"]["acts"]
     hit = [a for a in acts if a["text"].startswith(act)]
@@ -52,7 +63,12 @@ def slots():
 def main():
     setup()
     args = sys.argv[1:]
-    sp_each, most = 1, None
+    sp_each, most, tool = 1, None, None
+    if "--tool" in args:
+        i = args.index("--tool")
+        tool = args[i + 1]
+        del args[i:i + 2]
+        args = ["0", "0", "Use"] + args  # DX DZ ACT are unused for a carried tool
     if "--max" in args:
         i = args.index("--max")
         most = int(args[i + 1])
@@ -69,7 +85,7 @@ def main():
         stop(why)
     fed = []
     for want in wanted:
-        open_grid(dx, dz, act)
+        open_grid(dx, dz, act, tool)
         ing, inv = slots()
         hits = [h for h in inv if h.get("card") == want] or matches(want, inv)  # an exact name first
         if not hits:

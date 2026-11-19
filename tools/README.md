@@ -27,6 +27,13 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       no ITEM lists what the bag holds
     Exit: 0 every item moved, 1 any item not moved (run 38: a full pack exited 0).
     item.py finds items inside an open bag too (run 04: `item.py "piles of bread" Eat` ate from the Cooler Box); --take raised a NullReference in the game on the world map.
+- **`blanket.py`**: Fireproof blankets from the home's own stock (G65, run 54; the user: "a Goal on how to keep Fireproof Blankets in stock (either through stores or creation, it's clearly a frequent issue)"). Runs 42-53 left home on 0-1 blankets with 160 waivers in 12 days while 145 skins and 55 hide fibers sat in the boxes: the minimum counted only finished textures.
+    usage: python -I tools/blanket.py [--target N=6] [--max N] [--floor SP=40] [--dry]
+      --target  charged fireproof blankets wanted across the pack and the home boxes; makes the difference
+      --max     at most N this call
+      --floor   SP left at the end, at least (the trip after; no stage starts that would cross it)
+      --dry     print the stock, the plan and its SP, and act on nothing
+    Exit 0 made (or none needed), 1 refused, 2 the bridge, 3 stopped (a hostile, a window, a stage short of SP or stock).
 - **`board.py`**: List a town's jobs from its nearest quest board in one step (Start Run 1: town jobs were a new character's best income: 247 orens and +1 influence in 3 real minutes). Walks next to the nearest ordinary board, opens it and prints each job with its reward, danger and time. The board stays open, so a job is `bridge.py click N expect=NAME` from the list. All boards in a town show the same jobs.
     usage: python -I tools/board.py [--close]
            python -I tools/board.py --take NAME [NAME ...]   accept these jobs in order, each by its name on the board (an instance job moves
@@ -181,8 +188,11 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`common.py`**: Shared helpers for the tool scripts (run 12 review: fourteen copies of run(), six of walk(), eight idle-polls and about 150 fixed sleeps were spread over the scripts).
 - **`convert.py`**: Feed named stacks into an installed converter's drag grid (the kiln's Bake, the spinner's Spin; run 28). A converter turns the WHOLE dragged stack, one piece per tick, as one AI_UseCrafter task (run 25: 124 fibers on the spinner ran SP 51 -> -19, the death by overwork): so each stack is checked against SP first (SP_EACH a piece, plus the reserve), fed one at a time, and waited out before the next. The bridge's stamina floor (0.32.0) still cancels the task at SP 3. The grid closes at the end.
     usage: python -I tools/convert.py DX DZ ACT [--sp-each N] [--max N] STACK [STACK ...]
+           python -I tools/convert.py --tool "butcher's tool" [--max N] STACK [STACK ...]
       --max N  feed a bigger stack but stop after about N pieces: the bridge's stamina floor (spguard) is set
                to SP - N x sp-each for the task and put back to 3 after (run 28: 10 threads from 73 fibers)
+      --tool NAME  a converter carried in the pack, opened by its Use (G65: the butcher's tool turns skins into
+               2-3 hide fibers each, ~1 SP a skin, fact #1421)
       e.g. python -I tools/convert.py -1 1 Bake "6 pine logs" "5 palulu logs"     (kiln: log -> carbon log)
            python -I tools/convert.py -1 1 Spin --sp-each 1 "8 pieces of hide fiber"
       STACK  the pack stack's full name (whole-word matching; two candidates is a refusal)
