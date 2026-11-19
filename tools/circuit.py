@@ -213,7 +213,15 @@ def main():
         lo, hi = (int(x) for x in args[args.index("--danger") + 1].split("-"))
     r = int(args[args.index("--r") + 1]) if "--r" in args else 15
     floors = int(args[args.index("--floors") + 1]) if "--floors" in args else 5
-    skip = [args[i + 1] for i, a in enumerate(args) if a == "--skip" and i + 1 < len(args)]
+    # run 54: `--skip A B C` skipped only A (one name a flag), and the circuit walked back into Terrifying Cave, whose named
+    # kamikaze yeek had made me teleport off B4 an hour before: every name after --skip up to the next flag is skipped
+    skip = []
+    for i, a in enumerate(args):
+        if a == "--skip":
+            for b in args[i + 1:]:
+                if b.startswith("--"):
+                    break
+                skip.append(b)
     # run 36: --blanket-ok passes through to the ladder, only on purpose (the blanket burned out and neither Aquli Teola
     # seller had one; the escape kit itself is fire-safe: rods of teleport and the Evacuation spell)
     # 2026-11-06, the user: the flag now carries its reason, and run 42 passed it on every circuit without one

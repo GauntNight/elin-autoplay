@@ -61,8 +61,18 @@ def main():
         if p["mp"] < floor:
             stop(f"MP {p['mp']}: at the floor with {name} at {t['dist']}")
         if t["dist"] <= 3:  # the rule: a teleport if it closes within 4 (it was only at 1: a kamikaze covers 2 cells a turn)
-            print("  " + last(run("item.py", "scrolls of teleport", "Read")))
+            # run 54: the kit carries no plain scrolls of teleport (the spell and the rods are its teleports, run 53), and this
+            # line read "no inventory slot" 40 times while the named yeek stood at 3: the spell first, then a rod, then a scroll
+            r = call("cast", spell="SpTeleport")
+            if r.get("ok") and (r.get("data") or {}).get("cast"):
+                print("  teleported (the spell)")
+            else:
+                out = run("item.py", "rod of teleport", "Zap")
+                if out.rc != 0:
+                    out = run("item.py", "scrolls of teleport", "Read")
+                print("  " + last(out))
             run("close.py")
+            wait_until("frames", n=10)
             continue
         if t["dist"] < SAFE and step_away(t, p):
             continue

@@ -44,6 +44,7 @@ layers stand in this order: `knowledge/risk.md` (the user, run 16). Kit: **elin-
   random points of the whole region, so walking the world map spawns nothing and nothing spawns "around me". Level: 1 in 3
   from my level (the danger 16-31 ones), 2 in 3 from FameLv x 75-124% - 3 + a little. Random nefias expire within days
   (run 20: two were gone after 3-4 day walks): look again on arrival.
+- **Refills come in batches** (runs 51, 54, fact #1538; Region.CheckRandomSites): a check tops the region up to 70 sites at once, at most once a game day on a world-map entry, and every site lives 7 days, so a batch dies in the same hour: when every near nefia reads the same hours left, take the near ones first, fill the gap (a home stop, a map, a guild night) and be on the move a game day after the last check; the next batch is a full one (run 54: 12 left in the region, then 39 and 52).
 - **When the near ones run over the gate, sell fame** (runs 27, 32-42): `famesale.py NAME [TIMES=3] [MIN=140]` beside an
   informer of the Merchants Guild (Gizon, Ishbear; `whereis.py any NAME` first). A sale takes 20% of fame (run 27 at
   Ishbear in Palmia: ~1,040 -> ~665 brought danger 3-7; run 42: 263 + 210 + 168 and 191 + 153 orens), half the tax bill is
@@ -81,7 +82,7 @@ nefia of that base danger within R tiles, `wgo.py` there, Enter, `ladder.py`, on
 - **The grid is what ends a circuit now** (run 47: refused at the door four times, after every second conquest): the
   ladder wants 3 free cards and purge can only drop junk by rule. Before leaving home, box the kit's spares (a second
   arrow stack, rods past one of a kind, a plain bow) in the yard chest 68,44.
-- **A nefia's walk is its route** (run 49): circuit.py judges expiry and nearness by `wgo.route_steps` (a shortest path round blocked tiles: Derphy reads 16 steps for 14 tiles); two run-49 walks of 8-9 game days at 14-17 straight tiles had expired on the way.
+- **A nefia's walk is its route** (run 49): circuit.py judges expiry and nearness by `wgo.route_steps` (a shortest path round blocked tiles: Derphy reads 16 steps for 14 tiles); two run-49 walks of 8-9 game days at 14-17 straight tiles had expired on the way. **Near the margin it runs long** (runs 51, 54): Warped Ruin read ~96 h and took 30; Strange Machinarium read 51 h against 67 h of life and was skipped, walked by hand it took ~40 with ~20 h to spare: a skip whose walk is under the life left is walked by hand (`wgo.py NAME`, then the circuit from its door).
 - **What it does itself** (runs 39-44): sleeps on the tile when Sleepy before each Enter (run 47: twice the 9-hour nap
   outlived the nefia and the Enter landed on its field: the circuit stops, re-run it); eats before a nap (`fed_nap`) and
   takes the stairs up first when the meal stop left me on a floor; fights hostiles 10+ levels under mine before each

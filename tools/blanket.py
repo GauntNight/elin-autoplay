@@ -28,7 +28,7 @@ from home import BOX_STR, STATIONS  # noqa: E402
 LOOM, SPINNER, KILN = STATIONS["loom"], STATIONS["spinner"], STATIONS["kiln"]
 TEXTURES, LOGS = 5, 4          # a blanket's recipe (kb.py make "fireproof blanket")
 SP_SKIN, SP_SPIN, SP_TEX, SP_BLANKET, SP_BAKE = 1, 1, 2, 5, 1  # measured in run 48 (fact #1421)
-FIBER_PER_SKIN = 2.5           # 38 skins gave 95 fibers (run 48)
+FIBER_PER_SKIN = 2             # the game's minimum (2-3 a skin); run 48 averaged 2.5, run 54's 4 skins gave 9 fibers, one texture short
 CHARGES = re.compile(r"\((\d+) charges?\)", re.I)
 TOOL = "butcher's tool"
 

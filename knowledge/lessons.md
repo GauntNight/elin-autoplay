@@ -16,14 +16,16 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 
 
-- A walk estimate can be three times too long: circuit.py skipped Warped Ruin on "~96 h for 30 steps" against 110 h of life, and walked by hand it took 12 steps and 30.5 game hours and fell on B2; Unnamed Ruin the same night (a 17-h margin, 11 h to its master). Before trusting an expiry skip near the margin, compare route_steps with wgo's leg count, or walk it (fact #1498). (51)
-- Supply, not power, bound the run again: each refill's near batch went in one circuit, then the rest expired before the walks reached them. What filled the gaps paid: the home's shipping chest (~5,000 a game day for 247 over-cap stacks, fact #1493), the books read, Yowyn's never-invested shops (fact #1497), Derphy at night (Leoban). Plan the gap before the circuit stops, not after. (51)
 - What is carried decides the plan: six plain enchant armor scrolls rode in a bag and the yard chest (run 51 had seven unread), and a boss chest's helm gave the PV the antibody trip was for; three walks to an absent Miral cost ~20 real minutes and ~10 game days. Tally the pack, the bags and the boxes against the goal before a trip for it. (52)
 - Two home stops a game day apart meet the shipping chest's 40 a morning: the second time it was full, shipstar stopped at 12 and the bags left nearly full for the next circuit (and a circuit east turned back on "bags full"). Space the unloads a morning apart, or park the ☆ pieces in the Storage Chest 64,46 to ship later (decode.py does that for its books now). (53)
 - Far nefias need a walk by hand first: from home, circuit.py skipped every in-band nefia 40-50 tiles east on its walk estimate (~160 h against ~85 h of life), while walked by hand to Lumiest and Palmia the next refills lay within 7-20 tiles. This run's legs ran ~3.9 game hours a step (17 steps in 65 h, 8 in 33 h, 15 in 58 h), not the 3.2 route_steps assumes (fact #1533). (53)
 - Read what a place is before walking to it for floors: Lumiest Crater (danger 20) looked like a fixed ladder for G64's evidence and cost ~4 game days to reach, while story-guilds-research.md already called it "just an explorable zone": an empty dig site, no stairs (fact #1535). `kb.py show zone:ID` and its Zone class first; a fixed zone is a dungeon only when its floors are read. (54)
 
 ## Promoted (where the older lessons live now)
+
+- run 54's own, fixed the same session: a full shipping chest left ~40 over-cap stacks in the bags (they filled after two conquests, three times) -> stock.py --ship boxes the carried excess in a storage box when the chest refuses.
+
+- run 51's pair (triaged at run 54's close-out): a walk estimate near the margin -> elin-delve 3 ("Near the margin it runs long": walk the skip by hand); supply binding the run -> elin-delve 2 ("Refills come in batches", fact #1538).
 
 - run 50's pair and run 52's ether line (triaged at run 53's close-out): a far treasure map's walk -> elin-travel's maps line (the far ones wait in Poppy's Maps box; run 53 boxed five); an Enter that lands in a nefia -> digmap.off_nefia; Enemy of All Living Things in towns -> elin-guilds 7 (cured in run 53: that night 69 thefts). Run 53's own, fixed the same session: the bare neck after a cure on the road -> circuit.py warns of an empty slot; a weak foe mid-meal -> wgo.meal_stop fights it; Fire Bolt at point-blank -> fight.py casts an arrow within 2 cells.
 

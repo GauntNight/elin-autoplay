@@ -224,8 +224,11 @@ def ship(plan, d, limit):
     # the pack's own excess first (no take), then its bags, then box by box
     order = sorted(by_box, key=lambda k: (k[0] != "pack", k[1] != ""))
     from farmday import home_guard  # run 41: a walk at home has stops; this one had none (added run 42)
+    dest, boxed = BOX_STR(SHIPPING), 0
     for where, bag in order:
         names = by_box[(where, bag)]
+        if dest != BOX_STR(SHIPPING) and where != "pack":
+            continue  # the chest is full: what already sits in a home box waits there for another morning
         while names and moved < limit:
             home_guard("stock --ship")
             if where != "pack" or bag:
@@ -242,8 +245,18 @@ def ship(plan, d, limit):
                     stop(f"{'bag.py ' + bag if bag else 'box.py ' + where} --take refused (rc {r.rc})")
             else:
                 batch = names[:limit - moved]
-            r = run("box.py", BOX_STR(SHIPPING), *batch)
+            r = run("box.py", dest, *batch)
             print(r)
+            if r.rc != 0 and ": moved" not in str(r) and dest == BOX_STR(SHIPPING) and where == "pack":
+                # run 54: every home stop shipped the ☆ pieces first, the chest refused the stock, and ~40 over-cap stacks
+                # rode back out in the bags, which filled after two conquests, three times: carried excess goes to a home
+                # box with room instead, to ship another morning
+                spare = spare_box(len(names))
+                if spare:
+                    dest = BOX_STR(spare)
+                    print(f"  the shipping chest is full: the carried excess goes to {dest} for another morning")
+                    r = run("box.py", dest, *batch)
+                    print(r)
             if r.rc != 0 and ": moved" not in str(r):
                 # run 53: the chest was full for the morning (40 stacks) after a batch came out of a box, and the rods and
                 # scrolls stayed in the pack (the next decode found no free card): what was taken goes back where it was
@@ -251,9 +264,28 @@ def ship(plan, d, limit):
                     back = run("bag.py", bag, *batch) if bag else run("box.py", where, *batch)
                     print(f"  the chest refused: back to {bag or where}: {last(back)[:80]}")
                 stop(f"box.py shipping refused (rc {r.rc}): is the shipping chest full?")
-            moved += len(batch)
+            if dest == BOX_STR(SHIPPING):
+                moved += len(batch)
+            else:
+                boxed += len(batch)
             names = names[len(batch):]
-    print(f"shipped {moved} stacks")
+    print(f"shipped {moved} stacks" + (f"; {boxed} carried excess boxed in {dest} (the chest full)" if boxed else ""))
+
+
+def spare_box(n):
+    """The storage box (a wagon, a Storage Chest, a Spares or Library box) with the most free slots and at least n, or None."""
+    best = None
+    for b in data("stock").get("boxes") or []:
+        if (b["x"], b["z"]) == tuple(SHIPPING) or not b.get("installed", True):
+            continue
+        free = (b.get("slots") or 0) - (b.get("count") or 0)
+        name = b.get("name") or ""
+        # storage only: not the practice chest, a shared box (Maps for Poppy, the Dishes), a mail package or a locked chest
+        if not any(w in name for w in ("wagon", "Storage Chest", "Spares", "Library")):
+            continue
+        if free >= max(n, 1) and (best is None or free > best[0]):
+            best = (free, (b["x"], b["z"]))
+    return best[1] if best else None
 
 
 def read_books(plan, limit):
