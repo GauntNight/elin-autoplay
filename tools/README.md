@@ -447,8 +447,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                                                         (--log: a row in runs/index.csv for the run tracker)
 - **`ladder.py`**: Go down a multi-floor dungeon one floor at a time (run 20, the user: "we need some dungeons ... to level up two weapon skill"): on each floor delve.py until the floor is explored, loot.py, wrecks.py, a QuickSave, then the stairway that isn't the way in, and down. Lesimas and other quest dungeons aren't nefias, so delve.py's floor gate skips them: the gate here covers every floor.
     usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
-                                     [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
+                                     [--no-wrecks] [--in X,Z] [--unattended] [--breathe] [--spare NAME] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
       --sleepy-ok  go on through Very Sleepy (phase 2) and nap at phase 3 (circuit.py passes it when the nefia expires before a nap ends)
+      --breathe  an underwater dungeon (run 55, G66: the Sunken Temple of Lurie), only with water breathing worn: each floor and each
+                 delve pass reads the game's breathesWater flag and stops without it
       --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
       --in X,Z  the way in on the first floor when I am no longer standing on it
       --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen

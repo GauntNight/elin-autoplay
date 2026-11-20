@@ -21,7 +21,8 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 - watchlog reads only lines written after it starts: twice a short job (a 30-tile walk, music with no flute) ended before its watcher began and the watcher sat to its --idle line. On a fresh log, start it with `--from-start`. (55)
 - Plan arrivals by the clock: Derphy reached at 12:22 (thefts want night), Willow at 23:08 and Mysilia at 01:13 (shops shut; Chim and Rainof don't answer at night, no guard visible for whereis.py). A walk's steps x ~2.5 game hours a step says when I land; an inn (Tiguen) trades at night. (55)
 - The six-bill reserve is my own convention (G50's How), not the user's: the user's rule is which shops (fact #1025). Bend it for a goal's last step and say so; keep it for routine spending. (55)
-- Read every enchant scroll carried at the first home stop: run 55 found 7 enchant armor and 4 enchant weapon scrolls in the bags late on (PV +14 once read: the girdle, helm and boots to +2, two rings to +0), as run 52 did with six. (55; run 52's line promoted)
+- Read every enchant scroll carried at the first home stop: run 55 found a handful of enchant armor and weapon scrolls riding unread in the bags late in the run (PV rose by more than ten once they were read), as run 52 had. (55; run 52's line promoted)
+- Monsters steal from the pack, not only orens: a gnome took a treasure map, fairies 1,200-2,200 orens a time (fact #1558); the item ledger can't see it and the loop logs cut the line short. Run 55 lost four tools that way, most likely, and shipped the one "protects you from thieves" waist piece in hand before finding out (fact #1559): weigh that line before shipping one (run 55).
 
 ## Promoted (where the older lessons live now)
 
