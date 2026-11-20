@@ -276,6 +276,13 @@ def main():
             if n not in dead_said:
                 dead_said.add(n)
                 print(f"[{k}] ally dead: {n} (Zone.Revive brings a member home within a week; its corpse stays here)")
+        # run 55 (G66): Duponne on the Sunken Temple's B5 is to be captured, not killed (killing is irreversible): --spare NAME
+        # stops the moment that creature is in view, before any fight; the decision after it is a hand one
+        if "--spare" in argv:
+            spare = argv[argv.index("--spare") + 1].lower()
+            seen = next((c for c in s.get("nearby") or [] if spare in c["name"].lower()), None)
+            if seen:
+                halt(f"{seen['name']} Lv{seen.get('lv')} in view at {seen.get('dist')} (spared: --spare {spare}): decide by hand")
         why = check(s, p, foes, kab, kab_seen)
         if why:
             halt(why)

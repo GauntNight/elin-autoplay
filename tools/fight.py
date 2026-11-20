@@ -246,6 +246,13 @@ def _fight(trk):
         refuse("in a town: a townsperson's death costs karma (run 48: Anastazija, -5): walk away, take the stairs or leave "
                "the map; --town-ok for a monster that came into town")
     foes0 = [c for c in s0.get("nearby") or [] if match(c, name, force)]
+    # run 55 (G66): a creature to be spared (Duponne: captured, never killed) is named in runs/jobs/spare.txt by ladder --spare;
+    # every fight.py call refuses it, whichever tool asked (the ladder calls fight.py from four places besides delve)
+    spare_file = Path(__file__).resolve().parent.parent / "runs" / "jobs" / "spare.txt"
+    spared = [w.strip().lower() for w in (spare_file.read_text(encoding="utf-8").splitlines() if spare_file.exists() else []) if w.strip()]
+    hit = next((c for c in foes0 for w in spared if w in c["name"].lower() or w in str(c.get("id") or "").lower()), None)
+    if hit or any(w in name for w in spared):
+        refuse(f"{(hit or {}).get('name', name)} is spared ({spare_file.name}): never fight it")
     # run 53, Guiding Cave B1: a neutral Evolved Goblin Wizard fought with --force for its gene stole 3,249 orens and died
     # with nothing dropped. A neutral thief kind (threat.py's "steals") stays neutral unless --thief-ok says the gold is boxed
     if foes0 and force and "--thief-ok" not in sys.argv:

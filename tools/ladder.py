@@ -20,7 +20,7 @@ Exit 0 after FLOORS floors. The run is marked in runs/activity.csv (activity.mar
 the floors done at every exit).
 
 usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
-                                 [--no-wrecks] [--in X,Z] [--unattended] [--breathe] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
+                                 [--no-wrecks] [--in X,Z] [--unattended] [--breathe] [--spare NAME] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
   --sleepy-ok  go on through Very Sleepy (phase 2) and nap at phase 3 (circuit.py passes it when the nefia expires before a nap ends)
   --breathe  an underwater dungeon (run 55, G66: the Sunken Temple of Lurie), only with water breathing worn: each floor and each
              delve pass reads the game's breathesWater flag and stops without it
@@ -1210,6 +1210,8 @@ def main():
     if "--unattended" in sys.argv:
         max_danger -= THRESHOLDS["unattended_minus"]
     GATE = ["--max-danger", str(max_danger)] + (["--breathe"] if "--breathe" in sys.argv else [])  # run 55: every delve call
+    if "--spare" in sys.argv:  # run 55 (G66): a creature delve must never fight (Duponne, to be captured): delve stops on sight
+        GATE += ["--spare", sys.argv[sys.argv.index("--spare") + 1]]
     floors = nums[1] if len(nums) > 1 else 3
     solo = "--solo" in sys.argv
     register("ladder")  # stopjob.py ladder asks it to stop between floors (springday's pattern)
@@ -1224,10 +1226,15 @@ def main():
         kit_check()
     print(f"danger cap {max_danger}" + (" (unattended)" if "--unattended" in sys.argv else "") + f", {floors} floors")
     mark("nefia", "start")
+    spare_file = Path(__file__).resolve().parent.parent / "runs" / "jobs" / "spare.txt"
+    if "--spare" in sys.argv:  # run 55 (G66): fight.py refuses the spared creature whichever ladder step calls it
+        spare_file.write_text(sys.argv[sys.argv.index("--spare") + 1], encoding="utf-8")
     try:
         floors_loop(max_danger, floors, solo)
     finally:
         mark("nefia", "end", note=f"{FLOORS_DONE} floors")
+        if "--spare" in sys.argv and spare_file.exists():
+            spare_file.unlink()
 
 
 if __name__ == "__main__":
