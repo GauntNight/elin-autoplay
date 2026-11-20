@@ -244,6 +244,10 @@ code's `kamikaze_dist`: **5 cells** (3 until run 40, 4 until run 41).
 
 ## 7. The escape reserve, and leaving a floor
 
+- **Gravity blocks teleports** (run 55, a near-death: 453 -> 113 on the Minotaur's Nest B4, fact #1555): under ConGravity
+  (minotaur mages cast it) the Teleport spell and a scroll both left me beside two casters; `common.emergency_teleport` returns
+  at once under it. The escape then is a drink, the kill (melee a wounded caster: they die fast) and an evacuation. Casters
+  that Gravity you are a reason to leave a floor before HP runs low, not after.
 - **The reserve: 2 teleports + 3 heals untouched** (`escape_teleports`, `escape_heals`). After a bad fight, heal to the
   table's heal-to with no foe in view and go on (the user, run 16: "you may be teleporting out too early"); **leave the
   floor when going on would spend the reserve**, or when an "avoid" kind near my level holds the floor. When to read the

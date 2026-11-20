@@ -707,7 +707,12 @@ def emergency_teleport():
     """elin-play's teleport row, one chain for every tool: a scroll of teleport (item.py's whole-word match, never the
     short one), else the fullest rod of teleport zapped on my own cell, else the Teleport spell. Returns what was done,
     or None. Run 55 (Dangerous Ruin B3): the kit's 'teleport: 28' was two rods of 14 charges and no scroll at all;
-    delve.py read only the scroll and halted with a hot guy adjacent, and only the ladder's Short Teleport cast saved it."""
+    delve.py read only the scroll and halted with a hot guy adjacent, and only the ladder's Short Teleport cast saved it.
+    Under ConGravity no teleport moves me (run 55, Minotaur's Nest B4, fact #1555: the spell and a scroll both left me beside
+    two minotaur mages, 453 -> 113): returns None at once, so the caller drinks, fights or evacuates instead of spending turns."""
+    if "ConGravity" in (pc().get("conditions") or []):
+        print("  emergency teleport: Gravity is on (teleports don't move me, fact #1555): drink, kill or evacuate", flush=True)
+        return None
     out = run("item.py", "scroll of teleport", "Read")
     if out.rc == 0 and "Read" in out:
         return "read a scroll of teleport"
