@@ -102,7 +102,7 @@ def main():
         if action and any(a["text"].lower().startswith(action) for a in r["data"]["acts"]):
             rep, chosen = r, s
             break
-    if action == "buy" and (rep is None or not any(a["text"].lower().startswith("buy") for a in rep["data"]["acts"])):
+    if action and action.startswith("buy") and (rep is None or not any(a["text"].lower().startswith("buy") for a in rep["data"]["acts"])):
         # run 51: "travel ration" matched my own "a travel ration" at the exact level and never reached the shop's
         # "2 travel rations" (a plural one level down), so Buy was refused three times: for a Buy, look at the shop's side
         # of the grid with the plural too

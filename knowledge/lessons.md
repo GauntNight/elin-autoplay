@@ -16,12 +16,16 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 
 
-- What is carried decides the plan: six plain enchant armor scrolls rode in a bag and the yard chest (run 51 had seven unread), and a boss chest's helm gave the PV the antibody trip was for; three walks to an absent Miral cost ~20 real minutes and ~10 game days. Tally the pack, the bags and the boxes against the goal before a trip for it. (52)
-- Two home stops a game day apart meet the shipping chest's 40 a morning: the second time it was full, shipstar stopped at 12 and the bags left nearly full for the next circuit (and a circuit east turned back on "bags full"). Space the unloads a morning apart, or park the ☆ pieces in the Storage Chest 64,46 to ship later (decode.py does that for its books now). (53)
-- Far nefias need a walk by hand first: from home, circuit.py skipped every in-band nefia 40-50 tiles east on its walk estimate (~160 h against ~85 h of life), while walked by hand to Lumiest and Palmia the next refills lay within 7-20 tiles. This run's legs ran ~3.9 game hours a step (17 steps in 65 h, 8 in 33 h, 15 in 58 h), not the 3.2 route_steps assumes (fact #1533). (53)
 - Read what a place is before walking to it for floors: Lumiest Crater (danger 20) looked like a fixed ladder for G64's evidence and cost ~4 game days to reach, while story-guilds-research.md already called it "just an explorable zone": an empty dig site, no stairs (fact #1535). `kb.py show zone:ID` and its Zone class first; a fixed zone is a dungeon only when its floors are read. (54)
 
+- watchlog reads only lines written after it starts: twice a short job (a 30-tile walk, music with no flute) ended before its watcher began and the watcher sat to its --idle line. On a fresh log, start it with `--from-start`. (55)
+- Plan arrivals by the clock: Derphy reached at 12:22 (thefts want night), Willow at 23:08 and Mysilia at 01:13 (shops shut; Chim and Rainof don't answer at night, no guard visible for whereis.py). A walk's steps x ~2.5 game hours a step says when I land; an inn (Tiguen) trades at night. (55)
+- The six-bill reserve is my own convention (G50's How), not the user's: the user's rule is which shops (fact #1025). Bend it for a goal's last step and say so; keep it for routine spending. (55)
+- Read every enchant scroll carried at the first home stop: run 55 found 7 enchant armor and 4 enchant weapon scrolls in the bags late on (PV +14 once read: the girdle, helm and boots to +2, two rings to +0), as run 52 did with six. (55; run 52's line promoted)
+
 ## Promoted (where the older lessons live now)
+
+- run 52's and run 53's lines (triaged at run 55's close-out): enchant scrolls riding unread -> a Live line of run 55 (it happened again); two home stops a day apart against the shipping chest's 40 -> fact #1001's limit, and stock.py --ship boxes the excess when the chest refuses (run 54); far nefias need a walk by hand -> circuit.py stops and names the skipped nefias whose walk fits their life (run 55), elin-delve 3.
 
 - run 54's own, fixed the same session: a full shipping chest left ~40 over-cap stacks in the bags (they filled after two conquests, three times) -> stock.py --ship boxes the carried excess in a storage box when the chest refuses.
 

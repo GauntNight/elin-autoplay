@@ -158,22 +158,33 @@ def shed_heavy(dry):
         stolen = {it.get("uid") for it in inv.inventory() if it.get("stolen")}
     except Exception:  # noqa: BLE001 (an older mod: no flag to read)
         stolen = set()
-    for i in data("inv")["items"]:
+    # run 55 (Tragedic Cave B4): a boss chest's wall fountain went into the backpack, the burden 212%, evac refused, and this
+    # read only the grid ("no furniture over 5 kg"): every carried thing at any depth now, a bagged one taken out first
+    try:
+        carried = inv.inventory()
+    except Exception:  # noqa: BLE001
+        carried = data("inv")["items"]
+    for i in carried:
         t = table.get(i.get("id")) or {}
         if i.get("equipped") or re.search("★|☆", i["name"]) or t.get("category") not in FURNITURE or i.get("uid") in stolen:
             continue
         if (t.get("weight") or 0) >= HEAVY:
-            heavy.append(((t.get("weight") or 0) * (i.get("num") or 1), i["name"]))
-    heavy.sort(reverse=True)
+            heavy.append(((t.get("weight") or 0) * (i.get("num") or 1), i["name"], i))
+    heavy.sort(key=lambda h: -h[0])
     if not heavy:
-        print("no furniture over 5 kg in the pack")
-    for w, name in heavy:
+        print("no furniture over 5 kg carried")
+    for w, name, it in heavy:
         if dry:
-            print(f"would drop {name} ({w / 1000:.0f} kg)")
+            print(f"would drop {name} ({w / 1000:.0f} kg){' from ' + str(it.get('path')) if it.get('path') else ''}")
             continue
         if (pc().get("burdenPhase") or 0) < 3:
             break
-        out = run("item.py", name, "Drop", timeout=60)
+        if it.get("path"):
+            ok, why = inv.to_pack(it, inv.inventory())
+            if not ok:
+                print(f"{name}: not taken out of {it.get('path')} ({why})")
+                continue
+        out = run("item.py", f"uid:{it['uid']}" if it.get("uid") else name, "Drop", timeout=60)
         print(f"dropped {name} ({w / 1000:.0f} kg): rc {out.rc}, burden phase {pc().get('burdenPhase')}")
 
 
