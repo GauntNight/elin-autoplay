@@ -176,9 +176,21 @@ Demitas's shipping picture.
 Forgiveness). The village is at world 81,97, as computed above; Bicerin was in its one roofed room (phase 1 -> 2). The
 temple's floors read 25 (B1) to 29 (B5), as zones.json says, and served as the floor gate's evidence ladder 26 -> 30
 (facts #1545-#1547). B4's stairs showed as a "locked corridor" that opened on Use at phase 2. Duponne came into view on
-B5 (phase 3) and stole salads from the pack; `ladder.py --spare Duponne` kept every tool from fighting her. **Kill or
-capture is the user's call** (open after run 55); the capture needs Ungogo's horn from the Minotaur's Nest B5 at danger
-30, whose B4 minotaur mages cast Gravity (fact #1555).
+B5 (phase 3) and stole salads from the pack; `ladder.py --spare Duponne` kept every tool from fighting her. **The user
+chose capture** (2026-11-20). It needs Ungogo's horn from the Minotaur's Nest B5 at danger 30, whose B4 minotaur mages
+cast Gravity (fact #1555).
+
+**The capture ball in the code** (Elin-Decompiled main at EA 23.360.1 Nightly, read 2026-11-20: TraitDuponneBall,
+TraitMonsterBall, ActThrow, QuestNegotiationDarkness; fact #1560):
+- `TraitDuponneBall : TraitMonsterBall` overrides only `IsDuponneBall`.
+- **The throw:** ActThrow's MonsterBall case checks only that the target is `lurie_boss`, not of my faction, and not in
+  Zone_Exile or a user zone. No HP threshold, no level check and no roll: a plain monster ball's "HP <= 10%" and "level
+  <= the ball's" checks sit in the other branch. A ball throw skips the attack roll, so it can't miss.
+- **After:** the ball turns copper and holds her. At phase 3 the quest moves to phase 4 (`AfterTakeCareDuponne`).
+- **A wrong target:** "monsterball_invalid", and the ball stays.
+- **The release:** a filled ball releases only in Zone_Exile (the Village of Atonement) or survival mode. She becomes a
+  Friend with the village as her home, influence +20, and the ball is used up.
+- **Not found in this read:** the "duponne_rescued" branch, and the drama that makes the ball.
 
 ### stone_dream "Nightly Routine" (Loytel)
 Added on the first day-tick after into_darkness completes (GameDate). Reward (`reward_stone_dream`):
