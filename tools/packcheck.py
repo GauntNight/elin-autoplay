@@ -38,7 +38,8 @@ KIT = ("orens", "bandage", "throwing dagger", "cooler box", "backpack", "cure mi
        "butcher's tool", "loot bag", "spoils bag", "haul bag", "pouch",
        "shovel",  # the user, 2026-10-29: a few of the wiki's hidden Small Medals need digging (medals.py)
        "fireproof blanket",  # the user, 2026-10-30: 3 ride along (leave.py); --move had no reason to keep them
-       "potion of confusion", "potions of confusion", "rod of web", "bait", "monster ball")  # run 17: baits ride on the toolbelt (the Farm box is full; fishing anywhere)  # run 16: soak kamikazes Wet (delve.py throws them); web a foe and walk off  # run 13: butcher every corpse where it falls (G6 skins)  # run 12: Edible on roads, Forest (no blindness) in dungeons
+       "potion of confusion", "potions of confusion", "rod of web", "bait", "monster ball",
+       "water breathing", "forest gloves")  # run 55, G66: the Sunken Temple of Lurie is underwater: the Forest Gloves go on at its door, the blessed potions are the spare if acid strips the enchantment  # run 17: baits ride on the toolbelt (the Farm box is full; fishing anywhere)  # run 16: soak kamikazes Wet (delve.py throws them); web a foe and walk off  # run 13: butcher every corpse where it falls (G6 skins)  # run 12: Edible on roads, Forest (no blindness) in dungeons
 # run 36: the pack's 35 cards filled with minor kit pulled out of the bags (rods of silence, web, holy shield, magic
 # map; buff potions; spare scrolls), and the ladder's room check and leave.py's 3 free cards failed four times. Only
 # the core kit must sit in the pack itself (the tools read it by name from there: escape, heals, food, the bed, the
@@ -55,7 +56,7 @@ CORE_KIT = ("orens", "cooler box", "cure minor wound", "cure major wound", "cure
 # backpack (one worn, two blessed spares there)
 HOME_ONLY = ("holy veil", "potion of speed", "potion of resistance", "potion of hero", "scroll of hero",
              "exterminate", "intonation", "telepathy", "earthquake", "divine wisdom", "meteor", "flying scroll",
-             "salt water", "scroll of faith", "water breathing", "incognito", "rod of speed", "rod of death bolt",
+             "salt water", "scroll of faith", "incognito", "rod of speed", "rod of death bolt",
              "rod of mind bolt", "rod of poison missile", "rod of fire missile", "rod of lightning bolt", "rod of bane")
 FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "bread", "stew", "skewer",
            "corpse",  # run 12: cookable food; special mobs' corpses stay in the Cooler Box (elin-play)
@@ -64,6 +65,7 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "banana", "stir-fry", "stir-fries", "manju", "croquette", "pizza",  # run 24: Tiguen's foods had no route
            "rice", "cheese", "jerky", "jerkies", "pie",  # run 19: "4 jerkies" had no route
            "sashimi", "sandwich", "onigiri",
+           "sherbet", "sherbets", "anpan", "anpans", "breadstick", "breadsticks",  # run 55: a pumpkin sherbet had no route (Tiguen sells sherbets, anpans, breadsticks)
            "stir fried", "gourd", "curry", "curries",  # run 50: Erobird's stir fried gourds (kind meal) had no route
            "lunch box", "mousse", "shortcake", "mochi", "avocado", "watermelon", "sack", "dumpling",  # run 41: Semnof's stock had no route
              # run 39: palulu shortcakes had no route

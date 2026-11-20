@@ -20,8 +20,10 @@ Exit 0 after FLOORS floors. The run is marked in runs/activity.csv (activity.mar
 the floors done at every exit).
 
 usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
-                                 [--no-wrecks] [--in X,Z] [--unattended] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
+                                 [--no-wrecks] [--in X,Z] [--unattended] [--breathe] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
   --sleepy-ok  go on through Very Sleepy (phase 2) and nap at phase 3 (circuit.py passes it when the nefia expires before a nap ends)
+  --breathe  an underwater dungeon (run 55, G66: the Sunken Temple of Lurie), only with water breathing worn: each floor and each
+             delve pass reads the game's breathesWater flag and stops without it
   --expendable  the ally is a shield (delve.py --expendable, the user's rule from run 16): her HP stops nothing
   --in X,Z  the way in on the first floor when I am no longer standing on it
   --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen
@@ -256,7 +258,7 @@ def condition_wait():
     """elin-play's status rule (confused or afraid: stay put until it clears) for common.ready's "wait it out" stops
     (run 37: ConInsane and ConDim from an Eye of Insanity, gone in 11 turns): single turns while no hostile is in view;
     False (stop) on a hostile, HP under 70%, or 30 turns."""
-    from common import BAD_CONDITIONS
+    from common import bad_conditions
     step_off()  # run 41: a Wait on the arrival stairway takes it (out and back in, the turn count standing still, in a storm's confusion)
     # run 53 (Lively Forest B3): a crowd of weak foes (a cupid, a gnome, a performer, ...) each took one of the 30 turns, and
     # the wait gave up with Dim still on: fights have their own count, the 30 are waits
@@ -264,7 +266,7 @@ def condition_wait():
     while waits < 30 and fights < 20:
         s = state()
         p = s["pc"]
-        if not [c for c in p.get("conditions") or [] if c in BAD_CONDITIONS]:
+        if not bad_conditions(p):
             print("  condition: cleared")
             return True
         foes = [c for c in s.get("nearby") or [] if c.get("hostile")]
@@ -1084,8 +1086,11 @@ def floors_loop(max_danger, floors, solo):
             stop(f"{z.get('full')} is not a dungeon floor")
         new = depth(z.get("full")) > deepest
         underwater = z["underwater"] if "underwater" in z else "water" in str(z.get("full") or "").lower()
-        if underwater:
-            stop(f"{z.get('full')} is underwater (the user, run 17)")
+        if underwater and "--breathe" not in sys.argv:
+            stop(f"{z.get('full')} is underwater (the user, run 17); --breathe only with water breathing worn")
+        if underwater and not pc().get("breathesWater"):
+            # run 55 (G66): the flag is the game's (the Forest Gloves' enchantment or a potion's buff), read each floor
+            stop(f"{z.get('full')} is underwater and I don't breathe water now: drink a potion of water breathing, or leave")
         if (z.get("danger") or 0) > max_danger:
             stop(f"{z.get('name')} is danger {z.get('danger')}, over {max_danger}: go back up the stairs I came down")
         p = pc()
@@ -1204,7 +1209,7 @@ def main():
     global GATE
     if "--unattended" in sys.argv:
         max_danger -= THRESHOLDS["unattended_minus"]
-    GATE = ["--max-danger", str(max_danger)]
+    GATE = ["--max-danger", str(max_danger)] + (["--breathe"] if "--breathe" in sys.argv else [])  # run 55: every delve call
     floors = nums[1] if len(nums) > 1 else 3
     solo = "--solo" in sys.argv
     register("ladder")  # stopjob.py ladder asks it to stop between floors (springday's pattern)

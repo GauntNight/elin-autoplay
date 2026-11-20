@@ -373,7 +373,7 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 27,       # run 55 (G64 M2): 26 -> 27 at Lv47, unattended limit 25 -> 26: Dangerous Ruin B5, danger 25, lowest 76% on the floor (the ladder's 64% was B4's bleed), no drink, its master 『Monster mushroom』 Lv37; run 54 (G64 M1): 25 -> 26 at Lv47, unattended limit 24 -> 25: Unknown Cave B5, danger 24, lowest 91%, no drink, its master 『Asura』 Lv36; run 52 (G61 M4, G61 done): 24 -> 25 at Lv45, unattended limit 23 -> 24: Traditional Ruin B4, danger 23
+    "max_danger": 28,       # run 55 (G64 M3): 27 -> 28 at Lv47, unattended limit 26 -> 27: Sunken Temple of Lurie B2, danger 26, ~35 fights, lowest 90%, no drink (water breathing worn); run 55 (G64 M2): 26 -> 27 at Lv47, unattended limit 25 -> 26: Dangerous Ruin B5, danger 25, lowest 76% on the floor (the ladder's 64% was B4's bleed), no drink, its master 『Monster mushroom』 Lv37; run 54 (G64 M1): 25 -> 26 at Lv47, unattended limit 24 -> 25: Unknown Cave B5, danger 24, lowest 91%, no drink, its master 『Asura』 Lv36; run 52 (G61 M4, G61 done): 24 -> 25 at Lv45, unattended limit 23 -> 24: Traditional Ruin B4, danger 23
                             # (the limit), its master 『Stalker』 Lv34 killed in ~15 fights, lowest 100%, no drink (fact #1509).
                             # run 52 (G61 M3): 23 -> 24 at Lv45, unattended limit 22 -> 23: Traditional Ruin B3, danger 22 (the
                             # limit), explored at 400/400 with no drink (a king scorpion Lv21, a living armor, a slime, a sea snail;
@@ -447,6 +447,16 @@ if _LOCAL_NUMBERS.exists():
 BAD_CONDITIONS = ("ConBlind", "ConParalyze", "ConSleep", "ConFaint", "ConConfuse", "ConDim", "ConSuffocation")
 
 
+def bad_conditions(p):
+    """The BAD_CONDITIONS on me now. Run 55 (the Sunken Temple, G66): with water breathing worn, ConSuffocation comes back on
+    every underwater step and its own Tick kills it at once (ConSuffocation.cs: `if (owner.HasElement(429)) Kill()`), so
+    no damage and no regen block: it counts only when I don't breathe water (bridge breathesWater)."""
+    bad = [c for c in p.get("conditions") or [] if c in BAD_CONDITIONS]
+    if p.get("breathesWater"):
+        bad = [c for c in bad if c != "ConSuffocation"]
+    return bad
+
+
 def ready(s=None, *, hp=60, hunger=70, sp=None, idle=True, world_ok=False, nefia_ok=True,
           hostile_r=None, weak_ok=False, allow=("LayerInventory",), burden=3, returning_ok=True,
           hostiles=True):
@@ -498,7 +508,7 @@ def ready(s=None, *, hp=60, hunger=70, sp=None, idle=True, world_ok=False, nefia
         p = s["pc"]
     if idle and not (p.get("ai") or "NoGoal").startswith(("NoGoal", "GoalEndTurn")):
         return f"busy: {p.get('ai')} (wait_idle first)"
-    bad = [c for c in p.get("conditions") or [] if c in BAD_CONDITIONS]
+    bad = bad_conditions(p)
     if bad:
         return f"condition {bad[0]}: wait it out"
     if s.get("transit"):

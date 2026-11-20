@@ -204,6 +204,13 @@ def floor_gate():
     underwater = z["underwater"] if "underwater" in z else "water" in str(z.get("full") or "").lower()
     if underwater and "--breathe" not in sys.argv:
         stop(f"{z.get('full')} is an underwater dungeon: suffocation (the user, run 17); --breathe only with water breathing")
+    if underwater:
+        # run 55 (G66, the Sunken Temple of Lurie): --breathe is a claim; the game's own flag decides each pass (an acid trap
+        # stripped enchantments in run 54, and a potion's buff runs out): no breathing, no step
+        p = call("state")["data"]["pc"]
+        if not p.get("breathesWater"):
+            # (ConSuffocation itself flickers on every step while breathing and dies on its own tick: common.bad_conditions)
+            stop("underwater without water breathing (the gloves' enchantment or the potion gone?): drink a potion of water breathing, or leave")
     if z.get("nefia") and (z.get("danger") or 0) > limit and "--force" not in sys.argv:
         stop(f"this floor is danger {z.get('danger')}, over the limit {limit} (--max-danger N or --force to go on; the rule: go back up)")
 
