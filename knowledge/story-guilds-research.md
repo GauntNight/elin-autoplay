@@ -106,6 +106,8 @@ start of the next month".
 - `CanGiveBill()` is `stage < 7`, so there are **no bills after 2,000,000**. The remaining
   18,000,000 can't be paid in this build, and nothing completes the quest: **open-ended**.
 - The wiki: "Repaying the debt has no bearing on the scenario's progress."
+- **The user (2026-11-20):** from what they read online, the bills don't work yet in the current build; not set as a
+  goal (fact #1562). The Nightly code read that day has the bill rewards; the installed Stable build may differ.
 - While it runs, every 1 November mails a Lumiest Crim Ale (GameDate).
 
 ### The exile conversations (all auto-complete on the home board)
@@ -255,6 +257,9 @@ Then come the Lurie temple (needs water breathing) and the Crypt (danger 37 with
   A second treasure gives "Curse of the mansion" (LUK -10; Melilith won't join).
 - **Boss:** "Alone..." (LV35), optional.
 - **Reachable:** yes; the best story-adjacent target now.
+- **Checked 2026-11-20 (G69, the code):** the danger is 10-15 (Zone.DangerLv: the manor's 10 + depth - 1; the
+  dungeon row's LV 30 doesn't enter it); the DLC check returns true for everyone; the boss is Melilith's Nightmare
+  (Lv35). The wish's rules are fact #1564; the floors, fact #1563.
 
 **Lumiest: "Unknown Crater"**
 QuestLumiest is a bare stub, and the wiki says unimplemented. Lumiest Crater (LV20, danger 20) is
