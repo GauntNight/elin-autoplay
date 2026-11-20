@@ -406,7 +406,9 @@ def check():
         bad.append(("backpack", n, *route(n)))
     # run 14: bag 2 is "a loot bag" (renamed with boxcfg name=): the haul rides there, so on the
     # home map all of it is out of place; quality-marked gear waits for identification
-    for haul in ("loot bag", "spoils bag", "haul bag"):  # run 14: bag 3 is the second haul bag; run 41: bag 4 (G45)
+    # run 55: the pouch was never read: 43 red herbs, 43 iron bolts, 28 tobacco leaves, two claymores, a crossbow and an
+    # ancient book rode in it for runs while the other bags filled (the circuit stopped "bags full")
+    for haul in ("loot bag", "spoils bag", "haul bag", "pouch"):  # run 14: bag 3 is the second haul bag; run 41: bag 4 (G45)
         for n in bag_items(haul):
             low = norm_name(n)
             # run 22: Loytel's ★Land Deed waits on the user (reading it claims Vernis, G13 M2): it
