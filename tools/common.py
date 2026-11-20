@@ -153,6 +153,21 @@ def txlog(action, what, src="", dst="", note=""):
         pass
 
 
+# run 55: the butcher's tool (twice), the shovel and the pickaxe left the bags with no ledger line; the loop logs, cut short,
+# still showed "A gnome steals a treasure map from you" and fairies taking 1,219-2,239 orens (fact #1558). My own thefts
+# read "You steal ...": only a line that ends "from you" is a monster's.
+THEFT = re.compile(r"\bsteals?\b.*\bfrom you\b", re.I)
+
+
+def note_thefts(lines, seen):
+    """Print and ledger each new game log line where something stole from me, whole (seen: a set kept by the caller)."""
+    for ln in lines or []:
+        if isinstance(ln, str) and THEFT.search(ln) and ln not in seen:
+            seen.add(ln)
+            print(f"  !! theft: {ln}", flush=True)
+            txlog("stolen", ln, "pack", "a monster")
+
+
 def last(text):
     lines = [ln for ln in (text or "").splitlines() if ln.strip()]
     return lines[-1] if lines else ""

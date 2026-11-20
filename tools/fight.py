@@ -25,7 +25,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import THRESHOLDS, grab, last, named, refuse, run, stop, walk_beside  # noqa: E402
+from common import THRESHOLDS, grab, last, named, note_thefts, refuse, run, stop, walk_beside  # noqa: E402
 
 NET_HP = 10  # at or under this percent after a round the next hit kills: teleport now
 LAST_SWING = False  # run 37: the one extra round against a lone foe at 10% or less has been taken
@@ -70,6 +70,7 @@ def auto_fight(t, min_hp, timeout=25.0):
 
 
 from common import emergency_teleport  # noqa: E402,F401  (run 55: scroll, rod, then the spell; one chain for every tool)
+THEFTS_SEEN = set()  # run 55: each theft line ledgered once a call (common.note_thefts)
 
 
 def keep_log(s, what):
@@ -382,6 +383,7 @@ def _fight(trk):
         if AUTO and auto_fight(t, min_hp):
             s2 = after_round(hp0, pc["maxHp"], min_hp, t["name"])
             trk.see(s2)
+            note_thefts(s2.get("log"), THEFTS_SEEN)
             tt = [c for c in s2.get("nearby") or [] if c["uid"] == t["uid"]]
             print(f"HP {s2['pc']['hp']}/{s2['pc']['maxHp']}  {t['name']} {tt[0]['hpPct'] if tt else 0}% (auto-combat)")
             continue
@@ -389,12 +391,14 @@ def _fight(trk):
         time.sleep(1.0)
         s2 = after_round(hp0, pc["maxHp"], min_hp, t["name"])
         trk.see(s2)
+        note_thefts(s2.get("log"), THEFTS_SEEN)
         tt = [c for c in s2.get("nearby") or [] if c["uid"] == t["uid"]]
         if tt and tt[0]["hpPct"] < t["hpPct"]:
             hits.append(t["hpPct"] - tt[0]["hpPct"])
         print(f"HP {s2['pc']['hp']}/{s2['pc']['maxHp']}  {t['name']} {tt[0]['hpPct'] if tt else 0}%")
     end = call("state")["data"]
     log = end.get("log") or []
+    note_thefts(log, THEFTS_SEEN)
     print("log:", " / ".join(log[-5:]))
     # run 45 (Ancient Ruin B3): delve counted 25 fight steps that never swung as fought, 15 silent minutes with
     # two weak hostiles idle beside me. A call that leaves the target in view and the turn counter where it was

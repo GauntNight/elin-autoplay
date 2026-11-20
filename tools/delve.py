@@ -423,6 +423,9 @@ def main():
                         else "four fight steps without damage") + f"; last: {tool}: {last(out)[:80]}")
             print(f"[{k}] fought {t['name']} Lv{t['lv']}: {last(out)[:110]}  | HP {p['hp']}/{p['maxHp']}"
                   + "".join(f", {m['name']} {m['hp']}/{m['maxHp']}" for m in kab))
+            for ln in str(out).splitlines():  # run 55: a monster's theft, whole (fight.py ledgers it; common.note_thefts)
+                if "!! theft:" in ln:
+                    print(f"[{k}] {ln.strip()}")
             if "no target" in last(out).lower() and t.get("uid") is not None:  # run 49: a foe in view no attack reaches
                 note_no_target(str((s.get("zone") or {}).get("full") or ""), t["uid"], t["name"])
             # the fight tool stopped for a decision (HP, a hit over 15% in one round, a window) or
