@@ -86,8 +86,9 @@ now stand between a bad turn and death. Still no client-based instance jobs.
 
 The frame above still holds. Deaths since (runs/metrics.csv): 18 (starved), 19 (drowned), 25 (overwork), 33 and 37 (named
 exploders), 41 (two at home, a walk with no stops); none in runs 42-55. Most were tools, not fights (elin-play). The numbers
-moved: the gate is **30 at Lv47** (29 unattended), raised one step at a time on a floor at the limit cleared with no drink
-(elin-delve 5; the steps and their floors are facts #1047 onward). The risks the later runs added, each with its counter:
+moved: the gate is **29 at Lv47** (28 unattended), raised one step at a time on a floor at the limit cleared with no drink
+and lowered one after a near-death at or under the limit (elin-delve 5; the steps and their floors are facts #1047 onward).
+Run 55 reached 30, then went back to 29 for the Minotaur's Nest near-death below. The risks the later runs added, each with its counter:
 
 | Risk | Seen | Counter |
 |---|---|---|

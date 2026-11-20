@@ -23,6 +23,8 @@ Findings (exit 1; each a line a review had to fix by hand once):
     THRESHOLDS["hungry"] or state no other hunger literal; sleep.py uses THRESHOLDS["sleep_hunger"]
     or its number; elin-play's thresholds table states the same floor gate, Hungry, kamikaze
     distance and heal-to numbers (a regex per row; an unreadable row is a finding too)
+  - the gate's step down (the user's step rule, 2026-11-12; run 55 missed it): runstats.csv's latest row
+    with near_deaths > 0 and no "run NN down" or "run NN kept: WHY" in the max_danger line of common.py
   - the milestone lock (the run score's rules, the user 2026-10-26): a milestone in goals.md that
     knowledge/milestones.csv doesn't list (added or split without the user's yes), and one ticked
     since its approval without its run: `- [x] Mn (DATE, run NN)` (stats.py counts those)
@@ -258,6 +260,35 @@ def thresholds_check(findings):
     row_number("heal-to", r"Leave the floor|heal to", [r"heal to (\d+)%"], T["heal_to"])
 
 
+def gate_step_check(findings):
+    """The step rule (the user, 2026-11-12; elin-delve 5): one step down after a near-death at or under the limit.
+    Run 55 fell to 113/453 on the Minotaur's Nest B4 at danger 29, the unattended limit, and nothing lowered the gate:
+    conquests.csv logs conquests only, and the Nest was left unconquered. So the latest run with a near-death must
+    leave its mark on the gate's own line in common.py: "run NN down" (stepped) or "run NN kept: WHY" (not on a floor,
+    over the limit, or the user's word)."""
+    path = RUNS / "runstats.csv"
+    if not path.exists():
+        return
+    rows = list(csv.DictReader(path.open(encoding="utf-8", newline="")))
+    if not rows:
+        return
+    row = rows[-1]
+    try:
+        n = int(row.get("near_deaths") or 0)
+    except ValueError:
+        return
+    if n <= 0:
+        return
+    run = (row.get("run") or "").strip()
+    src = (TOOLS / "common.py").read_text(encoding="utf-8")
+    line = next((ln for ln in src.splitlines() if ln.lstrip().startswith('"max_danger"')), "")
+    if not re.search(rf"\brun {re.escape(run)} (down\b|kept:)", line):
+        findings.append(f"runs/runstats.csv: run {run} had {n} near-death(s) (lowest {row.get('lowest_hp')}/"
+                        f"{row.get('lowest_hp_max')}): the step rule lowers the gate one for a near-death on a floor at or "
+                        f"under the limit; step THRESHOLDS max_danger down and write 'run {run} down' in its comment, or "
+                        f"'run {run} kept: WHY' (elin-delve 5)")
+
+
 def main():
     if not (RUNS / "metrics.csv").exists():  # logs are gitignored: a fresh clone has none
         print("no records yet on this PC: a new player starts with the elin-setup skill (tools/newgame.py --yes)")
@@ -418,6 +449,7 @@ def main():
     errors_check(findings, latest, stems)
     lessons_checks(findings, advisories, dates)
     thresholds_check(findings)
+    gate_step_check(findings)
     milestones_check(findings, goals)
 
     if findings:
