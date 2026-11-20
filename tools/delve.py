@@ -54,7 +54,10 @@ SOAK = ("potion of blindness", "potion of confusion", "potion of slow", "potion 
         # run 24: Ether Hand (fact #845) turns bought cure potions into unidentified negative ones
         "gluey potion", "murky potion", "spotted potion",
         # run 41 (three blasts of 46-77%, no soak potion in the pack: purge drops them): any thrown potion wets; 31 cure minors ride along
-        "potion of cure minor wound")
+        "potion of cure minor wound",
+        # run 55 (Boring Cave B1: two bomb rocks blinked in, blasts of 29% and 26%): the cure minors rode in the spoils bag and
+        # inv_items() reads the grid only, so nothing was thrown; the grid's cure majors (40) wet one as well as any
+        "potion of cure major wound")
 
 
 def inv_items():
