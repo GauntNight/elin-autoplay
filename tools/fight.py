@@ -166,7 +166,8 @@ def evasive(t):
     if t["uid"] not in EVASIVE:
         import threat
         prof = threat.profile(t.get("id") or t["name"]) or {"flags": []}
-        EVASIVE[t["uid"]] = "evasive" in prof["flags"]
+        # run 55: a thorned kind (threat.py "thorns", featSpike) gets the same ranged rounds: melee hurts me back
+        EVASIVE[t["uid"]] = "evasive" in prof["flags"] or "thorns" in prof["flags"]
     return EVASIVE[t["uid"]]
 
 

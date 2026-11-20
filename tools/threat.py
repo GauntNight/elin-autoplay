@@ -99,6 +99,12 @@ def raw(c, lv=None):
         flags.add("ranged")
     if c.get("id") in ("hardgay", "kamikaze_yeek") or "suicide" in str(c.get("trait") or "").lower():
         flags.add("exploder")
+    # run 55: iron maidens took ~100 HP each through melee: element 1221 featSpike "Spiky" ("Thorns harm those who attack")
+    # reflected every flurry and opened a bleed; the named Iron maiden Lv33 took 38% in one round of my own swings, while
+    # ice arrows took her 45% -> 4% for nothing. Elements are [id, value, ...] on the chara row and the race row
+    els = list(c.get("elements") or []) + list(r.get("elements") or [])
+    if 1221 in els[0::2]:
+        flags.add("thorns")
     # run 34 (the user: "That kind of adversary we should know is hard to kill with swords/melee weapons"): a vampire bat
     # (race DV 40, speed 220) took 20% a round while my axe "miserably missed"; fairies (25, 180) and the metal bells
     # (20, 300) the same. The race's DV (median 0, top 10% at 20+) marks them: fight.py opens with magic and the Putit

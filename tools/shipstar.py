@@ -21,7 +21,9 @@ CHEST_MAX = 40  # fact #1001: the shipping chest's stacks
 # worn in Derphy, and gearcheck had recorded it there as a candidate. Pieces kept for a swap never ship.
 # Run 50: the Godbane Breastplate (blindness negated) rides as the swap for the Brilliant Ring Mail (PV 35, confusion
 # negated) on a floor whose foes blind
-KEPT = ("The Fighting Bull", "Queen's Victory", "Bad West")
+# Run 55: ☆The Rigid Ring 『Cheating Bleed』 (worn) negates blindness, so Bad West's swap shipped; 『The Evening』 (thieves'
+# protection and Pickpocket, no PV loss) is the Derphy ring beside the Fighting Bull
+KEPT = ("The Fighting Bull", "Queen's Victory", "The Evening")
 
 
 def pieces(keep):

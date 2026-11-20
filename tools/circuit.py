@@ -132,7 +132,11 @@ def expire_here():
     return None
 
 
+EXPIRY_SKIPS = []  # run 55: the in-band nefias candidates() skipped as expiring before the walk and a conquest
+
+
 def candidates(lo, hi, r, skip=()):
+    EXPIRY_SKIPS.clear()
     rep = call("places", r=r)
     for i in range(6):  # run 54: "ArgumentException: Can not convert Object to Int32" twice, just after an evacuation's landing; the same call answered later (three tries 30 frames apart weren't enough)
         if rep.get("ok"):
@@ -170,6 +174,7 @@ def candidates(lo, hi, r, skip=()):
         if left is not None and p["dist"] > 0 and left < steps * WALK_H_PER_TILE + CONQUEST_H:
             print(f"  skipped: {p['name']} expires in {left} h; the walk alone is ~{round(steps * WALK_H_PER_TILE)} h "
                   f"({steps} steps for {p['dist']} tiles)", flush=True)
+            EXPIRY_SKIPS.append((p['name'], left, round(steps * WALK_H_PER_TILE)))
             continue
         # distance 0 is the nefia just left (evac lands on its tile), unless it was never entered: run 37 walked onto
         # Ancient Machinarium's tile by hand and the circuit stopped "no nefia within 5"
@@ -274,6 +279,14 @@ def main():
                 cands = candidates(lo, hi, r, skip)
                 # run 40 (fact: "nefia list refills on a sleep"): 2 nefias within 42 tiles of Palmia, then 23 within 28 after one
                 # nap on the spot. Once a circuit, when the game lets me sleep
+                # run 55 (twice: Forgotten Cave, then Savage Machinarium): every nefia in range was skipped as expiring, and
+                # the refill nap burned 7-10 more hours of their life. With skips in band, stop and name them (a near-margin
+                # skip is walked by hand, elin-delve 3) instead of napping
+                if not cands and not napped and EXPIRY_SKIPS:
+                    near = "; ".join(f"{n} ({lft} h left, walk ~{w} h)" for n, lft, w in EXPIRY_SKIPS)
+                    stop(f"no nefia in range but {len(EXPIRY_SKIPS)} skipped as expiring: {near}: walk one by hand "
+                         "(wgo.py NAME, then circuit.py from its door) when its walk alone fits its life; else Fast Travel "
+                         "to a region not circuited lately. No refill nap: it would burn their hours")
                 if not cands and not napped:
                     napped = True
                     sl = fed_nap()

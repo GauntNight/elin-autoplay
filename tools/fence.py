@@ -66,12 +66,12 @@ def main():
     if not sell:
         refuse("nothing stolen is carried (the game's own flag; `items.py` shows what is)")
     # run 43: thefts in the bags weren't on the shop's list (it shows only the pack's grid): 15 of 27 "not sold"
-    stuck = []
+    stuck = []  # (uid, text): run 55 printed sold stacks as "not sold" too, because a move that reported a full grid had landed
     for it in sell:
         if it.get("path"):
             ok, why = inv.to_pack(it, inv.inventory())
             if not ok:
-                stuck.append(f"{it['name']} ({why})")
+                stuck.append((it.get("uid"), f"{it['name']} ({why})"))
     out = run("shop.py", args[0], "--keep-open", timeout=300)
     if out.rc != 0:
         refuse(f"shop.py: {last(out) or out.rc}")
@@ -104,6 +104,8 @@ def main():
     still = {i.get("uid") for i in inv.inventory()}
     kept = [k for k, it in enumerate(sold_items) if it.get("uid") in still]
     left += [sold_items[k]["name"] + " (still carried: the shopkeeper ran out of money?)" for k in kept]
+    sold_uids = {it.get("uid") for k, it in enumerate(sold_items) if k not in kept}
+    stuck = [text for uid, text in stuck if uid not in sold_uids]
     sold = [s for k, s in enumerate(sold) if k not in kept]
     print(f"sold {len(sold)}: " + "; ".join(sold))
     if left or stuck:
