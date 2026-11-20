@@ -75,7 +75,11 @@ Find with `find.py weed` / `find.py "vine bush"` / `find.py tree`; gather with
   dodo/raccoon/bear hide, caterpillar/beetle silk, spider spider silk; dogs like Poppy none. Wild
   ones give 1-2 once per zone visit; Lv11+ animals give "+1" fiber that won't stack with plain.
 - Tinker's table: Pair of shears = 2 stones + stick + string; shearing a snow putit gives cashmere
-  fiber (1-2 at short fur, 12-17 at full fur; shearing resets it).
+  fiber (1-2 at short fur, 12-17 at full fur; shearing resets it). **Shovel and pickaxe** are the same recipe shape (run 55
+  remade both, a granite shovel and a slate pickaxe, after thieves took the old ones): the stick from the sawmill's Saw on
+  a branch (`convert.py DX DZ Saw` beside the sawmill 47,56; Quick Craft has no stick, fact #192), the string at the
+  workbench from 2 threads of **one** stack (two wool-thread stacks failed: spin 4 hide fibers into one stack,
+  `convert.py DX DZ Spin` beside the spinner), then `craft.py` at the tinker's table with `--use` naming the stones. The butcher's tool is above.
 
 Gear path from nothing (run 03, about 1.5 game days): stones -> sawmill -> planks ->
 carpenter's table -> buckler, sword, shoes. Station row used: workbench, sawmill and

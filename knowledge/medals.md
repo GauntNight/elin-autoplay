@@ -57,3 +57,6 @@ crime too, sneakmine.py's rules), in deep water (walkto refuses: teleport, or wa
 | **33 maps** | **141** | none listed for Lumiest Crater, Permafrost, the Arena |
 
 **Run 31 first:** Miral's Workshop's three (the cure visit), then the towns on the way of each trip.
+
+**Run 55:** the Village of Atonement gave three of the wiki's four (`medals.py --take` on entering, G66's first visit);
+the run log doesn't say why the fourth stayed. Run `medals.py` again on the next visit for Bicerin.

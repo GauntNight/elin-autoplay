@@ -172,6 +172,14 @@ Demitas's shipping picture.
 - **Village of Atonement:** (+49,-7) from home, computed from zones.json pos. It is always on the
   map; the barrier needs the quest.
 
+**Observed in play (run 55, G66; the user's goal):** the quest came from the home board (Demitas gave the Bracelet of
+Forgiveness). The village is at world 81,97, as computed above; Bicerin was in its one roofed room (phase 1 -> 2). The
+temple's floors read 25 (B1) to 29 (B5), as zones.json says, and served as the floor gate's evidence ladder 26 -> 30
+(facts #1545-#1547). B4's stairs showed as a "locked corridor" that opened on Use at phase 2. Duponne came into view on
+B5 (phase 3) and stole salads from the pack; `ladder.py --spare Duponne` kept every tool from fighting her. **Kill or
+capture is the user's call** (open after run 55); the capture needs Ungogo's horn from the Minotaur's Nest B5 at danger
+30, whose B4 minotaur mages cast Gravity (fact #1555).
+
 ### stone_dream "Nightly Routine" (Loytel)
 Added on the first day-tick after into_darkness completes (GameDate). Reward (`reward_stone_dream`):
 Farris learns Song of Pebbles (6754) at 50.

@@ -95,7 +95,8 @@ never `step`.
 
 ## 5. In town
 
-- Enter in daylight. Shops sleep at night (and at odd hours). **Don't wait for them** (the user, run 05: waiting burns
+- Enter in daylight. Shops sleep at night (and at odd hours): **count a walk's game hours and plan the arrival by the
+  clock** (run 55 reached Willow and Mysilia at night, shops shut; Tiguen's inn trades at night). **Don't wait for them** (the user, run 05: waiting burns
   food): work the board, sell, or sleep in an inn bed when sleepy (a visitor may: SP 16 -> 57, run 05), and come back.
 - **Find anyone through a guard:** `whereis.py GUARD "name or service"` (guards walk you there). **A delivery or job
   target missing from the "Where is" list has its own line in any guard's main menu** ("Do you know Havin the guard?
@@ -222,6 +223,12 @@ Per-town notes from runs 03-25. Prices, stocks and people move: `kb.py facts PLA
   Fields around it ran danger 7-12 (run 14). The Thieves Guild: elin-guilds.
 - **Palmia, Yowyn, Lumiest, Aquli Teola, Noyel:** no notes here; the facts hold their shops (Semnof's inn and Frealord
   the craft trainer in Palmia, Sesa and Sayig in Aquli Teola).
+- **The Village of Atonement** (run 55, G66): world 81,97, ~30 tiles east of Mysilia (7 rations by Fast Travel once
+  visited); its barrier opens only with ★Negotiation with Darkness taken (the Bracelet of Forgiveness). Bicerin, the elder,
+  is in the village's one roofed room. The **Sunken Temple of Lurie** is underwater (elin-delve 2: `--breathe`, the Forest
+  Gloves worn at its door); its B4 stairs are a "locked corridor" that opens on Use once the quest reaches phase 2.
+  The **Minotaur's Nest** (danger 26-30) has minotaur mages that cast Gravity on B4 (no teleport moves you: elin-delve 7);
+  Ungogo, who drops ★Minotaur's Great Horn for the capture ball, is on B5. knowledge/story-guilds-research.md has the quest's phases.
 - **Town furniture for tickets** (run 06): the secretary sells tickets at 1 influence; hold one by a piece of town
   furniture for "Collect X (N Tickets)" (Mysilia: display shelves are 20-slot containers). Check the thing id first
   (`kb.py show thing:ID`): the wardrobe and the shelf "backpacks" were decor.

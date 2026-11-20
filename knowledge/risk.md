@@ -81,3 +81,20 @@ going on with the reserve spent; carrying a month's gold into a nefia.
 
 Unattended: the gate minus 1 (was minus 2), since the net, the reserve and boxed gold
 now stand between a bad turn and death. Still no client-based instance jobs.
+
+## 6. Since run 16 (updated after run 55)
+
+The frame above still holds. Deaths since (runs/metrics.csv): 18 (starved), 19 (drowned), 25 (overwork), 33 and 37 (named
+exploders), 41 (two at home, a walk with no stops); none in runs 42-55. Most were tools, not fights (elin-play). The numbers
+moved: the gate is **30 at Lv47** (29 unattended), raised one step at a time on a floor at the limit cleared with no drink
+(elin-delve 5; the steps and their floors are facts #1047 onward). The risks the later runs added, each with its counter:
+
+| Risk | Seen | Counter |
+|---|---|---|
+| A named exploder: the blast is past any HP | deaths, runs 33 and 37 | `common.named`; kill from 5+ cells at x1 or leave the floor (elin-delve 6) |
+| A mine-layer's buried mines | 354 -> 42, run 46 | Levitate (`delve.py` casts it), walk only crossed cells under Gravity (elin-delve 6) |
+| A neutral Evolved creature near my level | 57%, run 48; 41% in a round, run 49 | leave it alone, take the stairs on (elin-delve 4) |
+| **Gravity: no teleport moves you** | 453 -> 113, run 55 (two minotaur mages, Minotaur's Nest B4) | `emergency_teleport` returns at once under it; drink, kill the wounded caster, evacuate; leave such floors early (fact #1555) |
+| Thorned kinds reflect melee | ~100 HP an iron maiden, run 55 | threat.py's `thorns` flag: ranged rounds; a thorned master that out-trades the arrows is a reason to leave (fact #1552) |
+| Thieving monsters (gnomes take items, fairies orens) | four tools and ~1,200-2,240 orens a theft, runs 51-55 | kill them first; every theft line ledgered whole (`note_thefts`); thief protection is weighed before shipping (fact #1558) |
+| Suffocation underwater | 112 -> 20, run 17 | refused without `--breathe`; with water breathing worn it does no harm (fact #1544) |

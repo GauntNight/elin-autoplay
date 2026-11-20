@@ -1,13 +1,15 @@
 ---
 name: elin-guilds
-description: Guild work in Elin - the user's guild rule (every guild keeps rising to rank 6), reading contribution in the journal, where each promotion is given, and each guild's method. Thieves by stealing in Derphy and selling to the fence (steal.py, fence.py, the karma budget, the fence's hours, the Fighting Bull worn, the named-witness rule). Merchants by investing in shops (invest.py, cost per contribution point, low-level shops first, never a town secretary). Mages by decoding ancient books (decode.py --fetch on every return, the clerk's place). Fighters (done at rank 6). Use when a guild goal is in the session plan, in Derphy, Lumiest, Port Kapul or the Merchants Guild office, before any theft, investment or decode, and when a promotion is open.
+description: Guild work in Elin - the user's guild rule (every guild keeps rising to rank 6), reading contribution in the journal, where each promotion is given, and each guild's method. Thieves by stealing in Derphy and selling to the fence (steal.py, fence.py, the karma budget, the fence's hours, the Fighting Bull worn, the named-witness rule). Merchants by investing in shops (done at rank 6 in run 55; invest.py now buys a shop's stock only, never a town secretary). Mages by decoding ancient books (decode.py --fetch on every return, the clerk's place). Fighters (done at rank 6). Use when a guild goal is in the session plan, in Derphy, Lumiest, Port Kapul or the Merchants Guild office, before any theft, investment or decode, and when a promotion is open.
 ---
 
 # Guilds: Thieves, Merchants, Mages, Fighters
 
 **The rule (the user, 2026-11-01):** "all guilds should keep increasing until they are max rank". Rank 6 is the game's
-cap. A guild goal done sets the next rank as a goal at once (elin-goals); the goals and their milestones are in
-`knowledge/goals.md` (G62 Thieves rank 6, G63 Mages rank 5, G58 Merchants rank 6 at this writing; G57 and G49 done in run 52; the Fighters are done).
+cap (FactionRelation.MaxRank = 6 in EA 23.355, fact #1138: QuestGuild's text lists a rank-8 feat that no promotion reaches).
+A guild goal done sets the next rank as a goal at once (elin-goals); the goals and their milestones are in
+`knowledge/goals.md`. **After run 55:** Fighters rank 6 (G40, run 43), Merchants rank 6 (G58, run 55), Thieves rank 5
+(G62 for rank 6: 1,447/2,600), Mages rank 4 (G63 for rank 5: 498/1,700). Only the Thieves and the Mages are left.
 The review of 2026-11-11: the three ride along with the circuits and the trips, without a plan slot of their own.
 
 **Read the number:** `python -I tools/journal.py guilds` prints each guild's rank and contribution from the journal
@@ -34,7 +36,8 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
 
 1. **Derphy town only** (no guards there: a witness who notices only turns hostile). Wear **the Fighting Bull** in Derphy
    (it protects from thieves, or the pickpockets take thousands; it lives in the loot bag and `shipstar.py` never ships
-   it; a swap leaves both pieces mine: shipstar keeps the swap pair since run 44).
+   it; a swap leaves both pieces mine: shipstar keeps the swap pair since run 44). **☆The Evening** (a ring: thieves'
+   protection and Pickpocket, no PV loss) is the Derphy ring beside it since run 55 (shipstar's KEPT; 47 thefts in one batch).
 2. `python -I tools/steal.py auto TARGET 70 --bold`: the marks best first until their contribution adds up to TARGET. At
    DEX 61 a plain townsperson can't notice (run 43: 66 thefts in minutes; the old levels and the sneak guard had refused
    nearly every mark for 13 runs).
@@ -60,7 +63,9 @@ town (Siyun), Port Kapul (Minwer) and my own land buy stolen goods; rank 4 lets 
    (sleepers can't witness), the sale in the afternoon or evening; **try the sale and read fence.py's result** rather
    than write down "asleep" unchecked (run 45). Leoban on B1 refuses a high-karma buyer ("a straight-laced adventurer", karma 73)
    but **bought a night batch at 01:00 with karma at the floor 20** (run 51, fact #1492): end a batch at the floor and sell to
-   him at once (`bridge.py walkto 63 65`, `fence.py Leoban`), no wait for Siyun. **Run 52: he bought at karma 45 too**, and Siyun at 06:14 and 17:32. A stolen "cargo" container sells
+   him at once (`bridge.py walkto 63 65`, `fence.py Leoban`), no wait for Siyun. **Run 52: he bought at karma 45 too**, and Siyun at 06:14 and 17:32.
+   **Run 55: Leoban bought at karma 66** (fact #1548: his limit lies between 66 and 73), and **Kerona (B1, ~64,66) fences
+   too** at rank 5 (fact #1549: `fence.py Kerona`, 8 stacks a night): three buyers for a big night, after Siyun and Leoban run out of money. A stolen "cargo" container sells
    for ~120 (a few points): fence.py sells it now, though runs/carry.txt keeps it from being dropped or shipped.
 7. **An ether disease can end a theft night** (run 52, fact #1512): with Enemy of All Living Things every townsperson turns hostile
    on sight; steal.py fights those 20+ levels under mine and goes on, but a second night got 0 thefts. Cure it before a batch.
@@ -83,7 +88,12 @@ Pickpocket). Derphy as a town (the way in, the Lockpicking trainer, the board): 
 Crimes outside this method (mining or hammering town property, `sneakmine.py`): elin-travel 5. Below karma 0 the law
 towns refuse to trade and their guards attack.
 
-## Merchants (G26, G39, G42, G50)
+## Merchants (G26, G39, G42, G50, G58: done)
+
+**Rank 6 since run 55** (497-03-08, promoted by Rosetta, the office's clerk about 38,35, awake at dawn; fact #1551):
+2,208 -> 2,600 for ~122,000 orens, ~310 a point; salary 600 a month. No rank is left to buy: an investment now buys only
+the shop's level (more items a restock, fact #1456), for a store that stocks what runs short, from orens above the reserve.
+The notes below are how the ranks were bought.
 
 - **Joining (run 17):** 30 flyers handed out with `tools/flyer.py` (the adjacent "Gift" to Lv1-8 townsfolk; never twice to
   one NPC); Negotiation from Levadear. Salaries come to the home mail post as parcels (rank 5: 500 a month). The office
@@ -110,10 +120,12 @@ towns refuse to trade and their guards attack.
   8 -> 12 for 2,485, 2,840, 3,388, 4,159, a few percent under the table above at 9-12, fact #1480). **Run 53 read
   and raised:** Noyel Miscold 3 -> 9, Nuwert 1 -> 4; Olvina Wyward 9 -> 12, Hesbald 2 -> 8, Vanloot 3 -> 7, Raiyas 5 -> 6,
   Iofael 9 (fact #1528); **Lumiest's Teolarg and Raydorre were already 13** (this list had them as never invested);
-  Sayig 15. Still unread (G58's possible cheap points): Willow's Agasard (the butcher; fact #1481 lists the town); Noyel's
-  Ceshed, Oldotta, Teoyan; Mysilia, Tinker's Camp and Yowyn shops (levels from runs 21-43). Monazess's guild shop takes no investment.
+  Sayig 15. **Run 55 (G58's last 392 points, fact #1551):** Ilass 13 -> 16 (Tinker's Camp); Yowyn's Nagrul, Jesdestan,
+  Zidaos, Alifous, Semty (12 ->) and Meodeos (13 ->) to 15; Rainof 5 -> 6 (Willow); Tiguen 14 -> 15 (Mysilia: the inn
+  trades at night, 01:34; Chim and Rainof don't answer at night); steps at 12-14 cost 4,642 / 5,507 / 6,447; Willow's
+  Agasard is level 8. Still unread: Noyel's Ceshed, Oldotta, Teoyan; the rest of Mysilia and Tinker's Camp. Monazess's guild shop takes no investment.
 - **Never a town secretary:** that investment pays the guild nothing (fact #1336).
-- **The budget:** only orens above the six-bill reserve; G58 (rank 6, 2,600) takes what the circuits and the chest bring in.
+- **The budget:** only orens above the six-bill reserve (G58 took what the circuits and the chest brought in until run 55).
 - The guild's informers buy fame: `famesale.py` (elin-delve 2: a sale also pulls the nefia refill back under the gate).
 
 ## Mages (G34, G36, G43, G49)

@@ -61,6 +61,11 @@ Immunities and resistances (`gearcompare.py` prints the key lines only one piece
 - **See Invisible:** an unseen foe stops walks and looks like an empty screen, so it costs real time; a weapon carrying it saves a spell a floor.
 - **Paralysis, sleep, confusion, fear, blindness:** check who else in your gear gives each immunity before taking one off. Two pieces giving the same one means one is spare.
 - **Prevents teleportation:** never, it switches off every escape.
+- **"It protects you from thieves":** pickpockets in Derphy, and gnomes and fairies on nefia floors (items and 1,200-2,240
+  orens a theft: fact #1558). Run 55 shipped the Luminescent Saddle (PV+16, thief-proof) over the worn girdle, then found four
+  tools lost to thieves in the logs (fact #1559). Ship such a piece only when another worn one gives the same line (the
+  Fighting Bull and ☆The Evening in Derphy). Run 55 also wore ☆The Rigid Ring 『Cheating Bleed』 for blindness and paralysis
+  negation at 4% of damage a turn (fact #1550): rule zero over a few percent.
 - Keep the loser if it does something the winner can't; ship it if not. A resident can take gear from a shared box.
 
 ## Judging a whole set

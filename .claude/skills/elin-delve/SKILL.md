@@ -62,7 +62,10 @@ layers stand in this order: `knowledge/risk.md` (the user, run 16). Kit: **elin-
 - **No underwater dungeons** (the user, run 17: "you can't do those kinds of dungeons"): an "Underwater Ruin"
   (Zone_dungeon_water) suffocates every turn (ConSuffocation) on top of the fight: 112 -> 20 HP on a danger 4 B1 while
   delve.py waited on its HP rule, and the user walked me out. `wgo.py` and `delve.py` refuse them unless `--breathe`,
-  which is for water breathing in hand.
+  which is for water breathing in hand. **With it** (run 55, the Sunken Temple of Lurie B1-B4 with the Forest Gloves on):
+  `ladder.py --breathe` reads the game's breathesWater on every floor and pass and stops when it's gone; ConSuffocation
+  still flickers on after each step and dies the next tick for no damage (fact #1544), so `common.bad_conditions` ignores it
+  while breathing. The gloves and the water-breathing kit ride in the pack (packcheck).
 
 ## 3. The circuit
 
@@ -86,7 +89,9 @@ nefia of that base danger within R tiles, `wgo.py` there, Enter, `ladder.py`, on
 - **What it does itself** (runs 39-44): sleeps on the tile when Sleepy before each Enter (run 47: twice the 9-hour nap
   outlived the nefia and the Enter landed on its field: the circuit stops, re-run it); eats before a nap (`fed_nap`) and
   takes the stairs up first when the meal stop left me on a floor; fights hostiles 10+ levels under mine before each
-  evacuation (`clear_weak`); naps once to refill an empty list; started on a nefia's floor it runs the ladder there first.
+  evacuation (`clear_weak`); naps once to refill an empty list, **but not while a nefia it skipped as too far can still
+  be walked inside its life** (run 55: twice the nap burned a batch's last hours): it stops and names them, for `wgo.py
+  NAME` by hand; started on a nefia's floor it runs the ladder there first.
 - **The unload:** every **four** conquests (`circuit.UNLOAD_EVERY`; run 40: was two, three bags carry 3-4 conquests) and
   whenever the carried bags are full, the circuit stops with "go home: ...". It doesn't unload: `recall.py`, then
   `arrive.py` (elin-home 1), then `circuit.py` again. Return needs a local map: the circuit ends each conquest on the
@@ -98,8 +103,10 @@ nefia of that base danger within R tiles, `wgo.py` there, Enter, `ladder.py`, on
 
 ## 4. The ladder: one floor at a time
 
-`python -I tools/ladder.py [MAX_DANGER] [FLOORS=3] [--unattended] [--no-wrecks] [--solo] [--expendable] [--in X,Z]`
-(the circuit calls it). Per floor: `delve.py` until the floor is explored (frontier walking; fights at or below my level
+`python -I tools/ladder.py [MAX_DANGER] [FLOORS=3] [--unattended] [--no-wrecks] [--solo] [--expendable] [--in X,Z]
+[--breathe] [--spare NAME]` (the circuit calls it; `--breathe`: section 2; `--spare NAME`, run 55: delve stops on sight
+of that creature and `fight.py` refuses it through runs/jobs/spare.txt, for a story boss whose fate is the user's call,
+as Duponne on the Sunken Temple's B5). Per floor: `delve.py` until the floor is explored (frontier walking; fights at or below my level
 with the Putit as opener, soaks exploders, stops on the HP rules), `loot.py`, a QuickSave, then the stairway that isn't the
 way in. The gate covers every floor here (delve's own gate covers nefias only: Lesimas and Nymelle aren't).
 
@@ -193,6 +200,14 @@ most floors sit far under the gate.
   axe's 105%); melee last (`--melee` to force it). (34: a vampire bat, 20% a round, the axe missing)
 - **A foe that keeps running away gets thrown weapons, spells or ranged attacks, not a chase** (the user, run 21):
   `fight.py` throws the Putit In Amber at a target that kept its distance after one approach or moved away.
+- **Thorned kinds from range** (run 55, fact #1552): iron maidens carry featSpike (element 1221) and reflect melee as
+  damage and bleeds, ~100 HP a maiden; threat.py's `thorns` flag gives them ranged rounds in fight.py. A thorned master
+  that out-trades the arrows (Boring Cave's Lv40) is a reason to leave the floor.
+- **Thieves** (run 55, fact #1558): a gnome steals items ("A gnome steals a treasure map from you"), fairies steal orens
+  (1,200-2,240 a time in runs 51-55), a hungry sea lion took a can of spice. Kill them first when in reach; the four tools
+  run 55 lost from the bags most likely went this way. `fight.py` and `delve.py` put each "... steals ... from you" line
+  whole in the item ledger and the loop log (`common.note_thefts`), and a "protects you from thieves" piece is weighed
+  before it ships (elin-gear).
 - **The Swarm ability** (run 40, 50 platinum at Eligin): `fight.py` casts it in place of a swing by the table's row
   (3+ hostiles within 3 cells, SP 40+), never beside an exploder or a slime (12 SP; a 0.9x melee blow on each: ActSwarm).
 - HP decides, not the count: weak foes in numbers are a normal fight while HP holds (04); the table's swarm row counts
@@ -230,7 +245,8 @@ Kamikaze yeek, hot guy, **bomb rock**, any ActSuicide: threat.py's exploder flag
 code's `kamikaze_dist`: **5 cells** (3 until run 40, 4 until run 41).
 
 - Never adjacent. Soak first: a thrown potion makes it Wet, and Wet stops the blast (`delve.SOAK`, which falls back to a
-  thrown cure minor wound: any thrown potion wets). Then throw from the table's distance: `delve.py` steps back to it
+  thrown cure minor wound, then a cure major wound from the grid since run 55: any thrown potion wets; two bomb rocks
+  blinked in for 29% and 26% while the soak potions rode in a bag). Then throw from the table's distance: `delve.py` steps back to it
   first, and `cast.py` stops on an exploder inside it. A kill at 2 cells still cost 30 HP (run 12), run 40's throw a
   blast took 49%, and run 41's took 77%, 46% and 47% through ranged throws at 4 cells: **bomb rocks blink in**.
 - **A named exploder halts delve: its death blast is past any HP** (run 33: **death**, 214 -> -342; run 37: **death**
