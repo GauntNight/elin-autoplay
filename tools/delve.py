@@ -33,7 +33,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import THRESHOLDS, cells, last, named, pick, ready, run, stop, wait_idle, wait_until  # noqa: E402
+from common import THRESHOLDS, cells, emergency_teleport, last, named, pick, ready, run, stop, wait_idle, wait_until  # noqa: E402
 import threat  # noqa: E402
 
 SOLO = "--solo" in sys.argv
@@ -355,10 +355,11 @@ def main():
                 d = step_away(t) if t["dist"] < THRESHOLDS["kamikaze_dist"] else t["dist"]
                 if d <= 1:
                     # run 43 (Ominous Forest B1): this stop ended a circuit for a Lv6 yeek; the table's answer is a teleport, so read it
-                    out = run("item.py", "scrolls of teleport", "Read", timeout=60)
-                    if out.rc:
-                        halt(f"{t['name']} adjacent and no room to step away: a hit from here is a blast, and no teleport: {last(out)[:60]}")
-                    print(f"  {t['name']} adjacent and no room to step away: read a teleport", flush=True)
+                    # run 55: no scroll was carried (two rods of teleport were): the shared chain tries the rod and the spell too
+                    done = emergency_teleport()
+                    if not done:
+                        halt(f"{t['name']} adjacent and no room to step away: a hit from here is a blast, and no teleport (scroll, rod or spell)")
+                    print(f"  {t['name']} adjacent and no room to step away: {done}", flush=True)
                     wait_until("frames", n=10, timeout=2000)
                     continue
                 if pot:

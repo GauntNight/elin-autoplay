@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import THRESHOLDS, last, put_away, ready, refuse, run, state, stop  # noqa: E402
+from common import THRESHOLDS, emergency_teleport, last, put_away, ready, refuse, run, state, stop  # noqa: E402
 from delve import swarm  # noqa: E402
 
 TOOLS = Path(__file__).resolve().parent
@@ -67,7 +67,7 @@ def tend(p):
     print("  " + last(run("item.py", "cure minor wound", "Drink")))
     if state()["pc"]["hp"] * 100 < THRESHOLDS["teleport_hp"] * p["maxHp"]:
         print(f"  still under {THRESHOLDS['teleport_hp']}% after drinking: teleport, then leave")
-        print("  " + last(run("item.py", "scroll of teleport", "Read")))
+        print("  " + str(emergency_teleport()))  # run 55: the kit carries rods, not scrolls
         print(last(run("leave.py", "--force")))
         stop("teleported out under the HP floor: heal before the next hunt")
     return True

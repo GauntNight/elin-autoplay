@@ -30,7 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import THRESHOLDS, base_ready, last, ready, refuse, run, stop, wait_until, walk  # noqa: E402
+from common import THRESHOLDS, base_ready, emergency_teleport, last, ready, refuse, run, stop, wait_until, walk  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TRAVEL_CSV = ROOT / "knowledge" / "travel.csv"
@@ -136,7 +136,7 @@ def handle_ambush(_retry=False):
         # ConSuffocation, which only drowns: a scroll of teleport lands on dry ground (it did both times)
         # run 42: a water breather (gloves that "let you breathe underwater") loses nothing there: a whole sea-bed map stopped the circuit with 2 scrolls spent
         if (p.get("inWater") or "ConSuffocation" in (p.get("conditions") or [])) and not p.get("breathesWater"):
-            run("item.py", "scrolls of teleport", "Read", timeout=60)
+            print("  in water: " + str(emergency_teleport()), flush=True)  # run 55: the kit carries rods, not scrolls
             wait_until("frames", n=30, timeout=3000)
             s = call("state")["data"]
             p = s["pc"]
@@ -191,7 +191,7 @@ def handle_ambush(_retry=False):
             # blast: the thresholds table's answer (a scroll of teleport, then the edge) by itself, then walk on
             if "exploder" in last(out) or "avoid-group" in last(out):
                 print(f"  ambush: {target['name']} refused ({last(out)[:50]}): teleport and leave", flush=True)
-                run("item.py", "scrolls of teleport", "Read", timeout=60)
+                print("  " + str(emergency_teleport()), flush=True)  # run 55: the kit carries rods, not scrolls
                 time.sleep(1.0)
                 lv = run("leave.py", "--force", "--riding-ok", timeout=300)
                 if lv.rc == 0:

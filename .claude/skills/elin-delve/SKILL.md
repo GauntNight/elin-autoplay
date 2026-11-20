@@ -137,8 +137,8 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **26** at Lv47, G64 M1 in run 54; **G64 Floor gate 30** set by the user after run 53: four more steps by the same rule, the evidence floors a nefia's floors at the unattended limit, now 25: a base-20 nefia's B6 or a base 22-24 nefia's B2-B4); `ladder.py` takes
-the same number for every floor and **25** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **27** at Lv47, G64 M2 in run 55; **G64 Floor gate 30** set by the user after run 53: three more steps by the same rule, the evidence floors a nefia's floors at the unattended limit, now 26: a base-22 nefia's B5 or a base 23-26 nefia's B1-B4); `ladder.py` takes
+the same number for every floor and **26** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
 
@@ -170,7 +170,7 @@ drink: the evidence the run held back for the user, fact #1499), and **22** in r
 danger 20, the unattended limit, explored at full HP with no drink: an asura Lv22 and kamikaze yeeks, few fights, fact #1506), and **23** the same
 night (G61 M2: its B2 at danger 21, 8 fights, lowest 94%, no drink, explored after tunnel.py opened a wall, fact #1507), and **24** (G61 M3: its B3 at danger 22, explored at full HP, no
 drink: a king scorpion Lv21, a living armor, fact #1508), and **25** (G61 M4, G61 done: its B4 at danger 23, the master
-『Stalker』 Lv34 killed in ~15 fights at a lowest 100%, no drink, fact #1509), and **26** in run 54 (G64 M1: Unknown Cave, a base-20 nefia, B5 at danger 24, the unattended limit, its master 『Asura』 Lv36 on it, lowest 91%, no drink; B1 had needed a drink at danger 20 against a Santa Claus Lv40, not the evidence floor). The circuits take `--danger 2-15` once the unattended
+『Stalker』 Lv34 killed in ~15 fights at a lowest 100%, no drink, fact #1509), and **26** in run 54 (G64 M1: Unknown Cave, a base-20 nefia, B5 at danger 24, the unattended limit, its master 『Asura』 Lv36 on it, lowest 91%, no drink; B1 had needed a drink at danger 20 against a Santa Claus Lv40, not the evidence floor), and **27** in run 55 (G64 M2: Dangerous Ruin, a base-21 nefia east of the Village of Atonement, B5 at danger 25, the unattended limit, its master 『Monster mushroom』 Lv37 killed, lowest 76% on the floor, no drink; the conquest row's 64% was B4's iron-maiden bleed and yellow bits: the evidence is the limit floor's own lowest). The circuits take `--danger 2-15` once the unattended
 limit is 17+ (a base-15 nefia's B3 is the limit), `2-16` at 19, `2-17` at 20, `2-18` at 21 (a base-20 nefia's B1 or a base-18's B3 is the limit then), `2-19` at 22, `2-20` at 23, `2-22` at 24 (run 52: base-23 nefias, Capricious Ruin and Warded Forest, kept their masters past B2 at 24: explored, not conquered). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
 most floors sit far under the gate.
 

@@ -69,20 +69,7 @@ def auto_fight(t, min_hp, timeout=25.0):
     return True
 
 
-def emergency_teleport():
-    """The net rule: a scroll of teleport first (item.py: whole-word match, so never the short
-    one), else the fullest rod of teleport zapped on my own cell. Returns what was done, or None."""
-    out = run("item.py", "scroll of teleport", "Read")
-    if out.rc == 0 and "Read" in out:
-        return "read a scroll of teleport"
-    held = grab("rod of teleport", prefer="charges")
-    if held:
-        acts = call("acts", dx=0, dz=0, mode="right")["data"]["acts"]
-        zap = [a for a in acts if a["text"].startswith("Zap")]
-        if zap:
-            call("do", i=zap[0]["i"])
-            return f"zapped the {held}"
-    return None
+from common import emergency_teleport  # noqa: E402,F401  (run 55: scroll, rod, then the spell; one chain for every tool)
 
 
 def keep_log(s, what):

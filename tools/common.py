@@ -373,7 +373,7 @@ THRESHOLDS = {
     "hungry": 70,           # no loop works at Hungry (70+) and none sleeps hungry
     "sleep_hunger": 50,     # sleep.py refuses from here: eat first
     "eat_at": 45,           # the loops eat from here
-    "max_danger": 26,       # run 54 (G64 M1): 25 -> 26 at Lv47, unattended limit 24 -> 25: Unknown Cave B5, danger 24, lowest 91%, no drink, its master 『Asura』 Lv36; run 52 (G61 M4, G61 done): 24 -> 25 at Lv45, unattended limit 23 -> 24: Traditional Ruin B4, danger 23
+    "max_danger": 27,       # run 55 (G64 M2): 26 -> 27 at Lv47, unattended limit 25 -> 26: Dangerous Ruin B5, danger 25, lowest 76% on the floor (the ladder's 64% was B4's bleed), no drink, its master 『Monster mushroom』 Lv37; run 54 (G64 M1): 25 -> 26 at Lv47, unattended limit 24 -> 25: Unknown Cave B5, danger 24, lowest 91%, no drink, its master 『Asura』 Lv36; run 52 (G61 M4, G61 done): 24 -> 25 at Lv45, unattended limit 23 -> 24: Traditional Ruin B4, danger 23
                             # (the limit), its master 『Stalker』 Lv34 killed in ~15 fights, lowest 100%, no drink (fact #1509).
                             # run 52 (G61 M3): 23 -> 24 at Lv45, unattended limit 22 -> 23: Traditional Ruin B3, danger 22 (the
                             # limit), explored at 400/400 with no drink (a king scorpion Lv21, a living armor, a slime, a sea snail;
@@ -691,6 +691,27 @@ def hold(name):
     if out.rc != 0 and "held now" not in out:
         return None
     return (pc().get("held") or None)
+
+
+def emergency_teleport():
+    """elin-play's teleport row, one chain for every tool: a scroll of teleport (item.py's whole-word match, never the
+    short one), else the fullest rod of teleport zapped on my own cell, else the Teleport spell. Returns what was done,
+    or None. Run 55 (Dangerous Ruin B3): the kit's 'teleport: 28' was two rods of 14 charges and no scroll at all;
+    delve.py read only the scroll and halted with a hot guy adjacent, and only the ladder's Short Teleport cast saved it."""
+    out = run("item.py", "scroll of teleport", "Read")
+    if out.rc == 0 and "Read" in out:
+        return "read a scroll of teleport"
+    held = grab("rod of teleport", prefer="charges")
+    if held:
+        acts = call("acts", dx=0, dz=0, mode="right")["data"]["acts"]
+        zap = [a for a in acts if a["text"].startswith("Zap")]
+        if zap:
+            call("do", i=zap[0]["i"])
+            return f"zapped the {held}"
+    r = call("cast", spell="SpTeleport")
+    if r.get("ok") and (r.get("data") or {}).get("cast"):
+        return "cast Teleport"
+    return None
 
 
 def open_inventory():
