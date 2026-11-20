@@ -282,9 +282,11 @@ def main():
                 # run 55 (twice: Forgotten Cave, then Savage Machinarium): every nefia in range was skipped as expiring, and
                 # the refill nap burned 7-10 more hours of their life. With skips in band, stop and name them (a near-margin
                 # skip is walked by hand, elin-delve 3) instead of napping
-                if not cands and not napped and EXPIRY_SKIPS:
-                    near = "; ".join(f"{n} ({lft} h left, walk ~{w} h)" for n, lft, w in EXPIRY_SKIPS)
-                    stop(f"no nefia in range but {len(EXPIRY_SKIPS)} skipped as expiring: {near}: walk one by hand "
+                # (when no skipped walk fits its life at all, they are lost either way and the nap's fresh batch is the way on)
+                fits = [x for x in EXPIRY_SKIPS if x[2] < x[1]]
+                if not cands and not napped and fits:
+                    near = "; ".join(f"{n} ({lft} h left, walk ~{w} h)" for n, lft, w in fits)
+                    stop(f"no nefia in range but {len(fits)} skipped as expiring whose walk fits their life: {near}: walk one by hand "
                          "(wgo.py NAME, then circuit.py from its door) when its walk alone fits its life; else Fast Travel "
                          "to a region not circuited lately. No refill nap: it would burn their hours")
                 if not cands and not napped:
