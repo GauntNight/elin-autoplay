@@ -62,6 +62,7 @@ FOOD_OK = ("mushroom", "tomato", "imo", "on the bone", "meat", "egg", "milk", "b
            "corpse",  # run 12: cookable food; special mobs' corpses stay in the Cooler Box (elin-play)
            "roast", "ration", "fish", "herb", "fruit", "berry", "apple", "melon", "marshmallow", "cookie",  # run 21: melon, marshmallows, fortune cookies had no route
            "truffle", "soybean", "noodle", "mammoth",  # run 31: Semnof's whole roasted mammoths
+           "churyu",  # run 56: Upan's churyus are meals (items.py kind "meal")
            "banana", "stir-fry", "stir-fries", "manju", "croquette", "pizza",  # run 24: Tiguen's foods had no route
            "rice", "cheese", "jerky", "jerkies", "pie",  # run 19: "4 jerkies" had no route
            "sashimi", "sandwich", "onigiri",
@@ -126,7 +127,9 @@ ROUTES = [
     (("table clock", "boomerang", "beaker", "a saw", "old sketch", "tapestry", "tapestries", "stale head", "rubble", "ledger", "carved wooden", "a paper", "chess board", "a sink", "a dice", "wooden door", "an orb", "charm", "fishbowl", "alarm clock", "a head", "junk rope", "old lantern", "trident", "hanging shelf", "pipe bed", "a poster", "fortune telling", "lectern",
       # run 46: boss-chest and floor odds with no rule (a plate, hanging pots, sea pants, the rest)
       "tableware", "trash bin", "pot of water", "gamble chest", "a plate", "hanging pots", "sea pants", "cobweb", "moon chakram",
-      "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack", "churyu",
+      # run 56: "churyu" left this list: the game files churyus as meals (items.py kind "meal"), and the ones bought at
+      # Upan's inn for a trip were shipped as odd loot
+      "sleeping pill", "vomit", "music box", "pedestal", "snow globe", "rubber snail", "a rack",
       # run 48: a boss chest's skull, the loot bag's odds (the dried mandrake is a currency: valuables, above)
       "skull", "iron scale", "a junk", "towel", "anchor", "assorted vegetable", "broken barrel", "a cup", "small window", "dirty dish",
       "a cabinet",
