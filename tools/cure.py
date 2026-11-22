@@ -47,7 +47,12 @@ def main():
     global ALIAS
     spells = {s["spell"]: s["stock"] for s in call("power")["data"]["party"][0].get("spells") or []}
     # run 34: Healing Touch (Koflord's book) when Cure Minor Wound's stock is spent
-    ALIAS = next((a for a in ("SpHealLight", "SpHealTouch") if spells.get(a, 0) > 0), ALIAS)
+    # run 57: Cure Minor Wound's stock ran out on the Crypt's B1 while Cure Critical Wound held 121 casts; the hotbar
+    # button stayed and was clicked with nothing behind it ("heal casts: 0" in every kit line after). The heavier
+    # spells cost more MP a cast but heal more (+35-65 at Lv48)
+    ALIAS = next((a for a in ("SpHealLight", "SpHealTouch", "SpHealHeavy", "SpHealCritical") if spells.get(a, 0) > 0), ALIAS)
+    if ALIAS != "SpHealLight":
+        i = None  # the Cure Minor Wound button has no stock behind it: cast the alias through the bridge
     stock = spells.get(ALIAS, 0)
     if i is None and not stock:
         refuse(f"no '{SPELL}' button on the ability bar and no {ALIAS} stock")

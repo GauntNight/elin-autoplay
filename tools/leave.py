@@ -171,6 +171,12 @@ def main():
     # The user, run 11: the pack must be cleared of everything off the trip kit every time I leave
     # home ("it is a loss of treasure by not having those slots free"). packcheck.py lists it and
     # names the box; `packcheck.py --move` carries it there. --pack-ok skips (a deliberate haul).
+    # run 57: the bare skip flags left no row, so the close-out's waiver count missed every --shovel-ok and --party-ok
+    # of the night: each one that actually skips a failing check writes a row now
+    if at_base and "--pack-ok" in sys.argv:
+        r = run("packcheck.py")
+        if r.rc != 0:
+            log_waiver("leave", "the pack holds items off the trip kit", "--pack-ok (a deliberate haul)")
     if at_base and "--pack-ok" not in sys.argv:
         r = run("packcheck.py")
         if r.rc != 0:
@@ -179,6 +185,8 @@ def main():
                    "then leave again; --pack-ok only for a deliberate haul)")
     # runs 48-49: snow putits join the party at home on their own; solo is the rule (run 38) and Lonely Soul pays per
     # empty slot (run 49: max HP 396 -> 363 through four conquests): at home they are sent back first
+    if at_base and "--party-ok" in sys.argv and (s.get("party") or []):
+        log_waiver("leave", "party not sent home: " + ", ".join(m.get("name") or "?" for m in s["party"]), "--party-ok")
     if at_base and "--party-ok" not in sys.argv and (s.get("party") or []):
         r = run("sendhome.py", timeout=300)
         print(r)
@@ -201,6 +209,8 @@ def main():
             refuse("leaving home refused: empty gear slot(s): " + ", ".join(gaps) + " (wear the best piece in "
                    "hand, buy one, or --gear-ok when nothing fits yet)")
     # the user, 2026-10-29: "you need to carry a shovel and dig for medals" (medals.py; packcheck's KIT keeps it)
+    if at_base and "--shovel-ok" in sys.argv and not carried(lambda n: "shovel" in n.lower()):
+        log_waiver("leave", "no shovel carried", "--shovel-ok")
     if at_base and "--shovel-ok" not in sys.argv:
         if not carried(lambda n: "shovel" in n.lower()):
             refuse("leaving home refused: no shovel in the pack (box.py \"Farm\" --take shovel; "

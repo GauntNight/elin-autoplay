@@ -51,7 +51,7 @@ def main():
     # run 12 (the user caught it): the bow had no arrows for a whole trip and every "shot" was a
     # wasted call; say so at once so callers fall back to the Putit or throwing daggers
     names = " ".join(i["name"].lower() for i in call("inv")["data"]["items"])
-    if not re.search(r"\b(arrows?|bolts? of|pebbles?|bullets?)\b", names):
+    if not re.search(r"\b(arrows?|quarrels?|bolts? of|pebbles?|bullets?)\b", names):  # run 57: a crossbow takes quarrels
         refuse("no ammo: no arrows, pebbles or bullets in the pack (throw.py instead)")
     w = hold_ranged()
     if not w:

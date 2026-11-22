@@ -24,7 +24,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import data, last, refuse, run, setup, stop, txlog, walk  # noqa: E402
+from common import data, last, refuse, run, setup, stop, txlog, walk_beside  # noqa: E402
 import home  # noqa: E402
 import items as inv  # noqa: E402
 
@@ -36,10 +36,13 @@ def gold():
 def find_resident(name):
     """The resident board's Find: walk beside the board, open Residents, the row whose name holds NAME, its Find."""
     bx, bz = home.BOARDS["resident"]
-    w = walk(bx + 1, bz)
-    if "arrived" not in str(w) and "stopped" not in str(w):
-        stop(f"the walk to the resident board: {w}")
-    acts = call("acts", dx=-1, dz=0).get("data", {}).get("acts", [])
+    # run 57: a fixed walk to the cell east of the board stopped one short on a garbage pile, and acts at (-1,0) read
+    # the garbage: stand on any free neighbour and ask the board's own cell
+    w = walk_beside(bx, bz)
+    me = data("state")["pc"]
+    if max(abs(me["x"] - bx), abs(me["z"] - bz)) > 1:
+        stop(f"the walk to the resident board ended at {me['x']},{me['z']}: {w}")
+    acts = call("acts", dx=bx - me["x"], dz=bz - me["z"]).get("data", {}).get("acts", [])
     hit = [a for a in acts if (a.get("text") or "").startswith("Residents")]
     if not hit:
         me = data("state")["pc"]

@@ -157,6 +157,10 @@ def shovel_in_pack():
 
 def dig_here():
     name = shovel_in_pack()
+    # run 57: a seasonal drama ("Winter...winter is coming!") opened on arrival and the grab read "no usable slot"
+    # (invacts is ignored under a LayerDrama): step through any dialog first
+    if (state().get("layers") or {}).get("top") == "LayerDrama":
+        run("talk.py", "20")
     out = run("item.py", name, "Grab")
     if out.rc:
         refuse(f"no shovel in hand: {last(out)}")

@@ -197,6 +197,18 @@ def kit():
             grid.append((b["card"], qty(b["card"])))
     except Exception:  # noqa: BLE001 - the bag count never stops the card; inv alone is the old reading
         pass
+    if not heal_casts:
+        # run 57: Cure Minor Wound's stock out, Cure Critical Wound's 121 casts unseen ("heal casts: 0"): cure.py casts
+        # the heavier spells now, so they count, by the MP in hand at about 15 a cast
+        try:
+            spells = {sp["spell"]: sp["stock"] for sp in call("power")["data"]["party"][0].get("spells") or []}
+            mp = int((call("state")["data"].get("pc") or {}).get("mp") or 0)
+            for alias, cost in (("SpHealTouch", 5), ("SpHealHeavy", 10), ("SpHealCritical", 15)):
+                if spells.get(alias, 0) > 0:
+                    heal_casts = min(spells[alias], mp // cost)
+                    break
+        except Exception:  # noqa: BLE001
+            pass
     # run 40: only an open bag's window counted: unclutter had moved 7 evacuation scrolls into the spoils bag, the backpack alone
     # was open, and the ladder refused "no scroll of evacuation" at Traditional Cave's door. `stock` reads every carried bag
     try:

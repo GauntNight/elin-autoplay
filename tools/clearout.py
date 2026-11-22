@@ -65,7 +65,55 @@ def free_grid():
     return GRID_CARDS - sum(1 for i in call("inv")["data"]["items"] if not i.get("equipped")) - 1
 
 
+def make_room():
+    """Run 57: every home stop's clear-out began with a full grid (the kit: rods, lockpicks, the pickaxe, ammo) and the
+    same hand step, moving kit stacks into a bag. They go into the roomiest carried bag here; packcheck --move puts the kit
+    back into the pack before leave.py lets me out."""
+    import items as inv
+    its = inv.inventory()
+    bags = [b for b in its if b.get("container") and not b.get("path") and not b.get("equipped")
+            and b.get("name") in ("a haul bag", "a backpack", "a loot bag", "a spoils bag", "a pouch")]
+    if not bags:
+        return
+    bag = max(bags, key=lambda b: (b.get("slots") or 0) - (b.get("count") or 0))
+    space = (bag.get("slots") or 0) - (bag.get("count") or 0)
+    words = ("rod of", "lockpick", "pickaxe", "arrows",  # never the shovel: packcheck files it in the Farm box (run 57)
+              "quarrels", "troll blood", "restore mind", "restore body")
+    loose = [i for i in its if not i.get("path") and not i.get("equipped") and not i.get("container")
+             and any(w in (i.get("name") or "") for w in words)]
+    pick = loose[:max(0, min(space - 1, 12))]
+    if pick:
+        out = run("bag.py", bag["name"], *[f"uid:{i['uid']}" for i in pick], timeout=600)
+        print(f"  room: {sum(1 for ln in out.splitlines() if ': moved' in ln)} kit stacks into {bag['name']}")
+        MOVED.extend(i["uid"] for i in pick)
+
+
+MOVED = []  # make_room's kit stacks, put back into the pack when the clear-out ends
+
+
+def put_back():
+    """Run 57: packcheck leaves kit inside a bag ("kit rides where it is"), so the pickaxe, a lockpick and the arrows
+    make_room had bagged stayed there: the wrecks step found no pickaxe, unlock.py picked bare-handed, the bow had no arrows."""
+    if not MOVED:
+        return
+    import items as inv
+    its = inv.inventory()
+    back = 0
+    for i in its:
+        if i.get("uid") in MOVED and i.get("path"):
+            ok, _why = inv.to_pack(i, inv.inventory())
+            back += ok
+    print(f"  put back into the pack: {back} of {len(MOVED)} kit stacks")
+
+
 def main():
+    try:
+        _main()
+    finally:
+        put_back()
+
+
+def _main():
     setup()
     argv = sys.argv[1:]
     opt = {k: argv[argv.index(k) + 1] for k in ("--calls", "--batches", "--buyer") if k in argv}
@@ -92,6 +140,9 @@ def main():
             break
         farmday.home_guard(f"the clear-out, batch {b + 1}")
         room = free_grid()
+        if room < 3:
+            make_room()
+            room = free_grid()
         if room < 3:
             refuse(f"the pack's grid has {room} free: put kit stacks in a bag first (packcheck --move restores them)")
         todo = plan(calls, held, no_junk=to_chest)

@@ -115,6 +115,16 @@ def main():
             bad = [m["name"] for m in (sk.get("mutations") or {}).values() if m.get("neg")]
             if bad:
                 warn.append("harmful mutation: " + ", ".join(bad) + " (a potion of cure mutation)")
+            # run 57: Weakening (max HP -20%, melee halved) rode through a dig tour unseen: look.py named drains and
+            # mutations but no ether disease. ladder.ether_check's allowed list says which ones are kept on purpose
+            try:
+                from ladder import ETHER_OK
+            except Exception:  # noqa: BLE001
+                ETHER_OK = ()
+            eth = [e["name"] for e in (sk.get("ether") or {}).values()
+                   if e.get("id") not in ETHER_OK and e.get("name") not in ETHER_OK]
+            if eth:
+                warn.append("ether disease: " + ", ".join(eth) + f" (corruption {sk.get('corruption')}: an ether antibody)")
         except Exception:  # noqa: BLE001
             pass
         # run 36: the Ocean Bucket and the Practice Ring were worn cursed from run 35 or earlier and the axe was hexed

@@ -110,7 +110,7 @@ ROUTES = [
     # run 57: the earth, sun and mana crystals (Bicerin's reward, rune-forging materials) had no rule
     (("platinum", "gold bar", "medal", "ecopo", "coin", "ticket", "figure", "figurine", "card of", "gene of",
       "flicker of decency", "gem", "jewel", "cards of", "figures of", "mandrake", "a card",
-      "earth crystal", "sun crystal", "mana crystal"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
+      "earth crystal", "sun crystal", "mana crystal", "feather of healing"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
      "valuables (the Storehouse; the Storage Chest when full, run 21; the yard's 276-slot chest last, run 44)"),
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf
     # run 31 (G30 M5): loose lights (an old lantern from a nefia) wait with the decorations until they're installed
@@ -142,6 +142,8 @@ ROUTES = [
     # run 15 (G14): ration grain waits by the millstone's stock: the harvest box keeps it (never shipped)
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),
     (("offal", "heart", "liver", "kidney", "eyeball"), "ship", "the shipping chest (organs: the pantry is full, run 41)"),
+    # run 57: kibbles (pet food) bought in Yowyn had no rule; solo since run 38, so no pet eats them
+    (("kibble", "handful of snow"), "ship", "the shipping chest (pet food: solo, no pet to feed; winter snow, run 57)"),
     # run 56: stale meat (corpses have their own route above) crowded the meals out of the Cooler Box
     (("stale marbled meat", "stale marbled meats"), "ship", "the shipping chest (stale meat: run 56)"),
 ]

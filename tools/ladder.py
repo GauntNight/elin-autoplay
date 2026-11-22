@@ -151,6 +151,10 @@ def room_check():
                "or drop junk before a dungeon")
 
 
+# the ether diseases kept on purpose (the reasons are in ether_check's comments); look.py names every other one (run 57)
+ETHER_OK = (1550, 1551, 1552, 1553, 1554, 1555, 1556, 1563, 1564)
+
+
 def ether_check():
     # run 33: an ether disease (Enlarged Head at corruption 101) cut END 37 -> 21 and max HP 199 -> 150 on a world-map
     # walk, and a whole nefia ran on it unnoticed (every HP rule reads a percentage). Checked even with --kit-ok.
@@ -179,7 +183,7 @@ def ether_check():
     # run 56: Scalding Face (etherUgly, 1551; Crumbling Face, Facial Hives at other levels) is FEAT.cs ModBase(77 CHA,
     # -a x (4 + n/5)), nothing else: at Lv47 CHA -13, through Lonely Soul max HP 453 -> 435 and MP 232 -> 223; it stopped a
     # circuit at Silent Ruin's door. The same kind as 1563: allowed, cured at the next antibody
-    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1551, 1552, 1553, 1554, 1555, 1556, 1563, 1564)}
+    eth = {k: v for k, v in eth.items() if v.get("id") not in ETHER_OK}
     if eth:
         refuse("an ether disease: " + ", ".join(f"{v.get('name')} Lv{v.get('lv')}" for v in eth.values())
                + ": max HP or attributes may be down; the ether antibody cures it (Miral 10 medals, Yowyn's Ecopo shop)")
@@ -482,6 +486,7 @@ def nap_outside():
     # floor or the up stairs from B1, sleep on the world map, Enter the tile; the explored floors re-walk fast
     import stairs
     z = (state().get("zone") or {}).get("full") or ""
+    was_nefia = bool((state().get("zone") or {}).get("nefia"))
     nefia_name = re.sub(r"\s*(?:\*Conquered\*.*|B\d+F.*)$", "", str((state().get("zone") or {}).get("name") or "")).strip()
     # run 36 (Mossy Ruin B1): eaten at 44 or not at all, the walk out reached 50 and sleep.py refused on the world map,
     # where nothing can be eaten: eat down under 35 before leaving the floor (a mushroom is ~13)
@@ -544,7 +549,9 @@ def nap_outside():
     # run 34: Rustic Forest expired during a 9-hour nap; the tile's Enter then led into its Wilds field, and the
     # ladder delved the field for stairs ("no way down"). A re-entry that isn't a nefia ends the nefia here
     z2 = state().get("zone") or {}
-    if not z2.get("nefia"):
+    # run 57: a fixed dungeon (Minotaur's Nest, Zone_cave_mino) was never a nefia, and the nap's re-entry stopped it as
+    # "the nefia is gone": only a nefia going in is checked for having expired
+    if was_nefia and not z2.get("nefia"):
         stop(f"re-entered {z2.get('full')} ({z2.get('name')}), not a nefia: the nefia is gone (expired during the nap?); "
              "leave.py and pick another")
     p = pc()

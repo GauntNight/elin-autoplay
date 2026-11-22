@@ -189,11 +189,13 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     and anything that gives no harvest act. Stops at the SP floor, on a hostile or a window.
     Drops are picked up; food goes to the Cooler Box afterwards by hand (bag.py).
 - **`clearout.py`**: The clear-out of home storage by the keep rules (G70 Smart Storage M4, run 57): every stack keep.py calls "sell" or "trash" is taken from its box into the pack's own grid, a batch at a time, then sold to the home shopkeeper (sell.py, the resident board's Find walks me to her) or dropped in the trash can (trash.py dump). The approved calls are in knowledge/storage-audit.md (the user, 2026-11-21); gear ("gear") waits for gearcheck.py, unidentified things for Aliyun.
-    usage: python -I tools/clearout.py [--calls sell,trash] [--batches N] [--buyer NAME] [--dry]
+    usage: python -I tools/clearout.py [--calls sell,trash] [--batches N] [--buyer NAME] [--chest] [--dry]
       --calls    which of keep.py's calls to clear (default sell,trash)
       --batches  stop after N batches (default 99)
       --buyer    the shopkeeper (default "Samata": the name talkto sees)
+      --chest    the "sell" stacks go to the shipping chest instead of the shopkeeper (when her shop won't take more)
       --dry      print the plan (boxes and stacks per call) and move nothing
+      To end a run between batches: create runs/jobs/clearout.stop (it is removed when read).
     Exit 0 done (nothing left, or N batches), 1 refused (the grid has no room), 3 stopped (home_guard, a take or sale failed,
     the buyer out of money).
 - **`close.py`**: Close the top window safely, the right way for its type, and never leave the System menu open. A blind `act Cancel` is dangerous: when nothing (or only a container window) is open it opens the System context menu (Save / Load / To Title / Quit), which stays open (run 03).

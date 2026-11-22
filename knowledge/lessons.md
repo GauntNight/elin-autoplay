@@ -16,13 +16,22 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 
 
-- Read what a place is before walking to it for floors: Lumiest Crater (danger 20) looked like a fixed ladder for G64's evidence and cost ~4 game days to reach, while story-guilds-research.md already called it "just an explorable zone": an empty dig site, no stairs (fact #1535). `kb.py show zone:ID` and its Zone class first; a fixed zone is a dungeon only when its floors are read. (54)
 
 - watchlog reads only lines written after it starts: twice a short job (a 30-tile walk, music with no flute) ended before its watcher began and the watcher sat to its --idle line. On a fresh log, start it with `--from-start`. (55)
 - Plan arrivals by the clock: Derphy reached at 12:22 (thefts want night), Willow at 23:08 and Mysilia at 01:13 (shops shut; Chim and Rainof don't answer at night, no guard visible for whereis.py). A walk's steps x ~2.5 game hours a step says when I land; an inn (Tiguen) trades at night. (55)
 - The six-bill reserve is my own convention (G50's How), not the user's: the user's rule is which shops (fact #1025). Bend it for a goal's last step and say so; keep it for routine spending. (55)
 - A max HP that drops mid-run is a drain, a mutation or an ether disease, not damage: look.py's DANGER line names drained attributes and harmful mutations, `bridge.py skills` the ether ones. Run 56 went 453 -> 396 on END -5, CHA -5 (Lonely Soul reads CHA), Tainted Body and Scalding Face before a restore body and a cure mutation from the kit put it back to 435. Read it at the next stop, before the next nefia. (56)
 - Monsters steal from the pack, not only orens: a gnome took a treasure map, fairies took orens (fact #1558); the loop logs cut the line short (fight.py and delve.py now ledger each theft whole: common.note_thefts). Run 55 lost four tools that way, most likely, and shipped the one "protects you from thieves" waist piece in hand before finding out (fact #1559): weigh that line before shipping one (run 55).
+
+- A locked chest blocks `chests.py --field` for every chest of its name (it works by name), and the lockpick won't work
+  Overweight: on a dig tour nine chests held me at burden phase 3 until I dropped the locked one, emptied the rest, then
+  picked it back up (the empties too, by accident: they hold the left-behind junk). Drop only the locked one; open it at home. (57)
+- A <King> (chess piece: summoner, short teleport) on a floor is left by evacuation at once, never by walking off: leave.py
+  walked while it summoned pawns beside me, 460 -> 272 in a few steps (fact #1597). Two nefias stopped on one this run. (57)
+- A home shopkeeper's Restock costs home influence and runs out (~13 a visit in run 57): plan each home stop's clear-out as
+  the shipping chest's ~40 stacks plus what Samata takes, and expect her to stop after the influence is gone. (57)
+- Fame sales pull the next refill under the gate but near the sale point: the batch after Ishbear's sale lay round Palmia,
+  a 125-hour walk from home. Sell fame where the circuit will run, or circuit from the sale's town. (57)
 
 ## Promoted (where the older lessons live now)
 

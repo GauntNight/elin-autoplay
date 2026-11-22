@@ -44,6 +44,9 @@ def meal_stop():
     starved me, 154 -> 89 and 159 -> 50 HP, because a long leg ran from Hungry into Starving).
     Returns None when fed, or the reason it couldn't eat (a hostile there, no food)."""
     import farmday
+    # run 57: `from common import wait_until` sat below the home-tile step, so Python took wait_until as a local for the whole
+    # function and the step's own call raised UnboundLocalError (the circuit died on its refill nap from home's tile)
+    from common import wait_until
     # run 56: circuit.py's refill nap left home with hunger 52; this meal stop entered the home map from home's own tile, and
     # the leave.py below met the home's departure checks (no shovel carried), so the circuit looped "not on the world map"
     # and stopped. A meal is taken on a field: one step off home's tile first (as digmap.off_nefia does for a nefia's)
@@ -59,7 +62,6 @@ def meal_stop():
     if not enter:
         return "no local map to eat on here"
     call("do", i=enter[0]["i"])
-    from common import wait_until
     wait_until("zone", timeout=10000)
     wait_until("frames", n=30, timeout=3000)
     s = call("state")["data"]

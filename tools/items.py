@@ -33,6 +33,7 @@ usage: python -I tools/items.py            a summary by kind
        python -I tools/items.py --protected  what the drop/ship/sell tools must leave alone, and why
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -264,6 +265,19 @@ def carry_list():
     return out
 
 
+RANGED_CATS = ("bow", "crossbow", "gun", "sling")
+_DICE = re.compile(r"\((\d+)d(\d+)([+-]\d+)?")
+
+
+def best_ranged(items):
+    """The carried ranged weapon with the highest average damage (dice and bonus from its name), or None."""
+    def avg(i):
+        m = _DICE.search(i.get("name") or "")
+        return int(m.group(1)) * (int(m.group(2)) + 1) / 2 + int(m.group(3) or 0) if m else 0
+    cands = [i for i in items if (i.get("cat") or "") in RANGED_CATS and i.get("identified", True)]
+    return max(cands, key=avg) if cands else None
+
+
 def protected(it, items=None, carry=None, kit=True):
     """Why a tool that drops, ships, sells or stores must leave this thing alone, or None. One gate for purge,
     packcheck, trash, fence, shipstar and stock (the review of 2026-11-11: each had its own word list, and the
@@ -275,6 +289,13 @@ def protected(it, items=None, carry=None, kit=True):
         return "unidentified (identify first: Aliyun, a scroll, the spell)"
     if kit and k in KIT_KINDS and usable(it):  # kit=False: a tool that enforces the stock caps on the kit itself
         return f"kit ({k})"
+    # run 57: a sell loop over keep.py's "gear" sold ☆The Luminescent Long Bow (2d12+14, the wish's bow and the one in use)
+    # to Moyer for 366 orens: the ranged weapon was neither worn nor on the carry list. The best carried ranged weapon by its
+    # average damage is kit, whatever tool asks
+    if kit and (it.get("cat") or "") in RANGED_CATS:
+        best = best_ranged(items if items is not None else inventory())
+        if best and best.get("uid") == it.get("uid"):
+            return "kit (the ranged weapon in use: the best carried)"
     if it.get("container") and (it.get("count") or it.get("locked")):
         return "a container that isn't empty" + (" (locked: unread)" if it.get("locked") else "")
     name = (it.get("name") or "").lower()

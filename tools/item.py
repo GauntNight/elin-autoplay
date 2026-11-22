@@ -127,6 +127,20 @@ def main():
         print("\n".join(tip["data"]["texts"]) if tip.get("ok") else tip.get("error"))
         return
     card = (chosen.get("card") or rep["data"]["item"] or "").lower()
+    if action == "drop" and "--full-ok" not in sys.argv:
+        # run 57: six "empty" mystic chests were dropped on a far field after a chests.py --field pass; they still held
+        # the junk it leaves behind, and most likely the pine shovel (it was never seen again): a container that holds
+        # anything is not dropped without --full-ok
+        try:
+            import items as _inv
+            uid = chosen.get("uid")
+            hit = [i for i in _inv.inventory() if i.get("uid") == uid] if uid else []
+            if hit and hit[0].get("container") and (hit[0].get("count") or 0) > 0:
+                refuse(f"{rep['data']['item']} still holds {hit[0]['count']} things: empty it first (--full-ok to drop it anyway)")
+        except SystemExit:
+            raise
+        except Exception:  # noqa: BLE001 - the check never blocks a plain drop
+            pass
     if action in ("equip", "read", "use", "drink", "eat") and re.search(r"\b(cursed|doomed)\b", card) \
             and "--cursed-ok" not in sys.argv:
         refuse(f"{rep['data']['item']} is cursed or doomed: not {action}ing it (--cursed-ok to insist)")

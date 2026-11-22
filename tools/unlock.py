@@ -31,6 +31,20 @@ def main():
         return 0
     name = todo[0]["name"]
     print(f"{name}: lock {todo[0]['lockLv']}")
+    # run 57: twelve tries at a lock 27 failed bare-handed on a dig tour while the lockpicks rode in the haul bag (a clear-out
+    # had moved them); at home, with a lockpick back in the pack, it opened on the first try. The game uses a lockpick
+    # only from the pack's own grid: bring one out of its bag first
+    try:
+        import items as inv
+        its = inv.inventory()
+        picks = [i for i in its if "lockpick" in (i.get("name") or "").lower() and (i.get("charges") or 1) > 0]
+        if picks and not any(not p.get("path") for p in picks):
+            ok, why = inv.to_pack(max(picks, key=lambda p: p.get("charges") or 0), its)
+            print(f"  a lockpick into the pack: {'ok' if ok else why}")
+        elif not picks:
+            print("  no lockpick carried: bare hands (Lockpicking / 2 + 2 against the lock)")
+    except Exception as e:  # noqa: BLE001 - the pick check never blocks a try
+        print(f"  lockpick check skipped: {e}")
     for n in range(1, tries + 1):
         why = ready(hunger=None, hp=50)
         if why:

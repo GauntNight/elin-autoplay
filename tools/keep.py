@@ -106,6 +106,9 @@ def verdict(it):
         # the material is a state of the kind, not the kind: 'arrow' covers iron, grass, mica and wooden arrows
         if tid in AMMO_KEEP and name.split(" ", 1)[-1].startswith("iron "):
             return "keep", "the bow's iron arrows"
+        # run 57: ☆The Dreadbane Crossbow (undead bane [*****+]) rides for the crypt and Azrasizzle: its iron quarrels stay
+        if tid == "quarrel" and name.split(" ", 1)[-1].startswith("iron "):
+            return "keep", "the undead-bane crossbow's iron quarrels"
         return "sell", "ammo the bow doesn't use"
     if root in GEAR_ROOTS:
         return "gear", f"{cat}: gearcheck.py first"
