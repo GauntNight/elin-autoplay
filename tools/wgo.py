@@ -44,6 +44,16 @@ def meal_stop():
     starved me, 154 -> 89 and 159 -> 50 HP, because a long leg ran from Hungry into Starving).
     Returns None when fed, or the reason it couldn't eat (a hostile there, no food)."""
     import farmday
+    # run 56: circuit.py's refill nap left home with hunger 52; this meal stop entered the home map from home's own tile, and
+    # the leave.py below met the home's departure checks (no shovel carried), so the circuit looped "not on the world map"
+    # and stopped. A meal is taken on a field: one step off home's tile first (as digmap.off_nefia does for a nefia's)
+    for way in ("e", "w", "n", "s"):
+        here = [p for p in (call("places", r=0).get("data") or {}).get("places") or [] if p.get("dist") == 0]
+        if not any(p.get("id") == "startSite" for p in here):
+            break
+        print(f"  meal stop: home's tile: one step {way} first", flush=True)
+        call("move", dir=way)
+        wait_until("frames", n=30, timeout=3000)
     acts = call("acts", dx=0, dz=0, mode="all").get("data", {}).get("acts") or []
     enter = [a for a in acts if a["text"].startswith("Enter")]
     if not enter:

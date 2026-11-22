@@ -137,6 +137,8 @@ ROUTES = [
     # run 15 (G14): ration grain waits by the millstone's stock: the harvest box keeps it (never shipped)
     (("bundle of wheat", "bundles of wheat", "rice plant", "bag of rice", "bags of rice", "flour", "api nut", "coffee bean"), BOX_STR(home.HARVEST_BOX), "the harvest box (ration grain and nuts, G14)"),
     (("offal", "heart", "liver", "kidney", "eyeball"), "ship", "the shipping chest (organs: the pantry is full, run 41)"),
+    # run 56: stale meat (corpses have their own route above) crowded the meals out of the Cooler Box
+    (("stale marbled meat", "stale marbled meats"), "ship", "the shipping chest (stale meat: run 56)"),
 ]
 
 
@@ -455,6 +457,12 @@ def check():
         # to the shipping chest; quality-marked gear is never shipped from any bag
         if any(q in low for q in UNID_TAGS):
             unid.append(n)
+            continue
+        # run 56: FOOD_OK keeps corpses as cookable food (run 12), but trips eat bought meals now and the game files every
+        # corpse the PC steps onto into this box: eight stacks of corpses and stale meat left no slot for meals, so
+        # leave.py counted none. In the Cooler Box a corpse or stale meat leaves by its route (the shipping chest)
+        if re.search(r"\bcorpses? of\b|\bstale\b", low):
+            bad.append(("Cooler Box", n, *route(n)))
             continue
         if not is_food(low) and n.lower() not in eatable:
             bad.append(("Cooler Box", n, *route(n)))

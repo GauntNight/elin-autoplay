@@ -56,7 +56,9 @@ def main():
     # run 40: three plain scrolls of enchant weapon read on an axe at +3 only "resisted" and were used up. The code (ActEffect): the
     # cap is 2, great 4, +1 when blessed. A piece at its cap is refused before the read
     if "enchant" in item.lower() and "--force" not in sys.argv:
-        cap = (4 if "great" in item.lower() else 2) + (1 if "blessed" in item.lower() else 0)
+        # run 56: the game names the great scroll "scroll of *enchant armor*" (asterisks, no word "great"): it was refused at +2
+        great = "great" in item.lower() or "*enchant" in item.lower()
+        cap = (4 if great else 2) + (1 if "blessed" in item.lower() else 0)
         stock = call("stock", r=0)["data"].get("pack") or []
         names = [i["name"] for i in stock] + [s["name"] for i in stock for s in i.get("items") or []]
         now = [n for n in names if target.lower() in n.lower()]

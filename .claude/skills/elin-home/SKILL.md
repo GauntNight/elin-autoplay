@@ -34,7 +34,10 @@ line. Every step runs `farmday.home_guard` first (section 6).
    (elin-pack 3, elin-gear).
 3. **Tally the boxes by kind before planning or buying** (the user, run 40; at session start too): `stock.py` prints the
    caps table and what is over it across the pack, the bags and every home box; `stock.py --find TEXT` finds any stack
-   with its place. Then **`stock.py --ship [N]`** carries the excess to the shipping chest box by box (the chest takes 40
+   with its place. **Its ENCHANT rows are read at once** (run 56, after runs 52, 55 and 56 each found enchant scrolls
+   riding or boxed while worn pieces sat under the cap): an enchant scroll is listed there while a worn piece of its kind is
+   under that scroll's cap (plain +2, `*great*` +4, +1 blessed), read with `picker.py "SCROLL" Read PIECE`, lowest plus
+   first, the body's first among equals (it gives the most PV a plus). Then **`stock.py --ship [N]`** carries the excess to the shipping chest box by box (the chest takes 40
    stacks a morning, fact #1001; it pays out each morning, more than a shop, and adds gold bars by volume). One bridge
    client at a time: nothing else beside it (run 45: 4 of 36 shipped when I walked to the loom).
 4. **Garbage goes to the trash can, never the chest** (the user, run 08): `trash.py` (in arrive.py) walks every garbage

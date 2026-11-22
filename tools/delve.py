@@ -393,12 +393,20 @@ def main():
             inv = inv_names()
             ammo = re.search(r"\b(arrows?|pebbles?|bullets?)\b", inv.lower())
             ranged_foe = any(f in prof["flags"] for f in ("caster", "ranged", "blinder", "paralyser"))  # run 16: threat.py
-            if (any(k in tname.lower() for k in THROW_AT) or t.get("id") in ("robot", "drone") or ranged_foe or exploder)                     and "Putit In Amber" in inv:
-                tool, out = "throw.py", run("throw.py", tname, "Putit In Amber", "10", "55")
+            # run 56 (Misty Ruin B5): a named Lich Lv34 (threat.py "kill first": offense 4.02, defense 0.36) stood adjacent and
+            # the Putit round cost 20% (369 -> 283), a teleport; back in melee one round killed it for 6%. A frail caster
+            # already beside me gets the sword; slimes (acid on gear), drones and exploders keep the throw
+            frail_adjacent = (t["dist"] <= 1 and prof.get("group") == "kill first" and not exploder
+                              and not any(k in tname.lower() for k in ("slime", "drone")) and t.get("id") not in ("robot", "drone"))
+            if (any(k in tname.lower() for k in THROW_AT) or t.get("id") in ("robot", "drone") or ranged_foe or exploder) \
+                    and "Putit In Amber" in inv and not frail_adjacent:
+                # run 56 (Bewitching Cave B2): a named Mercenary mage's slide in rounds under 15% took 444 -> 198 while this
+                # loop stopped only at 55%, under the table's drink line: the throw loop stops at that line (HP_FLOOR) now
+                tool, out = "throw.py", run("throw.py", tname, "Putit In Amber", "10", str(HP_FLOOR))
             elif "floating eye" in tname:
                 # the user, run 12: the bow had no arrows; throw the Putit when there's no ammo
                 tool = "shoot.py" if ammo else "throw.py"
-                out = run("shoot.py", tname, str(HP_FLOOR), "12") if ammo else run("throw.py", tname, "Putit In Amber", "10", "55")
+                out = run("shoot.py", tname, str(HP_FLOOR), "12") if ammo else run("throw.py", tname, "Putit In Amber", "10", str(HP_FLOOR))
             else:
                 # the review of 2026-11-11: a neutral Evolved at or under my level was listed as a foe above, but
                 # fight.py only matches hostiles: "target not in view" at rc 0, 25 times, and the floor read as explored

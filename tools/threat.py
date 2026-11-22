@@ -175,10 +175,10 @@ def avoid(c, my_lv):
         return False
     if c["lv"] >= my_lv - THRESHOLDS["avoid_levels"]:
         return True
-    # run 43: a master 『Lizardman』 Lv19 stopped a circuit at Lv38, then died in 11 turns for 3 HP at PV 40 (weakened)
-    if c["lv"] <= my_lv - THRESHOLDS["avoid_ignore_below"]:
-        return False
     # only fights fought within 3 levels of mine count: run 17's 45% lizardmen were at Lv18 and cost 0-7 HP at Lv30
+    # run 56: Ungogo (Minotaur King Lv32, avoid, Critical 100) at exactly 15 under my Lv47 passed the ignore-below exception
+    # below, and his rounds took 40% and 61% (a near-death). A kind that already cost avoid_seen_pct at my level is avoided
+    # whatever the level gap: the recorded fights are read first, the exception after
     worst = 0
     path = ROOT / "knowledge" / "fights.csv"
     for row in (csv.DictReader(path.open(encoding="utf-8")) if path.exists() else []):
@@ -187,6 +187,8 @@ def avoid(c, my_lv):
                 worst = max(worst, 100 * int(row["hp_lost"]) // max(1, int(row["my_maxhp"])))
         except (ValueError, KeyError):
             continue
+    # run 43: a master 『Lizardman』 Lv19 stopped a circuit at Lv38, then died in 11 turns for 3 HP at PV 40 (weakened):
+    # without such a record, a kind avoid_ignore_below levels under mine (or anywhere under the window) is fought
     return worst >= THRESHOLDS["avoid_seen_pct"]
 
 

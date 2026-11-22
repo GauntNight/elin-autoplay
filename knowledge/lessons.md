@@ -21,10 +21,17 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 - watchlog reads only lines written after it starts: twice a short job (a 30-tile walk, music with no flute) ended before its watcher began and the watcher sat to its --idle line. On a fresh log, start it with `--from-start`. (55)
 - Plan arrivals by the clock: Derphy reached at 12:22 (thefts want night), Willow at 23:08 and Mysilia at 01:13 (shops shut; Chim and Rainof don't answer at night, no guard visible for whereis.py). A walk's steps x ~2.5 game hours a step says when I land; an inn (Tiguen) trades at night. (55)
 - The six-bill reserve is my own convention (G50's How), not the user's: the user's rule is which shops (fact #1025). Bend it for a goal's last step and say so; keep it for routine spending. (55)
-- Read every enchant scroll carried at the first home stop: run 55 found a handful of enchant armor and weapon scrolls riding unread in the bags late in the run (PV rose by more than ten once they were read), as run 52 had. (55; run 52's line promoted)
+- A max HP that drops mid-run is a drain, a mutation or an ether disease, not damage: look.py's DANGER line names drained attributes and harmful mutations, `bridge.py skills` the ether ones. Run 56 went 453 -> 396 on END -5, CHA -5 (Lonely Soul reads CHA), Tainted Body and Scalding Face before a restore body and a cure mutation from the kit put it back to 435. Read it at the next stop, before the next nefia. (56)
 - Monsters steal from the pack, not only orens: a gnome took a treasure map, fairies took orens (fact #1558); the loop logs cut the line short (fight.py and delve.py now ledger each theft whole: common.note_thefts). Run 55 lost four tools that way, most likely, and shipped the one "protects you from thieves" waist piece in hand before finding out (fact #1559): weigh that line before shipping one (run 55).
 
 ## Promoted (where the older lessons live now)
+
+- run 56's own, fixed the same session: enchant scrolls riding unread (run 55's Live line, run 52's before it) -> stock.py's
+  ENCHANT rows name every enchant scroll for a worn piece under its cap at the first home stop; Ungogo's near-death at 15
+  levels under me -> threat.avoid reads the recorded fights before the ignore-below exception; a Lich adjacent got the Putit
+  -> delve.py melees an adjacent kill-first foe; corpses filled the Cooler Box -> packcheck routes them out; a meal stop on
+  home's tile stranded a circuit -> wgo.meal_stop steps off home's tile; the throw loop stopped at 55% -> HP_FLOOR (70%);
+  Scalding Face (1551, CHA only) stopped a circuit -> ladder.ether_check allows it like 1563.
 
 - run 52's and run 53's lines (triaged at run 55's close-out): enchant scrolls riding unread -> a Live line of run 55 (it happened again); two home stops a day apart against the shipping chest's 40 -> fact #1001's limit, and stock.py --ship boxes the excess when the chest refuses (run 54); far nefias need a walk by hand -> circuit.py stops and names the skipped nefias whose walk fits their life (run 55), elin-delve 3.
 

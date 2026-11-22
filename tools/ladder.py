@@ -176,7 +176,10 @@ def ether_check():
     # run 52: Thick Neck (etherNeck, 1555) struck at corruption 500: FEAT.cs ModBase(65 PV, a x (12 + n)) and ModBase(77 CHA,
     # -a x (5 + n/5)), UnequipAll(neck): at Lv46 PV 100 -> 150 for the necklace's PV 4, DEX 5 and crits, and the CHA cost
     # through Lonely Soul (speed 197 -> 172, max HP 407 -> 389). Kept by the user's keep-while-worth-it rule (fact #1513)
-    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1552, 1553, 1554, 1555, 1556, 1563, 1564)}
+    # run 56: Scalding Face (etherUgly, 1551; Crumbling Face, Facial Hives at other levels) is FEAT.cs ModBase(77 CHA,
+    # -a x (4 + n/5)), nothing else: at Lv47 CHA -13, through Lonely Soul max HP 453 -> 435 and MP 232 -> 223; it stopped a
+    # circuit at Silent Ruin's door. The same kind as 1563: allowed, cured at the next antibody
+    eth = {k: v for k, v in eth.items() if v.get("id") not in (1550, 1551, 1552, 1553, 1554, 1555, 1556, 1563, 1564)}
     if eth:
         refuse("an ether disease: " + ", ".join(f"{v.get('name')} Lv{v.get('lv')}" for v in eth.values())
                + ": max HP or attributes may be down; the ether antibody cures it (Miral 10 medals, Yowyn's Ecopo shop)")

@@ -106,9 +106,28 @@ def inventory():
     return d, out
 
 
+def worn_pluses():
+    """(name, plus, "weapon" or "armor") for each worn piece (run 56: 7 enchant armor scrolls sat in a box and a great one in a
+    bag while both rings were at +0, the third run in a row a home stop missed them: runs 52, 55, 56)."""
+    try:
+        import items as _items
+        inv = _items.inventory()
+    except Exception:  # noqa: BLE001 - the table still prints without it
+        return []
+    out = []
+    for it in inv:
+        if not it.get("equipped") or it.get("kind") in ("light", "toolbelt"):
+            continue
+        n = it.get("name") or ""
+        m = re.search(r"\s([+-]\d+)(?=\s|$)", n)  # "+2 [5, 9]", "-2 [0, -4]"; the dice's "+3)" isn't after a space
+        out.append((n, int(m.group(1)) if m else 0, "weapon" if re.search(r"\(\d+d\d+", n) else "armor"))
+    return out
+
+
 def decide(items, stock):
-    """Sort each copy: keep / read / excess, with a reason."""
+    """Sort each copy: keep / read / excess / enchant, with a reason."""
     names = spell_names()
+    worn = None
     groups = defaultdict(list)
     for it in items:
         b = base(it["name"])
@@ -136,6 +155,23 @@ def decide(items, stock):
                     plan.append((it, "excess", f"{alias} at {have} casts (cap {SPELL_CAP})"))
                 else:
                     plan.append((it, "read", f"{alias} at {have or 0} casts"))
+            continue
+        if kind == "scroll" and what.strip("*") in ("enchant armor", "enchant weapon"):
+            # the code's caps (ActEffect): plain 2, great ("*enchant armor*") 4, +1 blessed; read with picker.py on the
+            # worn piece with the lowest plus (the best PV a plus: the body's, run 56)
+            if worn is None:
+                worn = worn_pluses()
+            slot = "armor" if "armor" in what else "weapon"
+            for it in copies:
+                cap = (4 if what.startswith("*") else 2) + (1 if it["bless"] == "blessed" else 0)
+                under = sorted((p, n) for n, p, s in worn if s == slot and p < cap)
+                if it["bless"] == "cursed":
+                    plan.append((it, "excess", "cursed: it takes a plus off"))
+                elif under:
+                    plan.append((it, "enchant", f"worn under +{cap}: " + ", ".join(f"{n} ({p:+d})" for p, n in under[:3])
+                                 + f": picker.py \"{it['name']}\" Read PIECE"))
+                else:
+                    plan.append((it, "keep", f"every worn {slot} piece at +{cap} or more"))
             continue
         if kind == "rod":
             keep = 0 if any(w in what for w in ROD_NEVER) else ROD_KEEP.get(what, 1)
@@ -182,7 +218,7 @@ def decide(items, stock):
 
 
 def show(plan):
-    for verdict in ("excess", "read", "keep"):
+    for verdict in ("excess", "enchant", "read", "keep"):
         rows = [p for p in plan if p[1] == verdict]
         print(f"\n{verdict.upper()} ({len(rows)} stacks)")
         for it, _, why in sorted(rows, key=lambda p: (p[0]["where"], p[0]["name"])):
@@ -367,7 +403,9 @@ def main():
     show(plan)
     ex = [p for p in plan if p[1] == "excess"]
     print(f"\n{len(ex)} excess stacks ({sum(1 for p in ex if p[0]['bag'])} in carried bags: bag.py them out first); "
-          f"{sum(1 for p in plan if p[1] == 'read')} books to read; the pack has {free_cards(d)} free cards")
+          f"{sum(1 for p in plan if p[1] == 'read')} books to read; "
+          f"{sum(1 for p in plan if p[1] == 'enchant')} enchant scroll stacks for worn pieces under their cap (read them now); "
+          f"the pack has {free_cards(d)} free cards")
 
 
 if __name__ == "__main__":

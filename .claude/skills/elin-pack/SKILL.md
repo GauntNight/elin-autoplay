@@ -25,7 +25,7 @@ gear. The user's rule (run 08): **the pack is for the trip; everything else live
 | pack | one throwable status potion (silence, slow): soaks kamikaze yeeks | 1-2 |
 | pack | rods that save a fight: slow, holy shield, magic map | optional, light |
 | home | scroll of incognito: not kit. packcheck sends it home with the other home-only kinds (`HOME_ONLY`, run 38: buff potions and scrolls, attack rods, rare scrolls); for a trip to a law town at karma below 0 it is a deliberate carry (`leave.py --pack-ok`) | 0 |
-| Cooler Box | food for the trip: real meals (inn food, cooked dishes: elin-travel 1), preserved food (melons 11 each, Kerona 10 orens), corpses to cook | 6+ meals carried (leave.py refuses under 6, run 32; `--food-ok`), 3+ days |
+| Cooler Box | food for the trip: real meals (inn food, cooked dishes: elin-travel 1), preserved food (melons 11 each, Kerona 10 orens); no corpses or stale meat (run 56: the game files every corpse the PC steps onto here, eight stacks crowded the meals out and leave.py counted none; packcheck routes them out now) | 6+ meals carried (leave.py refuses under 6, run 32; `--food-ok`), 3+ days |
 
 **The resupply rule** (the review of 2026-11-11: the two minimums were waived 62 times in runs 43-45, 33 for the
 lockpick and 29 for the blankets, because resupply was unplanned). **At every home arrival** count the charged fireproof
@@ -162,7 +162,7 @@ or ship one unidentified: Kerona paid 1-14 for Miracle gear that sold for 163-21
   (pick up whatever lies on top first), then `hotbar.py --deselect` puts it in the pack. Ship it.
 - Cobwebs can't be taken by hand (Collect destroys them). Crystal needs a harder pickaxe than granite.
 - Town furniture is someone's property (theft: Karma -1).
-- `loot.py` picks up valuables only; special mobs' corpses go in the Cooler Box.
+- `loot.py` picks up valuables only; corpses ship (packcheck routes them out of the Cooler Box since run 56).
 - **A boss chest is emptied completely** (the user, run 17: "there were two magical items"): its
   plain-named gear (cotton boots, a paper shirt) can be magical; identify, then wear or ship. Use
   every shrine on the floor before leaving (Wheel: a recipe; a material shrine, ★Shrine 《X Hammer》,

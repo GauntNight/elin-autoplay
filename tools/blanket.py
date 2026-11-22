@@ -90,7 +90,10 @@ def plan(st, n):
     thr = max(0, 2 * tex - total(st["thread"]))
     fib = max(0, thr - total(st["fiber"]))
     skins = math.ceil(fib / FIBER_PER_SKIN)
-    bake = max(0, LOGS * n - total(st["carbon"]))
+    # run 56: the log slot takes one stack of 4, and carbon logs come out in separate stacks (the run-start bake made 7 + 1;
+    # the second of two blankets then stopped "the count didn't rise" with 3 left): count only whole stacks' worth of 4
+    whole = sum((it.get("num") or 1) // LOGS for _, it in st["carbon"])
+    bake = max(0, n - whole) * LOGS
     sp = skins * SP_SKIN + thr * SP_SPIN + tex * SP_TEX + n * SP_BLANKET + bake * SP_BAKE
     short = []
     if skins > total(st["skin"]):
@@ -134,6 +137,8 @@ def fetch(key, want):
             break
         if place in ("pack", "bag"):
             continue
+        global FETCHED
+        FETCHED = True
         must(run("box.py", BOX_STR(place), "--take", it["name"], timeout=180), f"box.py {place} --take {it['name']}")
         have += it.get("num") or 1
     return have
@@ -207,6 +212,13 @@ def main():
     why = ready(hp=None, hunger=70, burden=None)
     if why:
         stop(why)
+    if best["skins"]:
+        # run 56: fetch() carried all 148 boxed skins to the pack, then feed() stopped on the missing tool and left them
+        # there, after packcheck had just put them away: check the tool before anything leaves a box
+        import items as _items
+        if not [it for it in _items.inventory() if TOOL in (it.get("name") or "").lower()]:
+            stop(f"no {TOOL} carried: make one at the tinker's table (3 barks + a dagger-class blade, fact #531); "
+                 "nothing taken from the boxes")
     if best["bake"]:
         fetch("log", best["bake"])
         feed(KILN, "Bake", "log", best["bake"])
@@ -245,5 +257,17 @@ def spares():
         print(f"  spare to the spoils bag: {it['name']} (rc {out.rc})")
 
 
+FETCHED = False  # set once fetch() takes anything out of a box
+
+
 if __name__ == "__main__":
-    main()
+    # run 56, twice in one run: a stop after fetch() left 132-148 skins, fiber, textures and carbon logs in the pack, which
+    # packcheck had just put away; on any stop after a fetch, the sort runs before the exit
+    try:
+        main()
+    except SystemExit as e:
+        if e.code not in (0, None) and FETCHED:
+            out = run("packcheck.py", "--move", timeout=600)
+            print("  after the stop, packcheck --move:")
+            print("\n".join("  | " + ln for ln in str(out).splitlines()[-4:]))
+        raise

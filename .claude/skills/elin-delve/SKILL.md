@@ -144,8 +144,8 @@ the stairs ignores far weaker foes.
 
 ## 5. The floor gate, and how it moves
 
-`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **29** at Lv47. G64 (**Floor gate 30**, set by the user after run 53) was done in run 55, and the gate went **back to 29** by the step rule for run 55's near-death on the Minotaur's Nest B4 at danger 29, the unattended limit (453 -> 113 under Gravity; applied after the close-out, which had missed it: `hygiene.py` checks it since). **G67 Floor gate 34** (the user, 2026-11-20: "raise the floor limit past 30 one step at a time"): the evidence floors sit at the unattended limit, now 28: a base 24-28 nefia's floors at 28, the Sunken Temple's B4, the Minotaur's Nest B3; `ladder.py` takes
-the same number for every floor and **28** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
+`delve.py` refuses a floor above `MAX_DANGER` (`THRESHOLDS["max_danger"]`: **34** at Lv48 (run 56: Dangerous Cave B1 at danger 28, the unattended limit, lowest 91%, no drink: G67's step with no milestone, to 30; its B2 at danger 29, 13 fights, lowest 96%, no drink: G67 M1, to 31; its B3 at danger 30, 16 fights, lowest 98%, no drink: G67 M2, to 32; its B4 at danger 31, 35 fights, lowest 81%, no drink: G67 M3, to 33; then **back to 32** by the step rule: a near-death on the Minotaur's Nest B5 at danger 30, Ungogo Lv32's melee round 398 -> 132 of 435, fact #1573; and **33 again** on Ancient Forest (base 30) B2 at danger 31, ~23 fights, lowest 94%, no drink, on a second visit: the first had fallen to 64% and didn't count, fact #1581; and **34**, G67 M4 and **G67 done**: its B3 at danger 32, 44 fights, lowest 96%, no drink, no heal, fact #1582). G64 (**Floor gate 30**, set by the user after run 53) was done in run 55, and the gate went **back to 29** by the step rule for run 55's near-death on the Minotaur's Nest B4 at danger 29, the unattended limit (453 -> 113 under Gravity; applied after the close-out, which had missed it: `hygiene.py` checks it since). **G67 Floor gate 34** (the user, 2026-11-20: "raise the floor limit past 30 one step at a time"): the evidence floors sit at the unattended limit, now 33: a base 29-33 nefia's floor at 33 (Ancient Forest's B4, 6 tiles from home, while it lasts); a gate past 34 is a new goal, the user's call; **Ungogo (Minotaur's Nest B5) is not a floor-gate question**: at Lv47 his melee rounds took 40% and 61% of my HP while my blows took ~1% of his (fact #1573), so the horn waits on another method, not a gate step; `ladder.py` takes
+the same number for every floor and **33** with `--unattended` (`unattended_minus` 1; it was minus 2 until run 16: the
 auto-combat net, the reserve and boxed gold now stand between a bad turn and death). elin-play's table states the gate and
 `hygiene.py` checks it against the code: `common.py`, the table and this section change together.
 
@@ -195,7 +195,13 @@ most floors sit far under the gate.
   at any level once a recorded fight cost 30% of my HP (`avoid_seen_pct`, run 33: aliens Lv18 at Lv30).
 - **From range first:** casters, archers, yeek warriors, shamans, mummies, drones, slimes, floating eyes (the Putit, the
   bow with arrows, the rod of slow); melee only what shrugs at range. `shoot.py` exits "no ammo" without arrows or pebbles
-  (the user caught a whole trip of empty shots, run 12), and delve then throws the Putit. (06, 08, 12)
+  (the user caught a whole trip of empty shots, run 12), and delve then throws the Putit. (06, 08, 12) **Once a kill-first
+  kind is already adjacent, the sword** (run 56: a named Lich Lv34's Putit round cost 20%, one melee round killed it for 6%):
+  delve.py melees it; slimes, drones, exploders and floating eyes keep the ranged branch. The throw loop stops at the
+  table's drink line (70%), not 55% (run 56: a named Mercenary mage's slide to 44% in rounds under 15%).
+- **A boss that out-trades the sword is no gate question** (run 56, fact #1573: Ungogo Lv32, Critical 100 and Cleave 42,
+  took 40% and 61% in single rounds at Lv47 while my blows took ~1%): `threat.avoid` now reads a recorded fight that cost
+  30%+ at my level before the 15-levels-under exception, so fight.py refuses such a kind without `--force`.
 - **Evasive kinds** (threat.py `evasive`: race DV 20+, or 15+ at speed 150+: bats, fairies, the metal bells; the user,
   run 34: "that kind of adversary we should know is hard to kill with swords"): `fight.py` casts an arrow spell each round
   (Fire Bolt solo: a bolt's line can hit the crew) while MP >= 25, then throws the ★Putit In Amber (hit 128% against the

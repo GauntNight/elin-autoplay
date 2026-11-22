@@ -38,7 +38,8 @@ never `step`.
 - **Its stops (exit 3):** an ambush (a local map: `look.py`), a hostile within 4, HP under the walk floor, Hungry, Very
   Sleepy, SP under 5, burden phase 3, a window, not moving. It cancels the leftover walk (run 08: a leftover goto walked
   me 14 game hours further). It eats on the way (a meal stop on the tile's local map at hunger 45, up to six small meals
-  since run 44), sleeps at Very Sleepy, and closes the morning shipping report itself (run 21). An Enter after a refused
+  since run 44; on home's own tile it steps one tile off first, run 56: the home map's departure checks stranded a
+  circuit there), sleeps at Very Sleepy, and closes the morning shipping report itself (run 21). An Enter after a refused
   or stopped wgo.py walks back into the place just left (run 21, twice): gate the next step on its exit code.
 - **`--ambush`** handles the ambush map itself by the table's rules (the swarm row, 3+ levels above me: stop), then
   `fight.py` one foe at a time, `loot.py 20`, `purge.py --free 3`, `leave.py`, and walks on (the review of 2026-10-23:
