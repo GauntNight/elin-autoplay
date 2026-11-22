@@ -107,8 +107,10 @@ ROUTES = [
     (("corpse",), "ship", "the shipping chest (a fresh corpse; cook it first if food is short)"),
     (("potion", "liquid", "scroll", "rod of", "poison"), BOX_STR(home.SPARES) + "|" + BOX_STR(home.SPARES2) + "|" + BOX_STR(home.SPARE_BOX) + "|" + BOX_STR(home.SPARES3) + "|" + BOX_STR(home.SPARES4) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2), "the spares chests (the Storehouse; the Storage Chest and the mystic chest when full)"),
     (("paint", "dye"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.SPARES), "valuables (paint and dyes: materials; run 31: dyes for G30's flower beds; the yard's chest last, run 44)"),
+    # run 57: the earth, sun and mana crystals (Bicerin's reward, rune-forging materials) had no rule
     (("platinum", "gold bar", "medal", "ecopo", "coin", "ticket", "figure", "figurine", "card of", "gene of",
-      "flicker of decency", "gem", "jewel", "cards of", "figures of", "mandrake", "a card"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
+      "flicker of decency", "gem", "jewel", "cards of", "figures of", "mandrake", "a card",
+      "earth crystal", "sun crystal", "mana crystal"), "|".join(BOX_STR(b) for b in home.VALUABLES) + "|" + BOX_STR(home.STORAGE_CHEST) + "|" + BOX_STR(home.OVERFLOW2) + "|" + "|".join(BOX_STR(b) for b in home.VALUABLES_OVERFLOW) + "|" + BOX_STR(home.SPARES),
      "valuables (the Storehouse; the Storage Chest when full, run 21; the yard's 276-slot chest last, run 44)"),
     # run 30 (G28): the Juremas decorations and dolls (things mount/deco) wait in Valuables 7, then the collectibles shelf
     # run 31 (G30 M5): loose lights (an old lantern from a nefia) wait with the decorations until they're installed

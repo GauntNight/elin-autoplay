@@ -229,7 +229,22 @@ def main(argv):
         kw["i"] = int(rest[0])
         rest = rest[1:]
         keyed(("expect",))
-    elif op in ("shiftclick", "choose", "hover"):
+    elif op == "choose":
+        # run 57: `choose 3` after talkto's listing ("click 3: Show me your wares") picked "I want to invest" (96 orens):
+        # talkto prints button indices, choose counts the choices from 0. Every choose names the text it expects now
+        kw["i"] = int(rest[0])
+        rest = rest[1:]
+        keyed(("expect",))
+        exp = kw.pop("expect", None)
+        if not exp:
+            sys.exit("choose N needs expect=TEXT (run 57's wrong pick); or `click N expect=TEXT` on the dialog's button")
+        bs = call("buttons").get("data", {}).get("buttons", [])
+        choices = [b for b in bs if (b.get("name") or "").startswith("UIButton")]
+        got = choices[kw["i"]].get("text") if 0 <= kw["i"] < len(choices) else None
+        if not got or exp.lower() not in got.lower():
+            sys.exit(f"refused: choice {kw['i']} is {got!r}, not {exp!r}: " + " | ".join(
+                f"{n}: {b.get('text')}" for n, b in enumerate(choices)))
+    elif op in ("shiftclick", "hover"):
         kw["i"] = int(rest[0])
     elif op == "altitude":
         kw["d"] = int(rest[0]) if rest else 0

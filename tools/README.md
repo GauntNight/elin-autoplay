@@ -19,6 +19,11 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`arrive.py`**: Arrive home (run 19, the user's rule after run 18): the scripted part of elin-home section 1, in order, with the Dishes box shared first. leave.py made it private on the way out (dishes.py).
     usage: python -I tools/arrive.py
     Exit: 0 done, 1 refused (not at home), 3 stopped (a threat, or the Dishes box couldn't be shared).
+- **`audit.py`**: Tally every home container by kind (G70 Smart Storage M1, run 57; the user, 2026-11-21: "go carefully through our current storage rules, what we currently have available, and make some decisions about what we need to keep and what we need to sell"). Reads the bridge's `stock` op once (every installed container on the home map, without walking), sorts each stack by the game's own category (things.json, never a word in its name: elin-play's rule since runs 47-50), and counts how many of the game's recipes take each thing, by its id or its category (graph.json's `needs` edges, kb.py's source).
+    usage: python -I tools/audit.py [--csv PATH] [--top N]
+      prints one block per category, largest first: stacks, items, the containers holding it, the recipes that use it, and its
+      N biggest kinds (default 6); --csv writes one row per kind (category, id, name, stacks, items, recipe uses, containers).
+    Exit 0, 2 the bridge.
 - **`bag.py`**: Move items between the pack and a container carried in it (Cooler Box, purse, bag) with the game's own Shift+click quick move (bridge 0.13.0 `shiftclick`, InvOwner.OnShiftClick). A carried container holds many items in one pack slot (the user, run 04: carry bags so the pack stops overflowing; keep food in the cooler box).
     usage: python -I tools/bag.py BAG [--take] [ITEM ...]
       BAG     part of the container's name ("Cooler Box"), or uid:N (tools/items.py)
@@ -183,6 +188,14 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Harvests up to N objects named OBJECT, nearest first, skipping the map edge (only "Enter" there)
     and anything that gives no harvest act. Stops at the SP floor, on a hostile or a window.
     Drops are picked up; food goes to the Cooler Box afterwards by hand (bag.py).
+- **`clearout.py`**: The clear-out of home storage by the keep rules (G70 Smart Storage M4, run 57): every stack keep.py calls "sell" or "trash" is taken from its box into the pack's own grid, a batch at a time, then sold to the home shopkeeper (sell.py, the resident board's Find walks me to her) or dropped in the trash can (trash.py dump). The approved calls are in knowledge/storage-audit.md (the user, 2026-11-21); gear ("gear") waits for gearcheck.py, unidentified things for Aliyun.
+    usage: python -I tools/clearout.py [--calls sell,trash] [--batches N] [--buyer NAME] [--dry]
+      --calls    which of keep.py's calls to clear (default sell,trash)
+      --batches  stop after N batches (default 99)
+      --buyer    the shopkeeper (default "Samata": the name talkto sees)
+      --dry      print the plan (boxes and stacks per call) and move nothing
+    Exit 0 done (nothing left, or N batches), 1 refused (the grid has no room), 3 stopped (home_guard, a take or sale failed,
+    the buyer out of money).
 - **`close.py`**: Close the top window safely, the right way for its type, and never leave the System menu open. A blind `act Cancel` is dangerous: when nothing (or only a container window) is open it opens the System context menu (Save / Load / To Title / Quit), which stays open (run 03).
     usage: python -I tools/close.py
 - **`common.py`**: Shared helpers for the tool scripts (run 12 review: fourteen copies of run(), six of walk(), eight idle-polls and about 150 fixed sleeps were spread over the scripts).
@@ -445,6 +458,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/kb.py stats                  counts for a session summary: nodes, edges, facts
            python -I tools/kb.py bench [--log RUN]      size and speed of the graph and the semantic index
                                                         (--log: a row in runs/index.csv for the run tracker)
+- **`keep.py`**: The keep rules for home storage, by kind (G70 Smart Storage M2, run 57): one table that the clear-out (clearout.py) and the home routine read, instead of word lists in each tool.
+    usage: python -I tools/keep.py            the verdict for every stack in the home's containers, counted by call and theme
+           python -I tools/keep.py --list CALL every stack with that call, with its place
+    Exit 0.
 - **`ladder.py`**: Go down a multi-floor dungeon one floor at a time (run 20, the user: "we need some dungeons ... to level up two weapon skill"): on each floor delve.py until the floor is explored, loot.py, wrecks.py, a QuickSave, then the stairway that isn't the way in, and down. Lesimas and other quest dungeons aren't nefias, so delve.py's floor gate skips them: the gate here covers every floor.
     usage: python -I tools/ladder.py [MAX_DANGER=delve.MAX_DANGER] [FLOORS=3] [--solo] [--expendable]
                                      [--no-wrecks] [--in X,Z] [--unattended] [--breathe] [--spare NAME] [--kit-ok 'why'] [--blanket-ok 'why'] [--sleepy-ok]
@@ -639,6 +656,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/scrap.py [--dry] [NAME ...]
       NAME  break these pack items too, by name (e.g. "strange silver coin": a gacha coin, ['scrap'],
             silver 27; not broken by default because the coins are currency)
+- **`sell.py`**: Sell chosen things to a shopkeeper, at home or in town (G70 Smart Storage M3, run 57; the user, 2026-11-21: "It may also help to have a Store in our home so we can sell things locally when we run out of time/room", then "for a store I just mean a Shopkeeper in town that we can use"). Run 57's M0 read: Samata the healer (home, shop level 2) bought a ☆ laser gun for 1,284 orens with no category gate; the shipping chest pays ~1.1x a shop's price but takes ~40 stacks a morning (fact #1001), so this is the outlet for what the chest refuses or what can't wait for a morning.
+    usage: python -I tools/sell.py SHOPKEEPER uid:N [uid:N ...] [--find] [--dry]
+    Exit 0 sold (or --dry listed), 1 refused (a protected thing, nothing to sell, no shopkeeper), 2 the bridge,
+    3 stopped (the buyer's gold ran out, a window, the Find walk didn't arrive).
 - **`sendhome.py`**: Send every party member home: walk beside it, Talk, "Wait at your home", close (fact #1435).
     usage: python -I tools/sendhome.py [--dry]
     Exit 0 the party is empty, 1 refused (a member not in view, no Talk, no "Wait at your home"), 2 the bridge.

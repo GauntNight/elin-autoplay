@@ -36,9 +36,11 @@ def cure():
     from common import data
     sk = data("skills")
     drains = sk.get("drains") or {}
-    need = [n for n, attrs in (("restore body", BODY), ("restore mind", MIND)) if any(a in drains for a in attrs)]
+    # run 57: "restore mind" matched a spellbook of restore mind riding in the pack as well as 6 potions: name the potion
+    need = [n for n, attrs in (("potion of restore body", BODY), ("potion of restore mind", MIND))
+            if any(a in drains for a in attrs)]
     if any(m.get("neg") for m in (sk.get("mutations") or {}).values()):
-        need.append("cure mutation")
+        need.append("potion of cure mutation")
     if not need:
         return "drains and mutations: none"
     done = []
@@ -55,6 +57,22 @@ def cure():
     after = data("skills")
     return (f"drains {drains} -> {after.get('drains') or 'none'}; " + "; ".join(done)
             + f"; mutations left: {[m['name'] for m in (after.get('mutations') or {}).values() if m.get('neg')] or 'none'}")
+
+
+def sell_step():
+    """G70 M3 (run 57; the user, 2026-11-21: "a Shopkeeper in town that we can use"): what keep.py calls "sell" leaves the
+    pack for Samata at home before packcheck files it into a box (the keep rule: sell unless used). Never the carried
+    ammo (the bow's: packcheck's kit word "arrow"), never gear (gearcheck.py and shipstar.py first), never what
+    items.protected() holds (worn, the kit, unidentified, the carry list)."""
+    import items as inv
+    from keep import verdict
+    carried = inv.inventory()
+    uids = [f"uid:{it['uid']}" for it in carried
+            if verdict(it)[0] == "sell" and (it.get("kind") or "") != "ammo" and not inv.protected(it, carried)]
+    if not uids:
+        return "sell: nothing keep.py sells in the pack"
+    out = run("sell.py", "Samata", *uids, "--find", timeout=900)
+    return f"sell ({len(uids)} stacks to Samata): {last(out) or out.rc}"
 
 
 def main():
@@ -75,6 +93,7 @@ def main():
     if d.rc != 0:
         stop("arrive: the Dishes box isn't shared: the residents can't eat while I'm here")
     print(cure())
+    print(sell_step())
     p = run("packcheck.py", "--move", timeout=1200)  # run 35: a full unload ran past the 300 s default twice
     print(p.strip())
     home_guard("the arrival, after the unload")

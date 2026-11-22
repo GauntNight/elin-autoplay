@@ -18,6 +18,33 @@ from bridge import call  # noqa: E402
 from common import stop, walk  # noqa: E402
 
 WALK = set('.\"*>@pn')
+# run 57 (Sunken Temple B1): every delve pass called this with a fresh `tried`, walked at the same two frontier cells
+# (3,27 and 6,31) from 8,20, moved nowhere, and stopped on the move limit: 21 passes, ~30 game minutes and ~15 real ones.
+# A target the walk can't move me toward is dead for this floor, across calls (runs/jobs/explore_dead.json)
+DEAD = Path(__file__).resolve().parent.parent / "runs" / "jobs" / "explore_dead.json"
+
+
+def dead_targets(zone):
+    import json
+    try:
+        d = json.loads(DEAD.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 - no file yet, or a bad one: nothing is dead
+        return {}
+    return {tuple(xy) for xy in d.get(zone, [])} if isinstance(d, dict) else set()
+
+
+def mark_dead(zone, xy):
+    import json
+    try:
+        d = json.loads(DEAD.read_text(encoding="utf-8"))
+        d = d if isinstance(d, dict) else {}
+    except Exception:  # noqa: BLE001
+        d = {}
+    d = {zone: d.get(zone, [])}  # only this floor's list is kept: a new floor starts clean
+    if list(xy) not in d[zone]:
+        d[zone].append(list(xy))
+    DEAD.parent.mkdir(parents=True, exist_ok=True)
+    DEAD.write_text(json.dumps(d), encoding="utf-8")
 
 
 def grid(r=40):
@@ -60,7 +87,8 @@ def main():
     if why:
         stop("not exploring: " + why)
     start = (s["pc"]["x"], s["pc"]["z"])
-    tried, seen_stairs = set(), set()
+    zone = f"{(s.get('zone') or {}).get('full')}"
+    tried, seen_stairs = set(dead_targets(zone)), set()
     why, decide = "move limit", False
     for k in range(1, moves + 1):
         cells = grid()
@@ -87,8 +115,11 @@ def main():
         # floor or a window; a stairway or an unexplored target is refused and skipped (run 12 review)
         w = walk(tx, tz, r=12, hp=min_hp, timeout=40000)
         if w.get("why") == "refused":
+            mark_dead(zone, (tx, tz))
             continue
         s = call("state")["data"]
+        if (s["pc"]["x"], s["pc"]["z"]) == here and w.get("why") not in ("hostile", "hp", "window", "zone"):
+            mark_dead(zone, (tx, tz))  # moved nowhere toward it: never again on this floor
         halt = danger(s, min_hp) if w.get("why") in ("hostile", "hp", "window", "zone") else None
         p = s["pc"]
         print(f"{k:2} -> {tx},{tz}  now {p['x']},{p['z']}  HP {p['hp']}/{p['maxHp']}  {p['date']}")

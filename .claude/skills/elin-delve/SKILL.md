@@ -65,7 +65,10 @@ layers stand in this order: `knowledge/risk.md` (the user, run 16). Kit: **elin-
   which is for water breathing in hand. **With it** (run 55, the Sunken Temple of Lurie B1-B4 with the Forest Gloves on):
   `ladder.py --breathe` reads the game's breathesWater on every floor and pass and stops when it's gone; ConSuffocation
   still flickers on after each step and dies the next tick for no damage (fact #1544), so `common.bad_conditions` ignores it
-  while breathing. The gloves and the water-breathing kit ride in the pack (packcheck).
+  while breathing. The gloves and the water-breathing kit ride in the pack (packcheck). **Wear the water breathing before the
+  walk there** (run 57): the temple's world-map tile reads as deep water, and the bridge's walk refuses a deep-water target
+  unless I breathe water (WalkTo: CanSuffocate and not BreathesWater), so `wgo.py` stopped twice on "the target is deep
+  water". ☆The Beautiful Necklace 『Queen』 (water breathing, DEX+4, fear) is the cheaper swap than the Forest Gloves.
 
 ## 3. The circuit
 

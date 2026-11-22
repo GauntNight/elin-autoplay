@@ -129,10 +129,22 @@ its context menu. Separate houses need a 1-cell gap or different room-board grou
 ## 3. Keep, ship or sell
 
 **The keep rule: sell unless used** (the user, 2026-11-21, setting G70 Smart Storage after run 56 ended with every route
-full). Keep what a tool, a recipe in use, a goal or the trip kit needs, one working stack of each crafting material, and
-collectibles (cards, figures, medals); everything else sells, ships or goes to the trash can. G70's audit
-(knowledge/storage-audit.md, M1) turns this into a call per kind, approved by the user, and the calls live in the tools
-(stock.py's caps, packcheck's routes): where this section and the tools disagree, the tools are newer.
+full). Keep what a tool, a recipe in use, a goal or the trip kit needs, and one working stack of each crafting material;
+everything else sells, ships or goes to the trash can. **Cards and figures sell too** (the user, approving the audit: "sell
+the cards and figures. They just increase tourist value - unless they have another purpose?": the game tags them 'tourism'
+only, no recipe takes one). The calls per kind are **`tools/keep.py`** (knowledge/storage-audit.md from `tools/audit.py`, approved 2026-11-21):
+keep, caps (stock.py), sell, read, identify, gear (gearcheck.py first). Where this section and keep.py disagree, keep.py is newer.
+
+**The outlets (G70 M3, run 57):**
+- **Samata the healer at home buys anything** (fact #1586): `tools/sell.py Samata uid:N ... --find` (the resident board's
+  Find walks me to her, the user's tip: fact #1587). She pays ~91% of the chest's price. **Her shop fills**: a sale is refused
+  silently once her own container is full of what I sold; her window's **Restock (-1 Influence)** empties it, and sell.py
+  presses it once before giving up.
+- **arrive.py sells on every return**: what keep.py calls "sell" in the pack goes to Samata before packcheck files the rest.
+- **The clear-out of the boxes:** `tools/clearout.py [--batches N]` takes keep.py's "sell" stacks out of the boxes a grid's
+  worth at a time (the pack's own grid: move the kit's loose stacks into a bag first, packcheck --move restores them) and
+  sells them. Gear waits for gearcheck.py; unidentified things for Aliyun.
+- **The shipping chest** still pays the most (x1.1) for ☆ gear and stock.py's cap excess, ~40 stacks a morning.
 
 **Trash can at once** (`trash.py`): garbage (burnable, unburnable), empty bottles and cans, rotten
 food and offal: the can pays Ecopo, the chest 0 (the user, run 08).
@@ -143,9 +155,9 @@ things made only for their first-craft ticket (signs, plates, doors, furniture w
 dead furniture (the Defense Training gallows, 56 weight each: carry one at a time, two made me
 Squashed), spare torches beyond one.
 
-**Keep:** crafting materials (one stack each), gold bars, gems and ores, spellbooks and tomes, potions
-and scrolls, food, seeds, tools, one spare of each weapon type, 2 old tickets (for a fortune drum),
-quest items (★).
+**Keep:** crafting materials (one stack each), gold bars, coins and medals, undecoded ancient books, potions, scrolls, rods
+and spellbooks under stock.py's caps, food, seeds, tools, the kit, 2 old tickets (for a fortune drum), quest items (★),
+treasure maps (Poppy).
 
 **Stock caps (the user, run 27; `tools/stock.py`, run 28):** the pack, the bags and every home box count
 together (bridge `stock` reads them all in one call). A spellbook of a spell at 100+ casts is excess; under it,
@@ -161,11 +173,9 @@ unidentified items ride along for Appraising (elin-pack 3); Aliyun the mage at T
 east, 5 north of home) identifies by the count (`kb.py facts Aliyun`). Spellbooks and rods first
 (run 04: a tome was Cure Minor Wound, a rod was identify).
 
-**Sell in town:** old tickets (114 orens each in Mysilia, keep 2). Everything else ships from home, and **a shopkeeper at
-home** takes what the chest can't (G70 M3; the user, 2026-11-21: "a Shopkeeper in town that we can use", not the guest store
-of Open For Business unless that is required). Any shop that trades for orens buys any sellable item at ~91% of the chest's
-price, +2% a point of Negotiation (fact #1584). Farris (scrolls, recipes) and Samata the healer (hired for 15 gold bars from
-the resident board's Recruit tab) have kept their shops at home (facts #718-#719); their buying gold is unread.
+**Sell in town:** old tickets (114 orens each in Mysilia, keep 2). At home, Samata (above): any shop that trades for orens
+buys any sellable item at ~91% of the chest's price, +2% a point of Negotiation (fact #1584); not the guest store of Open For
+Business (the user, 2026-11-21). Farris is no longer a resident (run 57's board: Samata is the one shopkeeper).
 
 **Unsure?** `kb.py show ITEM` gives the base value: under about 100 with no recipe use, ship it.
 
@@ -322,17 +332,7 @@ mushroom seeds go straight back into the field. Never a loop that waits (the
 user, runs 05 and 11): fill the rest of the day with crafting, tilling, hunting beside home, or a
 trip, and sleep when sleepy. `sleep.py` refuses at hunger 50+: eat first.
 
-**Exp (G10):** character exp comes from skill level-ups only (10-14 each), not kills. **Best (run
-14): a low weapon skill on the dummy** with `tools/trainday.py` (a hit pays clamp((20 - skill)/2, 1,
-10), so a never-used weapon earns ~9x the Long Sword: staff, unarmed, the Putit (`--throw`), a spear:
-~380 exp a real hour, Lv13 -> 15). Also: new skills (buy every useful unlearned one at a trainer, 5
-platinum, before upgrades: the user's rule), tilling new field cells (+41 in run 12), first crafts,
-nefia fights. The Long Sword (18) on the dummy gives ~nothing (run 12's measure). **Run 16: the bow at the dummy**
-(`trainday.py --shoot "forest long bow"`: Bow and Marksman, both new, +28 exp a bar of SP) with home-made
-arrows, and **lockpicking at the practice chest** (61,46; the user's tip) between bars: Lv16 186 -> Lv17
-419 over the run. When the branches run out, trainday falls back to the staff in melee (~9 a day).
-Every level gives a feat point (I pick: Lonely Soul at Lv11, Lv12; Party Animal at Lv17 for the
-follower plan).
+**Exp:** elin-train (the dummy, trainers' potential, music, Quick Craft).
 
 **Food:** the farm (section 2's field; tomatoes and imo for food, mushrooms for seeds and food),
 the bonfire 65,59 in the Kitchen (weed stew from 5 grass, meat on the bone from corpses, roasted
