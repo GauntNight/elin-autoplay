@@ -128,6 +128,12 @@ its context menu. Separate houses need a 1-cell gap or different room-board grou
 
 ## 3. Keep, ship or sell
 
+**The keep rule: sell unless used** (the user, 2026-11-21, setting G70 Smart Storage after run 56 ended with every route
+full). Keep what a tool, a recipe in use, a goal or the trip kit needs, one working stack of each crafting material, and
+collectibles (cards, figures, medals); everything else sells, ships or goes to the trash can. G70's audit
+(knowledge/storage-audit.md, M1) turns this into a call per kind, approved by the user, and the calls live in the tools
+(stock.py's caps, packcheck's routes): where this section and the tools disagree, the tools are newer.
+
 **Trash can at once** (`trash.py`): garbage (burnable, unburnable), empty bottles and cans, rotten
 food and offal: the can pays Ecopo, the chest 0 (the user, run 08).
 
@@ -155,7 +161,11 @@ unidentified items ride along for Appraising (elin-pack 3); Aliyun the mage at T
 east, 5 north of home) identifies by the count (`kb.py facts Aliyun`). Spellbooks and rods first
 (run 04: a tome was Cure Minor Wound, a rod was identify).
 
-**Sell in town:** old tickets (114 orens each in Mysilia, keep 2). Everything else ships from home.
+**Sell in town:** old tickets (114 orens each in Mysilia, keep 2). Everything else ships from home, and **a shopkeeper at
+home** takes what the chest can't (G70 M3; the user, 2026-11-21: "a Shopkeeper in town that we can use", not the guest store
+of Open For Business unless that is required). Any shop that trades for orens buys any sellable item at ~91% of the chest's
+price, +2% a point of Negotiation (fact #1584). Farris (scrolls, recipes) and Samata the healer (hired for 15 gold bars from
+the resident board's Recruit tab) have kept their shops at home (facts #718-#719); their buying gold is unread.
 
 **Unsure?** `kb.py show ITEM` gives the base value: under about 100 with no recipe use, ship it.
 
@@ -183,7 +193,7 @@ butcher's tool, the kiln, the six houses) are in the run logs and goals-done.md.
 |---|---|---|
 | Waste boxes (burnable, unburnable) and a compost box | 8 planks + 2 tight ropes each (tight rope = string + big leaf at the workbench) | open: first-craft tickets and real trash bins; need planks from the sawmill and big leaves |
 | More light | wall torches by the doors; the wall lights from nefias (run 16) | open: night visibility beyond the office torch |
-| Storage room | the valuables are full (run 20): a seventh box, or the Storage Chest for the overflow | run 36: every valuables box full again; the Depot's empty mystic chests (45,51; 44,46; 43,46) and 70,51 / 67,52 are `home.VALUABLES_OVERFLOW`, the bookshelf 65,38 is the library's tail; run 45 (G54): the five mystic chests retired into Nino's two big wagons south-west of the Storehouse (54,38 and 58,35, 96 slots each, 4x4 cells), which are the overflow now |
+| Storage room (**G70 Smart Storage** since 2026-11-21) | run 56: every route full (the shipping chest at 40, the armory, the yard chest): the audit and the keep rule first, then capacity where a kept theme still fills (wrenches, wagons) | run 36: every valuables box full again; the Depot's empty mystic chests (45,51; 44,46; 43,46) and 70,51 / 67,52 are `home.VALUABLES_OVERFLOW`, the bookshelf 65,38 is the library's tail; run 45 (G54): the five mystic chests retired into Nino's two big wagons south-west of the Storehouse (54,38 and 58,35, 96 slots each, 4x4 cells), which are the overflow now |
 
 **The crew's genes (G38, run 36):** the Gene Machine (54,59, powered by the Truce Ground generator) puts a gene into a
 home member (never me: a Juere has no Predatory Evolution). `gene.py plan [MEMBER]` lists each member's feat points,
