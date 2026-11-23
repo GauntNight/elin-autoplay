@@ -75,7 +75,7 @@ def main():
     out = run("shop.py", args[0], "--keep-open", timeout=300)
     if out.rc != 0:
         refuse(f"shop.py: {last(out) or out.rc}")
-    sold, left, sold_items = [], [], []
+    sold, left, sold_items, restocks = [], [], [], 0
     gold0 = data("state")["pc"].get("gold")
     for it in sell:
         bs = call("buttons", all=True)["data"]["buttons"]
@@ -90,7 +90,23 @@ def main():
             left.append(it["name"])
             continue
         a = sells[-1]  # "Sell N" for the whole stack
+        g0 = data("state")["pc"].get("gold")
         call("invdo", i=a["i"])
+        # run 58: Leoban and Kerona "ran out of money" every night since run 53; what fills is the shop's own container, as at
+        # home (fact #1590), and the window's "Restock (-1 Influence)" empties it: press it and sell this one again, twice at most
+        if data("state")["pc"].get("gold") == g0 and restocks < 2:
+            rs = [b for b in data("buttons")["buttons"] if (b.get("text") or "").startswith("Restock")]
+            if rs:
+                call("click", i=rs[0]["i"], expect="Restock")
+                restocks += 1
+                txlog("restock", args[0], "", "", "-1 influence: the shop was full")
+                bs = call("buttons", all=True)["data"]["buttons"]
+                hit = [b for b in bs if "inventory grid" in (b.get("name") or "") and b.get("mine") is not False
+                       and b.get("uid") == it["uid"]]
+                again = [x for x in (call("invacts", i=hit[0]["i"]).get("data", {}).get("acts", []) if hit else [])
+                         if x["text"].startswith("Sell")]
+                if again:
+                    call("invdo", i=again[-1]["i"])
         sold.append(f"{it['name']} ({a['text']})")
         sold_items.append(it)
         txlog("sold", it["name"], "pack", "the fence", a["text"])  # run 49: the run's item ledger
