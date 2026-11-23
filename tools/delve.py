@@ -407,6 +407,8 @@ def main():
                 # the user, run 12: the bow had no arrows; throw the Putit when there's no ammo
                 tool = "shoot.py" if ammo else "throw.py"
                 out = run("shoot.py", tname, str(HP_FLOOR), "12") if ammo else run("throw.py", tname, "Putit In Amber", "10", str(HP_FLOOR))
+                if ammo and out.rc == 1:  # run 58: "no bow or sling in the pack" over a Lv3 floating eye ended a circuit
+                    tool, out = "throw.py", run("throw.py", tname, "Putit In Amber", "10", str(HP_FLOOR))
             else:
                 # the review of 2026-11-11: a neutral Evolved at or under my level was listed as a foe above, but
                 # fight.py only matches hostiles: "target not in view" at rc 0, 25 times, and the floor read as explored

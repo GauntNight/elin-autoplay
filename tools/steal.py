@@ -266,6 +266,8 @@ def auto(target, r):
 
 
 def main():
+    from job import register  # run 58: bridge.call refuses a second acting client while this runs
+    register("steal")
     setup()
     args = [a for a in sys.argv[1:]]
     if args and args[0] == "auto":

@@ -76,6 +76,8 @@ def sell_step():
 
 
 def main():
+    from job import register  # run 58: bridge.call refuses a second acting client while this runs
+    register("arrive")
     t0 = time.time()
     setup()
     s = state()
@@ -132,6 +134,11 @@ def main():
     pc = state()["pc"]
     print(f"food: my hunger {pc['hunger']} ({pc.get('hungerText') or 'ok'}); feed the residents from the "
           f"Dishes box above (cookdishes.py), keep the stay short")
+    if p.rc != 0:
+        # run 58 (G70 M5): what Appraising identified, the mail and the morning's payout brought after the sort stood as 6 out
+        # of place at the arrival's end: one closing pass files them, and the count is what it leaves
+        p = run("packcheck.py", "--move", timeout=1200)
+        print("the closing pass: " + " / ".join(ln.strip() for ln in str(p).splitlines() if "out of place" in ln or "decide:" in ln))
     if p.rc != 0:
         print("!! packcheck left items out of place (above): put them away before leaving")
     # G46 (the user, after run 40: a short home trip): the measure, per arrival: real minutes and what had no box to go to

@@ -23,10 +23,27 @@ from common import grab, matches, put_away, ready, refuse, stop  # noqa: E402
 BOW = re.compile(r"(?<![a-z])(bow|crossbow|sling)(?![a-z])")
 
 
+AMMO = {"bow": r"\barrows?\b", "crossbow": r"\b(quarrels?|bolts)\b", "gun": r"\bbullets?\b", "sling": r"\bpebbles?\b"}
+
+
 def hold_ranged():
     held = call("state")["data"]["pc"]["held"] or ""
     if BOW.search(held.lower()):
         return held
+    # run 58 (Ominous Forest B4): purge had bagged the crossbow and the bow rode in the loot bag, so a Lv3 floating eye ended
+    # the circuit on "no bow or sling in the pack": the weapon by the game's category at any depth, with its own ammo carried
+    import items as inv
+    its = inv.inventory()
+    names = " ".join(i["name"].lower() for i in its)
+    cands = [i for i in its if (i.get("cat") or "") in AMMO and i.get("identified", True) and (i.get("bless") or 0) >= 0
+             and re.search(AMMO[i["cat"]], names)]
+    while cands:
+        best = inv.best_ranged(cands)
+        out = inv.use(best, "Grab", its)
+        got = call("state")["data"]["pc"]["held"] or ""
+        if getattr(out, "rc", 1) == 0 and got:
+            return got
+        cands = [c for c in cands if c["uid"] != best["uid"]]
     for want in ("bow", "crossbow", "sling"):
         got = grab(want, what="weapon")
         if got and BOW.search(got.lower()):

@@ -96,6 +96,8 @@ def ship_deciphered():
 
 
 def main(argv):
+    from job import register  # run 58: bridge.call refuses a second acting client while this runs
+    register("decode")
     setup()
     if "--fetch" in argv and "--dry" not in argv:
         total = 0

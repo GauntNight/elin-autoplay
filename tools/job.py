@@ -21,7 +21,7 @@ def register(name):
     f.write_text(json.dumps({"pid": os.getpid(), "started": time.time(), "argv": sys.argv}),
                  encoding="utf-8")
     # run 52: the job's own children inherit this, so bridge.call can tell them from a second client (bridge.py)
-    os.environ["ELIN_JOB"] = name
+    os.environ.setdefault("ELIN_JOB", name)  # run 58: a job started by another job keeps the outer one's name
     atexit.register(lambda: f.unlink(missing_ok=True))
 
 

@@ -226,6 +226,8 @@ def plan(mx, mz, ms, start=None):
 
 
 def main():
+    from job import register  # run 58: bridge.call refuses a second acting client while this runs
+    register("digmap")
     setup()
     args = sys.argv[1:]
     if not world_ok():

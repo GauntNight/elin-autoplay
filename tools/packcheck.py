@@ -266,9 +266,9 @@ def is_food(low):
 _KINDS = None
 
 
-def _junk_kind(name):
-    """True when the carried thing of this name is in the game's junk category (box.py's rule for the shipping chest),
-    never a ☆ piece (run 49: ☆The Scrubber ships). One inventory read per run."""
+def _kind_of(name):
+    """The kind (items.kind, the game's own category) of the carried thing of this name, "" when it isn't carried. One
+    inventory read per run."""
     global _KINDS
     if _KINDS is None:
         try:
@@ -276,7 +276,13 @@ def _junk_kind(name):
             _KINDS = {(i.get("name") or "").lower(): i.get("kind") or "" for i in _items.inventory()}
         except Exception:  # noqa: BLE001 - the word rules still route it
             _KINDS = {}
-    return _KINDS.get(name.lower(), "").startswith("junk") and not name.startswith("☆")
+    return _KINDS.get(name.lower(), "")
+
+
+def _junk_kind(name):
+    """True when the carried thing of this name is in the game's junk category (box.py's rule for the shipping chest),
+    never a ☆ piece (run 49: ☆The Scrubber ships)."""
+    return _kind_of(name).startswith("junk") and not name.startswith("☆")
 
 
 def route(name):
@@ -303,7 +309,8 @@ def route(name):
     # the parts box); identified spare gear and jewelry arm the residents (G12 M8)
     # run 46: "charm" wasn't here, so ☆The Glittering Charm (kept for run 45's open trial) fell through to ROUTES' odd-loot
     # "charm" and shipped; a ☆/★ charm is neck gear and goes to "decide" like the rest
-    is_gear = (GEAR.search(name) or has_word(low, ("amulet", "necklace", "ring", "girdle", "cloak"))
+    # run 58: "a bronze claw (+1, -1)" shows neither dice nor [DV, PV] and fell through to "no rule": the game's category decides too
+    is_gear = (GEAR.search(name) or _kind_of(name) == "gear" or has_word(low, ("amulet", "necklace", "ring", "girdle", "cloak"))
                or (has_word(low, ("charm",)) and ("☆" in name or "★" in name)))  # plain charms still ship (run 30)
     if is_gear and ("☆" in name or "★" in name):
         # run 13: an identified ☆ shirt went to the armory and a resident wore it within the hour,

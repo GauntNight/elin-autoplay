@@ -371,6 +371,9 @@ def read_books(plan, limit):
 
 
 def main():
+    if {"--ship", "--read"} & set(sys.argv[1:]):
+        from job import register  # run 58: bridge.call refuses a second acting client while this runs
+        register("stock")
     setup()
     args = sys.argv[1:]
     d, items = inventory()

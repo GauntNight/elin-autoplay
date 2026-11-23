@@ -105,7 +105,7 @@ the pack every game hour, and Aliyun at Tinker's Camp identifies the pack for 45
 or ship one unidentified: Kerona paid 1-14 for Miracle gear that sold for 163-213 identified.
 
 **On return, in this order:**
-1. Identify (Aliyun, `identifyall.py` beside him, or wait for Appraising): **Godly items need the artifact identify (660 in run 16;
+1. Identify (Aliyun, `identifyall.py` beside him, or wait for Appraising): **Godly and Special items need the artifact identify (`identifyartifact.py`, 348 a piece in run 58: a Special badge was ★《Sea Dragon Ribbon》, every Special book a Dojin Book that sells for 1,700-3,000 and is never read; 660 in run 16;
    it gave ☆The Immortal Necklace: no blindness, fear or thieves), Miracle and Good ones the
    identify-all (132-264, it covers the carried bags)**; unidentified items sell for 1-15, so identify
    before shipping (the user, run 15). Equip what beats worn gear (`item.py X info`, compare

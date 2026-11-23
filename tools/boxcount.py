@@ -46,6 +46,9 @@ def kinds(items):
 
 
 def main():
+    if {"-h", "--help"} & set(sys.argv[1:]):  # run 58: --help read the boxes beside arrive.py (two bridge clients)
+        print(__doc__)
+        return
     setup()
     args = sys.argv[1:]
     run_no = args[args.index("--run") + 1] if "--run" in args else "xx"

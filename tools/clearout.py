@@ -107,6 +107,8 @@ def put_back():
 
 
 def main():
+    from job import register  # run 58: bridge.call refuses a second acting client while this runs
+    register("clearout")
     try:
         _main()
     finally:
