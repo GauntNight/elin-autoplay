@@ -357,7 +357,7 @@ def route(name):
 
 # run 49: loot furniture and decor by the game's category (things.json); a light, a bed or a container the town wants is
 # placed by hand before an arrival sorts it
-SHIP_CATS = {"deco", "mount", "chair", "crafter", "container", "table", "furniture", "bed", "light", "ext", "util", "tool_deco"}
+SHIP_CATS = {"mech", "deco", "mount", "chair", "crafter", "container", "table", "furniture", "bed", "light", "ext", "util", "tool_deco"}
 _CATS = {}
 
 
@@ -480,7 +480,21 @@ def check():
             continue
         if not is_food(low) and n.lower() not in eatable:
             bad.append(("Cooler Box", n, *route(n)))
-    return bad, unid
+    # run 58: a ☆ piece Appraising identified on the way waits for my reading (gearcheck.py beside the worn one) as an
+    # unidentified one waits for Aliyun: it isn't misplaced, it is undecided. leave.py holds the door until it is read
+    UNREAD.clear()
+    UNREAD.extend(b[1] for b in bad if "☆ gear" in b[3] and b[1] not in gear_read())
+    return [b for b in bad if b[1] not in UNREAD], unid
+
+
+UNREAD = []  # the ☆ pieces of the last check() that gearcheck.py hasn't shown yet
+
+
+def gear_read():
+    """The names gearcheck.py has shown beside the worn piece (its record, which shipstar.py reads too)."""
+    from job import JOBS
+    f = JOBS / "gearcheck.txt"
+    return set(f.read_text(encoding="utf-8").splitlines()) if f.exists() else set()
 
 
 _CASTS = {}
@@ -518,6 +532,8 @@ def main():
         print(f"  {c:10} {n}  ->  {label}")
     if unid:
         print("for identification (carried, not blocking): " + "; ".join(unid))
+    if UNREAD:
+        print("for reading (gearcheck.py, then wear, ship or sell; leave.py asks): " + "; ".join(UNREAD))
     if "--move" in sys.argv and bad:
         z = (call("state")["data"].get("zone") or {}).get("full", "")
         if not z.startswith("Zone_startSite"):

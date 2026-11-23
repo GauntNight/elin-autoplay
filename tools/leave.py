@@ -183,6 +183,9 @@ def main():
             print(r)
             refuse("leaving home refused: the pack holds items off the trip kit (packcheck.py --move, "
                    "then leave again; --pack-ok only for a deliberate haul)")
+        if "for reading (gearcheck.py" in str(r):  # run 58: an unread ☆ piece is a decision to make at home, not a misplaced one
+            refuse("leaving home refused: unread ☆ pieces: gearcheck.py, then wear, ship (shipstar.py) or sell them: "
+                   + str(r).split("for reading", 1)[1].splitlines()[0][:200])
     # runs 48-49: snow putits join the party at home on their own; solo is the rule (run 38) and Lonely Soul pays per
     # empty slot (run 49: max HP 396 -> 363 through four conquests): at home they are sent back first
     if at_base and "--party-ok" in sys.argv and (s.get("party") or []):
