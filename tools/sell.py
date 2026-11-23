@@ -16,6 +16,8 @@ tip, run 57: "you can use the board, I think, to find residents as well. Similar
 me to them wherever they wander.
 
 usage: python -I tools/sell.py SHOPKEEPER uid:N [uid:N ...] [--find] [--dry]
+       python -I tools/sell.py SHOPKEEPER --excess [--find] [--dry]   the carried stacks over stock.py's caps (kit rods included: the
+                                       copies kept are stock.py's best; run 58: 12 rods over their caps rode home in the grid four times)
 Exit 0 sold (or --dry listed), 1 refused (a protected thing, nothing to sell, no shopkeeper), 2 the bridge,
 3 stopped (the buyer's gold ran out, a window, the Find walk didn't arrive).
 """
@@ -64,11 +66,32 @@ def find_resident(name):
     run("close.py")
 
 
+def excess_uids():
+    """The carried stacks stock.py calls excess (over a cap, empty, a kind never used), matched to their uids by bag and name."""
+    import stock as st
+    _, rows = st.inventory()
+    spells = {s["spell"]: s["stock"] for s in data("power")["party"][0].get("spells") or []}
+    want = [(p[0]["bag"], p[0]["name"]) for p in st.decide(rows, spells) if p[1] == "excess" and p[0]["where"] == "pack"]
+    its, used = inv.inventory(), []
+    for bag, name in want:
+        hit = next((i for i in its if i["uid"] not in used and i["name"] == name and not i.get("equipped")
+                    and inv.where(i, its) == (bag or "pack")), None)
+        if hit and inv.protected(hit, its, kit=False) is None:
+            used.append(hit["uid"])
+    return used
+
+
 def main():
     setup()
     argv = sys.argv[1:]
-    dry, find = "--dry" in argv, "--find" in argv
+    dry, find, excess = "--dry" in argv, "--find" in argv, "--excess" in argv
     args = [a for a in argv if not a.startswith("--")]
+    if excess and args:
+        ex = excess_uids()
+        if not ex:
+            print("nothing carried is over stock.py's caps")
+            return
+        args = [args[0], *(f"uid:{u}" for u in ex)]
     if not args or len(args) < 2 and not dry:
         refuse("usage: sell.py SHOPKEEPER uid:N [uid:N ...] [--find] [--dry]")
     who, uids = args[0], []
@@ -85,7 +108,7 @@ def main():
             # run 57: a stack taken from a box merged into one already carried and took its uid: skip it, sell the rest
             print(f"  not carried: uid:{u} (merged into another stack?)")
             continue
-        why = inv.protected(it, carried)
+        why = inv.protected(it, carried, kit=not excess)
         if why:
             refuse(f"{it['name']} (uid:{u}): {why}")
         sell.append(it)
@@ -191,7 +214,7 @@ def main():
         stop(why_stop)
     if later and sold:
         print(f"next round: {len(later)} that waited for grid room", flush=True)
-        sys.argv = [sys.argv[0], who, *(f"uid:{u}" for u in later)] + (["--find"] if find else [])
+        sys.argv = [sys.argv[0], who] + (["--excess"] if excess else [f"uid:{u}" for u in later]) + (["--find"] if find else [])
         main()
     elif later:
         print(f"left in the bags (the pack's grid is full and nothing sold): {len(later)}")

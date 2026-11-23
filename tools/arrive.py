@@ -70,9 +70,11 @@ def sell_step():
     uids = [f"uid:{it['uid']}" for it in carried
             if verdict(it)[0] == "sell" and (it.get("kind") or "") != "ammo" and not inv.protected(it, carried)]
     if not uids:
-        return "sell: nothing keep.py sells in the pack"
+        ex = run("sell.py", "Samata", "--excess", "--find", timeout=900)
+        return f"sell: nothing keep.py sells in the pack; over the caps: {last(ex)[:200]}"
     out = run("sell.py", "Samata", *uids, "--find", timeout=900)
-    return f"sell ({len(uids)} stacks to Samata): {last(out) or out.rc}"
+    ex = run("sell.py", "Samata", "--excess", "--find", timeout=900) if out.rc == 0 else out  # run 58: the rods over the caps too
+    return f"sell ({len(uids)} stacks to Samata): {last(out) or out.rc}; over the caps: {last(ex)[:200] if ex is not out else 'not tried'}"
 
 
 def main():
@@ -139,6 +141,10 @@ def main():
     if p.rc != 0:
         # run 58 (G70 M5): what Appraising identified, the mail and the morning's payout brought after the sort stood as 6 out
         # of place at the arrival's end: one closing pass files them, and the count is what it leaves
+        # the ☆ pieces gearcheck.py has shown beside the worn ones ship (shipstar.py refuses an unread one and keeps runs/carry.txt):
+        # run 58's fourth arrival left 14 of them that the camp's buyer had missed
+        sh = run("shipstar.py", timeout=900)
+        print("shipstar: " + (str(sh).strip().splitlines() or ["?"])[-1][:160])
         p = run("packcheck.py", "--move", timeout=1200)
         print("the closing pass: " + " / ".join(ln.strip() for ln in str(p).splitlines() if "out of place" in ln or "decide:" in ln))
     if p.rc != 0:
