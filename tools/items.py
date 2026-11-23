@@ -296,6 +296,13 @@ def protected(it, items=None, carry=None, kit=True):
         best = best_ranged(items if items is not None else inventory())
         if best and best.get("uid") == it.get("uid"):
             return "kit (the ranged weapon in use: the best carried)"
+    # the user, run 58: "All tools (Shovel, Axe, etc) should be palced in the 'hot bar' area ... so they are never lost/removed
+    # again": a carried tool is kit whatever tool asks (the game's category _tool, the lockpick's id), one of each kind on the hotbar
+    if kit and (it.get("cat") == "_tool" or it.get("id") == "lockpick") and (it.get("bless") or 0) >= 0:
+        return "kit (a tool: the hotbar, run 58)"
+    # run 58: a sale list held ★Putit In Amber (the thrown opener), unprotected since it left the kit kinds: ★ things stay
+    if kit and it["name"].startswith("\u2605") and (it.get("cat") or "") in GEAR_CATS + ("ranged", "weapon"):
+        return "kit (a \u2605 piece)"
     if it.get("container") and (it.get("count") or it.get("locked")):
         return "a container that isn't empty" + (" (locked: unread)" if it.get("locked") else "")
     name = (it.get("name") or "").lower()

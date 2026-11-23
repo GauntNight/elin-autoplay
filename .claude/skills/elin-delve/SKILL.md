@@ -59,7 +59,9 @@ layers stand in this order: `knowledge/risk.md` (the user, run 16). Kit: **elin-
   ~890 at 6-7, platinum 1-3 at every level; masters sit on B2-B4, so the band's top stays under the gate by the floors
   below the first (fact #1136: base 11-12 nefias met the gate before their master). **Add a row at every conquest**: the
   file has none after run 40 (the review of 2026-11-11), so the current mix is unrecorded.
-- **No underwater dungeons** (the user, run 17: "you can't do those kinds of dungeons"): an "Underwater Ruin"
+- **Underwater ruins count while ★《Sea Dragon Ribbon》 is worn** (run 58: it lets me breathe water for good; `circuit.py` reads the
+  game's breathesWater and passes `--breathe`). **Without water breathing, none** (the user, run 17: "you can't do those kinds of
+  dungeons"): an "Underwater Ruin"
   (Zone_dungeon_water) suffocates every turn (ConSuffocation) on top of the fight: 112 -> 20 HP on a danger 4 B1 while
   delve.py waited on its HP rule, and the user walked me out. `wgo.py` and `delve.py` refuse them unless `--breathe`,
   which is for water breathing in hand. **With it** (run 55, the Sunken Temple of Lurie B1-B4 with the Forest Gloves on):

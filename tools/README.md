@@ -164,7 +164,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
            python -I tools/chests.py --field   on a trip (run 41: five chests on a dig tour, 15 weight each, Burden phase 2): the money, medals,
                                                unidentified pieces and books go into the pack and bags, the chest stays on the tile with the rest
     Exit 0 done (or none), 1 refused (not at home), 3 stopped (the pack full: a chest left as it is).
-- **`circuit.py`**: The nefia circuit as one loop (the review of 2026-10-30, the user's ok): run 30's 820 points an hour was this done by hand. From the world map: `places` -> the nearest unconquered nefia of base danger LO-HI within R tiles (no underwater ones) -> wgo.py there -> Enter -> ladder.py (the gate, FLOORS floors) -> on "conquered" evac.py out -> repeat, until N nefias, or a ladder stop that isn't a conquest, or the unload is due.
+- **`circuit.py`**: The nefia circuit as one loop (the review of 2026-10-30, the user's ok): run 30's 820 points an hour was this done by hand. From the world map: `places` -> the nearest unconquered nefia of base danger LO-HI within R tiles (underwater ones only while I breathe water, run 58) -> wgo.py there -> Enter -> ladder.py (the gate, FLOORS floors) -> on "conquered" evac.py out -> repeat, until N nefias, or a ladder stop that isn't a conquest, or the unload is due.
     usage: python -I tools/circuit.py [N=4] [--danger LO-HI=3-7] [--r 15] [--floors 5] [--unattended] [--solo] [--wrecks] [--danger-ok N] [--skip NAME ...] [--blanket-ok 'why']
       --blanket-ok 'why'  passed to each ladder: a nefia with no charged blanket, a row in runs/waivers.csv each time (the user, 2026-11-06)
       --wrecks  mine the wrecks on each floor (ladder.py without --no-wrecks; run 34, G35: iron wrecks drop a battery and a
@@ -413,6 +413,11 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`identifyall.py`**: Have a mage identify everything in the pack and bags in one step (run 43: done by hand on each pass of Tinker's Camp since run 08: a talk, three clicks, a Bye). Reads the price from the dialog and stops over MAX. Godly pieces aren't covered: the mage's artifact service does those, one at a time, and only when the slot can beat what's worn (elin-pack 3).
     usage: python -I tools/identifyall.py [NAME=Aliyun] [MAX=1500]   stand near NAME (at Tinker's Camp: bridge.py walkto 60 55)
     Exit 0 done (or nothing to identify), 1 refused (not in view, no such service), 3 a dialog that didn't read as expected.
+- **`identifyartifact.py`**: Have a mage's artifact service identify the carried Godly (and Special) pieces, one per conversation (run 58; by hand in runs 11, 16, 44 and 49: a talk, the service's line, a Yes, a drag onto the grid under the drama, a close, a Bye, fourteen times over). "Identify all" (identifyall.py) doesn't cover them. The grid lists the pack's own cards, so each piece is moved out of its bag first. Fact #1450: 377 orens a piece at shop level 15, and a second drag in the same conversation is refused.
+    usage: python -I tools/identifyartifact.py [NAME=Aliyun] [MAX=700] [--match TEXT] [--dry]   beside NAME
+      MAX     the most orens a piece: a dearer price is answered No and the run ends
+      --match only the pieces whose name holds TEXT (default "(Godly)")
+    Exit 0 done (or nothing to identify), 1 refused (not in view, no such service), 3 a dialog or grid that didn't read as expected.
 - **`invest.py`**: Invest in a shopkeeper's shop (G26, the Merchants Guild: run 29) when the price is low enough.
     usage: python -I tools/invest.py NAME [MAX=600] [TIMES=1]
     Exit 0 invested (or priced over MAX: the price is printed), 1 refused (not in view, no Invest choice), 3 a

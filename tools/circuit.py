@@ -1,6 +1,6 @@
 """The nefia circuit as one loop (the review of 2026-10-30, the user's ok): run 30's 820 points an hour was this
 done by hand. From the world map: `places` -> the nearest unconquered nefia of base danger LO-HI within R
-tiles (no underwater ones) -> wgo.py there -> Enter -> ladder.py (the gate, FLOORS floors) -> on "conquered"
+tiles (underwater ones only while I breathe water, run 58) -> wgo.py there -> Enter -> ladder.py (the gate, FLOORS floors) -> on "conquered"
 evac.py out -> repeat, until N nefias, or a ladder stop that isn't a conquest, or the unload is due.
 
 The home unload every UNLOAD_EVERY nefias (four since run 40: the bags fill) is NOT done here: the loop stops with
@@ -156,7 +156,11 @@ def candidates(lo, hi, r, skip=()):
     out = []
     for p in rep["data"]["places"]:
         m = re.search(r"\(Danger Lv\.(\d+)\)", p["name"])
-        if not m or "Conquered" in p["name"] or "Underwater" in p["name"] or "water" in str(p.get("id") or ""):
+        if not m or "Conquered" in p["name"]:
+            continue
+        # run 58: ★《Sea Dragon Ribbon》 is worn for good and lets me breathe underwater, so underwater ruins (a quarter of all
+        # sites) count while the game's own flag says so; each ladder floor and delve pass reads it again (run 55's rule)
+        if ("Underwater" in p["name"] or "water" in str(p.get("id") or "")) and not (state().get("pc") or {}).get("breathesWater"):
             continue
         if any(k.lower() in p["name"].lower() for k in skip):  # run 34: a master below the gate (Ancient Grassland)
             continue
@@ -231,6 +235,8 @@ def main():
     # seller had one; the escape kit itself is fire-safe: rods of teleport and the Evacuation spell)
     # 2026-11-06, the user: the flag now carries its reason, and run 42 passed it on every circuit without one
     extra = [a for a in ("--unattended", "--solo", "--expendable") if a in args]
+    breathe = ["--breathe"] if (state().get("pc") or {}).get("breathesWater") else []
+    extra += breathe
     blanket_why = waiver_reason("--blanket-ok")
     if blanket_why:
         extra += ["--blanket-ok", blanket_why]
@@ -318,7 +324,7 @@ def main():
                 # routes before the first step (rc 1), so the next candidate is tried instead of ending the circuit
                 for dist, danger, p in cands:
                     print(f"[{done + 1}/{n}] {p['name']} at {dist} tiles", flush=True)
-                    w = run("wgo.py", p["name"], "--ambush", "--weak-ok", *dok, timeout=900)
+                    w = run("wgo.py", p["name"], "--ambush", "--weak-ok", *breathe, *dok, timeout=900)
                     # run 45: "no place 'Rustic Forest (Danger Lv.11)' listed" twice: it expired between this list and wgo's own
                     if w.rc == 1 and ("the route crosses ambush level" in w or "no place" in w and "listed" in w):
                         print(f"  skipped: {last(w)[:110]}", flush=True)
