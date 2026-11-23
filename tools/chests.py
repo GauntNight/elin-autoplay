@@ -82,25 +82,34 @@ def field():
                 stop(f"{len(bagged())} chests in the bags behind a full grid ({free_cards()} free): drop or bag a stack, then again")
             print("no chest left in the pack")
             return
-        # run 41: a chest's name varies ("a madam's favorite mystic treasure chest"), and listing the first while dropping the
-        # second left 2,086 orens and 3 bars on a danger 34 field: the full name, every call, and the drop checks it's empty
-        NAME = carried()[0]["name"]
-        items = split_listing(last(run("bag.py", NAME)))
-        keep = [i.lstrip("★") for i in items if (KEEP.search(i) or re.match(r"An? [A-Z]", i)) and "learned x" not in i.lower()]
-        print(f"chest: keep {keep}; left behind {[i for i in items if i.lstrip('★') not in keep]}")
-        run("item.py", NAME, "Close")
-        while keep:
+        # run 41: a chest's name varies, and listing the first while dropping the second left 2,086 orens and 3 bars on a danger
+        # 34 field. Run 58: four chests of one name: the bars of one went into another, and the drop of a chest that still held
+        # its junk was refused (item.py, run 57). One chest at a time by its uid, its contents by theirs
+        import items as inv
+        its = inv.inventory()
+        c = next((i for i in its if BASE in i["name"].lower() and not i.get("path") and not i.get("locked")), None)
+        if c is None:
+            print("no unlocked chest in the pack's own grid")
+            return
+        inside = [i for i in its if (i.get("path") or [None])[-1] == c["uid"]]
+        keep = [i for i in inside if (KEEP.search(i["name"]) or re.match(r"An? [A-Z]", i["name"]) or i["name"].startswith(("\u2606", "\u2605")))
+                and "learned x" not in i["name"].lower()]
+        print(f"chest: keep {[i['name'] for i in keep]}; left behind {[i['name'] for i in inside if i not in keep]}")
+        ups = [f"uid:{i['uid']}" for i in keep]
+        while ups:
             room = max(1, free_cards() - 1)
-            batch, keep = keep[:room], keep[room:]
-            out = run("bag.py", NAME, "--take", *batch)
-            run("item.py", NAME, "Close")
+            batch, ups = ups[:room], ups[room:]
+            out = run("bag.py", f"uid:{c['uid']}", "--take", *batch)
+            run("close.py")
             if out.rc:
                 print(out.strip())
-            to_bags(batch)
-        if twin_locked(NAME):
-            print(f"  {NAME}: a locked chest has the same name: it stays in the pack until unlock.py opens that one")
-            return
-        out = run("item.py", NAME, "Drop")
+            to_bags([i["name"] for i in keep if f"uid:{i['uid']}" in batch])
+        its = inv.inventory()
+        left = [i["name"] for i in its if (i.get("path") or [None])[-1] == c["uid"]]
+        bad = [n for n in left if n in {i["name"] for i in keep} and not any(x in n for x in ("orens",))]
+        if bad:
+            stop(f"{bad} wouldn't come out of the chest (uid:{c['uid']}): make room, then again")
+        out = run("item.py", f"uid:{c['uid']}", "Drop", "--full-ok")
         print("  " + last(out))
         if out.rc or "has no" in last(out):
             stop("a chest can't be dropped here (the world map offers no Drop): run it on a local map")

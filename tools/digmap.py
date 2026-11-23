@@ -5,7 +5,7 @@ bars, 2 medals, two pieces, about 2 real minutes with the walk.
 
 usage: python -I tools/digmap.py --list                 every carried map's spot, nearest first
        python -I tools/digmap.py --plan [X,Z]             a greedy tour of them from here or X,Z, with each leg's worst ambush level
-       python -I tools/digmap.py [N=1] [--max-dist D=70] [--danger-ok N]   the nearest N maps: walk, dig, pick the chest, list it
+       python -I tools/digmap.py [N=1] [--max-dist D=70] [--danger-ok N] [--tour]   the nearest N maps: walk, dig, pick the chest, list it (over 3: --tour)
 Between legs it eats (entering the tile's field map) and sleeps on the world map when wgo.py stops for it. Each dig is a row in
 runs/digs.csv: real seconds, game hours, map level, walk length, orens, bars, medals and the rest of the chest.
 The chests ride home closed; their money counts as carried (elin-pack), so arrive.py's chest step empties them.
@@ -246,6 +246,9 @@ def main():
         return
     pos = [a for a in args if a.isdigit() and args[args.index(a) - 1] not in ("--max-dist", "--danger-ok")]
     n = int(pos[0]) if pos else 1
+    # run 58: "digmap.py 14" meant a distance and was a count: four maps and twenty game days across the region
+    if n > 3 and "--tour" not in args:
+        refuse(f"{n} maps is a tour across the region (--plan shows its legs): pass --tour on purpose; a distance is --max-dist {n}")
     max_dist = int(args[args.index("--max-dist") + 1]) if "--max-dist" in args else 70
     danger_ok = int(args[args.index("--danger-ok") + 1]) if "--danger-ok" in args else 0
     done = 0

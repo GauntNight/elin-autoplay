@@ -261,7 +261,7 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
 - **`digmap.py`**: Dig up treasure maps (G44, the user 2026-11-04; run 41): the dig is on the world map itself. Each carried map's spot is in bridge `places` (TraitScrollMapTreasure.GetDest); a shovel in hand on that tile offers "Dig (Easy)" (TaskDig), and "You dig up the treasure" leaves an unguarded mystic treasure chest on the tile, unlocked. The first one (run 41, Lv21): 1,753 orens, 2 gold bars, 2 medals, two pieces, about 2 real minutes with the walk.
     usage: python -I tools/digmap.py --list                 every carried map's spot, nearest first
            python -I tools/digmap.py --plan [X,Z]             a greedy tour of them from here or X,Z, with each leg's worst ambush level
-           python -I tools/digmap.py [N=1] [--max-dist D=70] [--danger-ok N]   the nearest N maps: walk, dig, pick the chest, list it
+           python -I tools/digmap.py [N=1] [--max-dist D=70] [--danger-ok N] [--tour]   the nearest N maps: walk, dig, pick the chest, list it (over 3: --tour)
     Between legs it eats (entering the tile's field map) and sleeps on the world map when wgo.py stops for it. Each dig is a row in
     runs/digs.csv: real seconds, game hours, map level, walk length, orens, bars, medals and the rest of the chest.
     The chests ride home closed; their money counts as carried (elin-pack), so arrive.py's chest step empties them.
@@ -670,6 +670,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
             silver 27; not broken by default because the coins are currency)
 - **`sell.py`**: Sell chosen things to a shopkeeper, at home or in town (G70 Smart Storage M3, run 57; the user, 2026-11-21: "It may also help to have a Store in our home so we can sell things locally when we run out of time/room", then "for a store I just mean a Shopkeeper in town that we can use"). Run 57's M0 read: Samata the healer (home, shop level 2) bought a ☆ laser gun for 1,284 orens with no category gate; the shipping chest pays ~1.1x a shop's price but takes ~40 stacks a morning (fact #1001), so this is the outlet for what the chest refuses or what can't wait for a morning.
     usage: python -I tools/sell.py SHOPKEEPER uid:N [uid:N ...] [--find] [--dry]
+           python -I tools/sell.py SHOPKEEPER --excess [--find] [--dry]   the carried stacks over stock.py's caps (kit rods included: the
+                                           copies kept are stock.py's best; run 58: 12 rods over their caps rode home in the grid four times)
     Exit 0 sold (or --dry listed), 1 refused (a protected thing, nothing to sell, no shopkeeper), 2 the bridge,
     3 stopped (the buyer's gold ran out, a window, the Find walk didn't arrive).
 - **`sendhome.py`**: Send every party member home: walk beside it, Talk, "Wait at your home", close (fact #1435).
