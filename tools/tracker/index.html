@@ -5,6 +5,7 @@
 .rt-key { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-lg); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-sm); }
 .rt-key span { display: inline-flex; align-items: center; gap: var(--cds-gap-xs); }
 .rt-key i { display: inline-block; width: 14px; height: 0; border-top: 2px dashed var(--cds-chart-reference); }
+.rt-key i.upd { border-top: 2px dotted var(--color-fg-muted); }
 .rt-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: var(--cds-gap-md); }
 .rt-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 5.5rem; }
 .rt-tile .k { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
@@ -43,6 +44,7 @@
     <p class="rt-take dash-skeleton" id="take" data-source="latest">&nbsp;</p>
     <div class="rt-key">
       <span><i></i>The four review refactors (after runs 12, 20, 33 and 45) mark the epochs 0-4</span>
+      <span><i class="upd"></i>An update line is a game update (EA 23.362 after run 57); a run after it plays on new game code</span>
       <span>Hover a chart for each run's numbers and the model that played it</span>
     </div>
   </header>
@@ -284,10 +286,13 @@ function draw(c, rows) {
     .attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((p) => p);
   for (const ev of rows.filter((r) => r.kind !== 'run')) {
     g.append('line').attr('x1', cxOf(ev.point)).attr('x2', cxOf(ev.point)).attr('y1', 12).attr('y2', H - 22)
-      .attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
-    // only reviews reach here: the metrics rows are filtered out; an epoch chart names the epochs instead
-    if (c.kind !== 'epoch') g.append('text').attr('x', cxOf(ev.point)).attr('y', 7).attr('text-anchor', 'middle').attr('font-size', 10)
-      .attr('fill', 'var(--color-fg-muted)').text('refactor');
+      .attr('stroke', ev.kind === 'game' ? 'var(--color-fg-muted)' : 'var(--cds-chart-reference)').attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', ev.kind === 'game' ? '1 3' : '4 3');
+    // reviews and game updates reach here (the user, run 58: mark the game update): the metrics rows are filtered out; an
+    // epoch chart names the epochs instead of the reviews, and starts no epoch at a game update
+    if (c.kind !== 'epoch' || ev.kind === 'game') g.append('text').attr('x', cxOf(ev.point)).attr('y', ev.kind === 'game' ? 18 : 7)
+      .attr('text-anchor', 'middle').attr('font-size', 10)
+      .attr('fill', 'var(--color-fg-muted)').text(ev.kind === 'game' ? 'update' : 'refactor');
   }
   // the refactor epoch of each run (a review row starts the next) and each epoch's mean of the measure
   const epOf = new Map(), epMean = new Map();
@@ -431,7 +436,7 @@ const N = (x) => (x === undefined || x === null || x === '' ? null : (Number.isF
 const cmp = document.querySelector('#cmp tbody');
 const tbl = document.getElementById('tbl');
 const COLS = [
-  ['point', 'Run', 'l'], ['date', 'Date', 'l'], ['model', 'Model', 'l'], ['character', 'Character', 'l'], ['minutes', 'Minutes'],
+  ['point', 'Run', 'l'], ['date', 'Date', 'l'], ['model', 'Model', 'l'], ['game_version', 'Game', 'l'], ['character', 'Character', 'l'], ['minutes', 'Minutes'],
   ['points', 'Points'], ['points_per_hour', 'Points/hour'],
   ['game_days', 'Game days'], ['level', 'Level'], ['exp_gained', 'Exp gained'], ['exp_per_hour', 'Exp/hour'], ['gold', 'Gold'], ['orens_per_hour', 'Orens/hour'], ['rent_per_hour', 'Rent/hour'], ['wealth', 'Wealth'], ['planned_pct', 'Plan %'],
   ['deaths', 'Deaths'], ['near_deaths', 'Near deaths'], ['lowest_hp_pct', 'Lowest HP %'], ['jobs', 'Jobs'],
@@ -440,7 +445,7 @@ const COLS = [
   ['karma', 'Karma'], ['tool_files', 'Tool files'], ['tool_files_new', 'New tools'], ['facts_added', 'Facts added'],
   ['index_entries', 'Index entries'], ['query_ms', 'Query ms'],
 ];
-const TEXT = new Set(['point', 'date', 'model', 'character']);
+const TEXT = new Set(['point', 'date', 'model', 'game_version', 'character']);
 
 dash.onData(() => {
   const R = dash.data('refactor');

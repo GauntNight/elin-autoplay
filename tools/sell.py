@@ -93,10 +93,17 @@ def main():
         for it in sell:
             print(f"  would sell: {it['name']} ({inv.where(it, carried)})")
         return
-    ready = []
+    ready, later = [], []
     for it in sell:
         if it.get("path"):
+            if later:  # the grid filled already: the rest wait for the next round
+                later.append(it["uid"])
+                continue
             ok, why = inv.to_pack(it, inv.inventory())
+            if not ok and "grid is full" in str(why):
+                # run 58: 31 rods in the bags and 6 free cards: one call sold 6 and left 25. The rest go in the next round
+                later.append(it["uid"])
+                continue
             if not ok:
                 # run 57: 11 holy boots in a lame purse inside the worn toolbelt refused the whole batch: skip that one
                 print(f"  left: {it['name']} won't come out of {inv.where(it, carried)}: {why}")
@@ -182,6 +189,12 @@ def main():
         print(f"wouldn't sell even after a Restock: {', '.join(unsold)}")
     if why_stop:
         stop(why_stop)
+    if later and sold:
+        print(f"next round: {len(later)} that waited for grid room", flush=True)
+        sys.argv = [sys.argv[0], who, *(f"uid:{u}" for u in later)] + (["--find"] if find else [])
+        main()
+    elif later:
+        print(f"left in the bags (the pack's grid is full and nothing sold): {len(later)}")
 
 
 if __name__ == "__main__":

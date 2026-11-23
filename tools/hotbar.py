@@ -5,6 +5,8 @@ run 04). Moves go through the bridge's `drag` op, the game's own drop transactio
 usage: python -I tools/hotbar.py                 list the slots on this page
        python -I tools/hotbar.py ITEM [ITEM ...]  put each item on an empty slot
        python -I tools/hotbar.py --take ITEM      move it back into the backpack grid
+       python -I tools/hotbar.py --tools          every carried tool on the hotbar (the user, run 58), one of a kind; exit 1
+                                                  when one has no slot
        python -I tools/hotbar.py --deselect       empty the hands: a selected slot is the held item
                                                   (right-click then means Place/Throw, not Collect)
 Good hotbar residents: the Putit In Amber, the bow, potions, teleport scrolls, the pickaxe,
@@ -57,8 +59,57 @@ def deselect():
     return held() is None
 
 
+def is_tool(it):
+    """A tool by the game's own table (category _tool: shovel, pickaxe, axe, hoe, sickle, hammer, fishing rod, butcher's
+    tool ...) or a lockpick; never by a word in its name (elin-play's hard rule)."""
+    return it.get("cat") == "_tool" or it.get("id") == "lockpick"
+
+
+def put_tools():
+    """The user, run 58: "All tools (Shovel, Axe, etc) should be palced in the 'hot bar' area where the cooler is so they are
+    never lost/removed again" (run 57 lost the shovel and the pickaxe with a bag dropped on a dig tour; run 55 four tools).
+    One of each kind goes on (of two lockpicks the one with the most charges); a tool in a bag comes out of it first."""
+    import items as inv
+    its = inv.inventory()
+    best = {}
+    for it in its:
+        if is_tool(it) and it.get("bless", 0) >= 0:
+            b = best.get(it["id"])
+            if b is None or (it.get("charges") or 0) > (b.get("charges") or 0):
+                best[it["id"]] = it
+    missing = []
+    for it in best.values():
+        if not it.get("path") and any(norm(b.get("card")) == norm(it["name"]) for b in hot(buttons())):
+            continue  # on it already
+        if it.get("path"):
+            ok, why = inv.to_pack(it, its)
+            if not ok:
+                missing.append(f"{it['name']} ({why})")
+                continue
+        bs = buttons()
+        src = [b for b in grid(bs) if norm(b.get("card")) == norm(it["name"]) and b.get("in") == "pack"]
+        dst = [b for b in reversed(hot(bs)) if not b.get("card")]
+        if not src or not dst:
+            missing.append(f"{it['name']} ({'no empty hotbar slot' if src else 'not in the backpack grid'})")
+            continue
+        r = call("drag", i=src[0]["i"], j=dst[0]["i"])
+        if not (r.get("ok") and r["data"].get("accepted")):
+            missing.append(f"{it['name']} ({r.get('error') or r})")
+            continue
+        print(f"{it['name']}: on the hotbar")
+        time.sleep(0.5)
+    slots = " | ".join(f"{n}:{b.get('card') or '-'}" for n, b in enumerate(reversed(hot(buttons())), 1))
+    print(f"tools carried: {', '.join(it['name'] for it in best.values()) or 'none'}; hotbar {slots}")
+    if missing:
+        print("not on the hotbar: " + "; ".join(missing))
+        return 1
+    return 0
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if "--tools" in sys.argv:
+        sys.exit(put_tools())
     if "--deselect" in sys.argv:
         h = held()
         print(f"held {h!r} -> " + ("hands empty" if deselect() else f"still {held()!r}"))

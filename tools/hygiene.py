@@ -25,6 +25,8 @@ Findings (exit 1; each a line a review had to fix by hand once):
     distance and heal-to numbers (a regex per row; an unreadable row is a finding too)
   - the gate's step down (the user's step rule, 2026-11-12; run 55 missed it): runstats.csv's latest row
     with near_deaths > 0 and no "run NN down" or "run NN kept: WHY" in the max_danger line of common.py
+  - the game's version (the user, run 58): the latest run with no row in runs/versions.csv (power.py --log writes it), or a
+    version that changed between two runs with no `game` row after the earlier one in runs/events.csv
   - the milestone lock (the run score's rules, the user 2026-10-26): a milestone in goals.md that
     knowledge/milestones.csv doesn't list (added or split without the user's yes), and one ticked
     since its approval without its run: `- [x] Mn (DATE, run NN)` (stats.py counts those)
@@ -289,6 +291,27 @@ def gate_step_check(findings):
                         f"'run {run} kept: WHY' (elin-delve 5)")
 
 
+def version_check(findings, latest):
+    """The user, run 58: "in the larger tracking system we mark the game update (in case of an unusual number of fixes or
+    other events)": every run has its game version, and every change between two runs its `game` event."""
+    path, ev_path = RUNS / "versions.csv", RUNS / "events.csv"
+    if not path.exists():
+        findings.append("runs/versions.csv is missing: power.py --log RUN writes each run's game version")
+        return
+    rows = list(csv.DictReader(path.open(encoding="utf-8", newline="")))
+    evs = list(csv.DictReader(ev_path.open(encoding="utf-8", newline=""))) if ev_path.exists() else []
+    marked = {e["after"] for e in evs if e["kind"] == "game"}
+    if latest and not any(r["run"].isdigit() and int(r["run"]) == latest for r in rows):
+        findings.append(f"runs/versions.csv: run {latest} has no game version (power.py --log {latest} writes it)")
+    for a, b in zip(rows, rows[1:]):
+        if a["version"] != b["version"] and a["run"] not in marked:
+            findings.append(f"runs/events.csv: the game went {a['version']} -> {b['version']} between runs {a['run']} and "
+                            f"{b['run']} with no `game` row after {a['run']} (the tracker's update line comes from it)")
+    for e in evs:
+        if e["kind"] == "game" and "goes here" in (e.get("note") or ""):
+            findings.append(f"runs/events.csv: {e['id']} ({e['label']}) still has the placeholder note: say what the update changed for play")
+
+
 def main():
     if not (RUNS / "metrics.csv").exists():  # logs are gitignored: a fresh clone has none
         print("no records yet on this PC: a new player starts with the elin-setup skill (tools/newgame.py --yes)")
@@ -449,6 +472,7 @@ def main():
     errors_check(findings, latest, stems)
     lessons_checks(findings, advisories, dates)
     thresholds_check(findings)
+    version_check(findings, latest)
     gate_step_check(findings)
     milestones_check(findings, goals)
 

@@ -8,7 +8,10 @@ usage: python -I tools/power.py                 the power card and a danger tabl
                                                 also append a row to runs/power.csv (session start/end;
                                                 the row carries the real clock, and --tag names the
                                                 activity whose edge this is: nefia, jobs, home, travel,
-                                                train, build, town, mine, farm; stats.py reads both)
+                                                train, build, town, mine, farm; stats.py reads both);
+                                                the run's first --log also records the game version in
+                                                runs/versions.csv, and a version that changed since the
+                                                run before gets its own `game` row in runs/events.csv
        python -I tools/power.py fight FOE LV N TURNS HP_LOST RESULT RUN [NOTE]
                                                 record a fight (N foes at once, HP I lost) for calibration
 """
@@ -25,6 +28,8 @@ from bridge import call  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 FIGHTS = ROOT / "knowledge" / "fights.csv"
 POWER = ROOT / "runs" / "power.csv"
+VERSIONS = ROOT / "runs" / "versions.csv"
+EVENTS = ROOT / "runs" / "events.csv"
 
 # Priors for a foe of level L (hypotheses, replaced by fights.csv where it has data):
 # PV and DV are L + equipment for non-allies (Chara.PV/DV); evasion adds 25 and a small skill
@@ -424,6 +429,44 @@ def main():
                         # from ~24 to ~9.5 a turn (a shield in the off hand since run 30) for seven runs
                         round(max(best.get("melee", 0), best.get("martial", 0)), 1), round(vs_fixed, 1)])
         print(f"logged to {POWER.relative_to(ROOT)}" + (f" (tag {tag})" if tag else ""))
+        note_version(run)
+
+
+def note_version(run):
+    """runs/versions.csv: the game version each run played on, written once a run; a change since the run before also
+    writes a `game` row in runs/events.csv, which stats.py and the tracker mark (the user, run 58: "in the larger tracking
+    system we mark the game update (in case of an unusual number of fixes or other events)")."""
+    import json
+    from kb import INSTALL_VERSION
+    if not INSTALL_VERSION.exists():
+        print(f"game version: not recorded ({INSTALL_VERSION} is missing)")
+        return
+    v = json.loads(INSTALL_VERSION.read_text(encoding="utf-8-sig"))
+    text, built = v.get("versionText") or v.get("version") or "?", (v.get("buildDate") or "")[:10]
+    rows = []
+    if VERSIONS.exists():
+        with VERSIONS.open(encoding="utf-8", newline="") as fh:
+            rows = list(csv.DictReader(fh))
+    if any(r["run"] == run for r in rows):
+        return
+    new = not VERSIONS.exists()
+    with VERSIONS.open("a", encoding="utf-8", newline="") as fh:
+        w = csv.writer(fh, lineterminator="\n")
+        if new:
+            w.writerow(["run", "version", "build_date", "channel"])
+        w.writerow([run, text, built, v.get("channel") or ""])
+    before = rows[-1] if rows else None
+    print(f"game version: {text} (build {built}), recorded for run {run}")
+    if before and before["version"] != text and EVENTS.exists():
+        with EVENTS.open(encoding="utf-8", newline="") as fh:
+            evs = list(csv.DictReader(fh))
+        gid = f"G{sum(1 for e in evs if e['kind'] == 'game') + 1}"
+        with EVENTS.open("a", encoding="utf-8", newline="") as fh:
+            csv.writer(fh, lineterminator="\n").writerow(
+                [gid, before["run"], built, "game", f"Game update {before['version']} -> {text}", "", "", "",
+                 f"run {run} is the first on {text}; what it changed for play goes here"])
+        print(f"  the game changed since run {before['run']} ({before['version']}): {gid} in runs/events.csv; write what it "
+              "changed for play in its note, and rebuild the graph (kb.py build)")
 
 
 if __name__ == "__main__":

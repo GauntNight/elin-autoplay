@@ -396,6 +396,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     usage: python -I tools/hotbar.py                 list the slots on this page
            python -I tools/hotbar.py ITEM [ITEM ...]  put each item on an empty slot
            python -I tools/hotbar.py --take ITEM      move it back into the backpack grid
+           python -I tools/hotbar.py --tools          every carried tool on the hotbar (the user, run 58), one of a kind; exit 1
+                                                      when one has no slot
            python -I tools/hotbar.py --deselect       empty the hands: a selected slot is the held item
                                                       (right-click then means Place/Throw, not Collect)
     Good hotbar residents: the Putit In Amber, the bow, potions, teleport scrolls, the pickaxe,
@@ -475,8 +477,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       --unattended  the danger cap one lower (THRESHOLDS unattended_minus): nobody is watching the screen
       --kit-ok 'why'  skip the escape-kit count (a deliberate short trip); the reason goes to runs/waivers.csv
       --blanket-ok 'why'  waive only the fireproof blanket (run 36: none for sale; the rest of the kit is still counted); a row in runs/waivers.csv each time it is used
-- **`leave.py`**: Leave a local outdoor map (ambush site, wilds, home) back to the world map through the nearest border cell that offers "Enter". If no explored border cell is known (ambush maps start mid-map, run 03), walk straight toward the nearest side of the map's bounds (bridge 0.11.0 `zone.bounds`) and look again. Refuses (exit 1) while a hostile is in view unless --force, and at home while the pack holds items off the trip kit, holds no shovel, carries under 3 fireproof blankets or 5 lockpick charges while storage holds more, or the Dishes box is shared; anywhere, while the party is over the ally cap. Stops (exit 3) when a dialog opens on the way out (an escort client out of reach: answered No), when a hostile comes into view or stands adjacent on the way to the edge, and when no exit is found.
-    usage: python -I tools/leave.py [--force] [--pack-ok] [--dishes-ok] [--gear-ok] [--shovel-ok] [--food-ok]
+- **`leave.py`**: Leave a local outdoor map (ambush site, wilds, home) back to the world map through the nearest border cell that offers "Enter". If no explored border cell is known (ambush maps start mid-map, run 03), walk straight toward the nearest side of the map's bounds (bridge 0.11.0 `zone.bounds`) and look again. Refuses (exit 1) while a hostile is in view unless --force, and at home while the pack holds items off the trip kit, holds no shovel, has a tool off the hotbar, carries under 3 fireproof blankets or 5 lockpick charges while storage holds more, or the Dishes box is shared; anywhere, while the party is over the ally cap. Stops (exit 3) when a dialog opens on the way out (an escort client out of reach: answered No), when a hostile comes into view or stands adjacent on the way to the edge, and when no exit is found.
+    usage: python -I tools/leave.py [--force] [--pack-ok] [--dishes-ok] [--gear-ok] [--shovel-ok] [--tools-ok] [--food-ok]
                                     [--blanket-ok 'why'] [--pick-ok 'why'] [--party-ok] [--rations-ok]
     At home it first checks the pack (packcheck.py) and makes the Dishes box private (dishes.py). --blanket-ok and --pick-ok
     need a reason, and leaving short of either writes a row to runs/waivers.csv, which the close-out reports (the user, 2026-11-06).
@@ -592,7 +594,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
                                                     also append a row to runs/power.csv (session start/end;
                                                     the row carries the real clock, and --tag names the
                                                     activity whose edge this is: nefia, jobs, home, travel,
-                                                    train, build, town, mine, farm; stats.py reads both)
+                                                    train, build, town, mine, farm; stats.py reads both);
+                                                    the run's first --log also records the game version in
+                                                    runs/versions.csv, and a version that changed since the
+                                                    run before gets its own `game` row in runs/events.csv
            python -I tools/power.py fight FOE LV N TURNS HP_LOST RESULT RUN [NOTE]
                                                     record a fight (N foes at once, HP I lost) for calibration
 - **`publishcheck.py`**: Is this repo fit to publish? (2026-11-04, before the first push.) Scans what a push would send for what must never leave this PC: names and account details, private claude.ai links, real-life schedule notes, network ids, secrets, and files that aren't ours to share. It prints where each hit is, with the value masked, and exits 1 on any.

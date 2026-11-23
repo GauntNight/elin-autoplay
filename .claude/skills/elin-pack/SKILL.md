@@ -14,7 +14,7 @@ gear. The user's rule (run 08): **the pack is for the trip; everything else live
 | Slot | Item | Minimum |
 |---|---|---|
 | worn | weapon, armour, torch (light slot) | - |
-| hotbar 1-9 | Putit In Amber, bow, cure potions, bandages, rod of teleport, Cooler Box, throwing daggers, pickaxe, shovel, evacuation | the hotbar is free space outside the pack grid; the shovel (the user, 2026-10-29: medals) and leave.py refuses home without one |
+| hotbar 1-9 | **every carried tool** (shovel, pickaxe, axe, lockpick ...), Putit In Amber, Cooler Box, return scrolls, cure potions | **tools live on the hotbar, never in a bag** (the user, run 58: "so they are never lost/removed again"; run 57 lost the shovel and the pickaxe with a dropped bag): `hotbar.py --tools` puts them there and leave.py runs it at the door; the hotbar is free space outside the pack grid; the shovel (the user, 2026-10-29: medals) and leave.py refuses home without one |
 | pack | scrolls of teleport | 2+ for a dungeon, 4 is comfortable (road ambushes used 2 in run 08) |
 | pack | scroll of evacuation, scroll of return | 1 each |
 | pack | cure minor wound, plus one cure major | 5+ potions |

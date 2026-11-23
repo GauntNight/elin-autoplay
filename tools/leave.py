@@ -2,12 +2,12 @@
 nearest border cell that offers "Enter". If no explored border cell is known (ambush maps
 start mid-map, run 03), walk straight toward the nearest side of the map's bounds (bridge
 0.11.0 `zone.bounds`) and look again. Refuses (exit 1) while a hostile is in view unless --force,
-and at home while the pack holds items off the trip kit, holds no shovel, carries under 3 fireproof blankets
+and at home while the pack holds items off the trip kit, holds no shovel, has a tool off the hotbar, carries under 3 fireproof blankets
 or 5 lockpick charges while storage holds more, or the Dishes box is shared; anywhere, while the party is over the ally cap. Stops
 (exit 3) when a dialog opens on the way out (an escort client out of reach: answered No), when a
 hostile comes into view or stands adjacent on the way to the edge, and when no exit is found.
 
-usage: python -I tools/leave.py [--force] [--pack-ok] [--dishes-ok] [--gear-ok] [--shovel-ok] [--food-ok]
+usage: python -I tools/leave.py [--force] [--pack-ok] [--dishes-ok] [--gear-ok] [--shovel-ok] [--tools-ok] [--food-ok]
                                 [--blanket-ok 'why'] [--pick-ok 'why'] [--party-ok] [--rations-ok]
 At home it first checks the pack (packcheck.py) and makes the Dishes box private (dishes.py). --blanket-ok and --pick-ok
 need a reason, and leaving short of either writes a row to runs/waivers.csv, which the close-out reports (the user, 2026-11-06).
@@ -215,6 +215,13 @@ def main():
         if not carried(lambda n: "shovel" in n.lower()):
             refuse("leaving home refused: no shovel in the pack (box.py \"Farm\" --take shovel; "
                    "--shovel-ok to leave without one)")
+    # the user, run 58: "All tools (Shovel, Axe, etc) should be palced in the 'hot bar' area where the cooler is so they are
+    # never lost/removed again": the carried tools go on the hotbar before the door; one left over is a refusal
+    if at_base:
+        out = run("hotbar.py", "--tools", timeout=180)
+        print("  " + "; ".join(str(out).splitlines()[-2:]), flush=True)
+        if out.rc != 0 and "--tools-ok" not in sys.argv:
+            refuse("leaving home refused: a tool isn't on the hotbar (free a slot: hotbar.py --take ITEM; --tools-ok to go anyway)")
     # run 32: the Upkeep block's food rule was only a line in goals.md; the night's first nefia began at hunger 68
     # with nothing eat_one would take (the bread was in the loot bag, the Cooler Box held raw fish and corpses)
     if at_base and "--food-ok" not in sys.argv:

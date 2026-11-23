@@ -19,9 +19,11 @@ Sources, each read as it stands (nothing here is typed twice):
   runs/activity.csv    the loops' start and end marks (tools/activity.py): real clock, game date,
                        tag, exp, lv, gold; absent until the first marked loop runs
   runs/index.csv       index size and speed (kb.py bench --log RUN)
+  runs/versions.csv    the game version each run played on (power.py --log; runs 01-57 back-filled from the logs)
   runs/bills.csv       the monthly tax bills (month, orens, run, source), one row as each one arrives
-  runs/events.csv      events between runs and the commit ranges git can't place by subject; kind `review` and
-                       `metrics` become their own rows (the tracker's "refactor" and "new metric" markers), kind
+  runs/events.csv      events between runs and the commit ranges git can't place by subject; kind `review`,
+                       `metrics` and `game` become their own rows (the tracker's "refactor", "new metric" and "update"
+                       markers; power.py --log writes a `game` row when the game's version changed, run 58), kind
                        `tooling` (a tool change that changes no measure, run 31) is a record only: its commits
                        go with the next commit that names a run
   knowledge/facts.jsonl facts added per run
@@ -182,7 +184,7 @@ def exp_total(lv, exp):
     return sum(50 + 30 * k for k in range(1, lv)) + exp
 
 
-MARKED = ("review", "metrics")  # event kinds that get their own stats row and a marker on the tracker's charts
+MARKED = ("review", "metrics", "game")  # event kinds that get their own stats row and a marker on the tracker's charts
 
 
 def git_buckets(events):
@@ -372,6 +374,7 @@ def main():
     index = {r["run"]: r for r in rows("index.csv")}
     reg_done, reg_steps = register_counts()
     bill_table = {tuple(int(v) for v in r["month"].split("-")): num(r["orens"]) for r in rows("bills.csv")}
+    versions = {r["run"]: r["version"] for r in rows("versions.csv")}
     facts_by_run = defaultdict(int)
     for line in (ROOT / "knowledge" / "facts.jsonl").read_text(encoding="utf-8").splitlines():
         if line.strip():
@@ -400,6 +403,7 @@ def main():
             continue
         m, h, pw = metrics[p], hand.get(p, {}), power.get(p, [])
         row["system"] = "v2 refactored" if int(p) >= 13 else "v1"
+        row["game_version"] = versions.get(p, "")
         minutes = num(m["minutes"])
         hours = minutes / 60 if minutes else None
         start = h.get("game_start") or (pw[0]["game_date"] if pw else "")

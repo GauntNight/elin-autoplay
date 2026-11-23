@@ -16,10 +16,11 @@ usage: python -I tools/recall.py [DESTINATION=Meadow] [MAX_TURNS=60] [MIN_HP_PCT
 """
 import re
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import overweight_stop, call, data, last, refuse, run, setup, state, stop, wait_until  # noqa: E402
+from common import BridgeError, overweight_stop, call, data, last, refuse, run, setup, state, stop, wait_until  # noqa: E402
 
 
 def zone():
@@ -168,8 +169,16 @@ def wait_out(start, max_turns=60, min_hp=50):
         # run 21: Waits sent back to back were swallowed while the last one was still running (60
         # loop turns passed 11 game turns): wait for the game's turn counter to move before the next
         for _ in range(20):
-            wait_until("frames", n=5, timeout=1000)
-            s2 = state()
+            try:
+                wait_until("frames", n=5, timeout=1000)
+                s2 = state()
+            except BridgeError as e:
+                # run 58: the countdown fired and the home map's load held the main thread past 2 s: a traceback and exit 2
+                # for a return that had worked. The load isn't a hang: wait it out and read the zone again
+                if "main thread" not in str(e):
+                    raise
+                time.sleep(3)
+                s2 = state()
             if (s2.get("zone") or {}).get("full") != start or s2["pc"].get("turn") != turn0:
                 break
         if isinstance(ri, dict) and t % 5 == 0:
