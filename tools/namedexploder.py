@@ -47,7 +47,10 @@ def main():
     s, t = find(name)
     if not t:
         refuse(f"no hostile {name!r} in view")
+    prior = (call("speed").get("data") or {}).get("index") or 3
     call("speed", i=1)
+    import atexit
+    atexit.register(lambda: call("speed", i=prior))  # run 58: an x1 left behind slowed an hour of play
     for _ in range(rounds):
         s, t = find(name)
         if not t:

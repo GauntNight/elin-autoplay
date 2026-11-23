@@ -31,6 +31,7 @@ def parse(step):
 
 def main():
     if "--dry" not in sys.argv[1:]:
+        sys.path.insert(0, str(TOOLS))
         from job import register  # run 58: bridge.call refuses a second acting client while this runs
         register("seq")
     for stream in (sys.stdout, sys.stderr):

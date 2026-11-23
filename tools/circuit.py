@@ -267,6 +267,8 @@ def main():
     except Exception as e:  # noqa: BLE001 - a warning only
         print(f"  (gear check skipped: {e})", flush=True)
     register("circuit")
+    from common import fast
+    fast()
     mark("circuit", "start", note=f"{n} nefias, danger {lo}-{hi}, r {r}")
     done = 0
     try:

@@ -78,6 +78,8 @@ def sell_step():
 def main():
     from job import register  # run 58: bridge.call refuses a second acting client while this runs
     register("arrive")
+    from common import fast
+    fast()
     t0 = time.time()
     setup()
     s = state()

@@ -1224,6 +1224,8 @@ def main():
         GATE += ["--spare", sys.argv[sys.argv.index("--spare") + 1]]
     floors = nums[1] if len(nums) > 1 else 3
     solo = "--solo" in sys.argv
+    from common import fast
+    fast()
     register("ladder")  # stopjob.py ladder asks it to stop between floors (springday's pattern)
     if depth(zone().get("full")) == 0:
         stop(f"{zone().get('full')} is not a dungeon floor")

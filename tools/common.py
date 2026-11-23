@@ -718,6 +718,19 @@ def hold(name):
     return (pc().get("held") or None)
 
 
+def fast():
+    """The game at x5 (the user, 2026-11-06: "5x is fine", watched or not), set again when something left it slower. Run 58: a
+    hand-set x1 for a named foe (15:08) stayed for an hour of circuits and an arrival until the user saw it ("I notice the
+    game is running at regular speed now instead of 5x"). circuit.py, ladder.py and arrive.py call it at their start."""
+    try:
+        d = call("speed").get("data") or {}
+        if (d.get("base") or 5.0) < 5.0:
+            call("speed", i=3)
+            print(f"  game speed was x{d.get('base'):g}: back to x5", flush=True)
+    except Exception as e:  # noqa: BLE001 (an older mod without the op: never stops a loop)
+        print(f"  game speed not read: {e}", flush=True)
+
+
 def emergency_teleport():
     """elin-play's teleport row, one chain for every tool: a scroll of teleport (item.py's whole-word match, never the
     short one), else the fullest rod of teleport zapped on my own cell, else the Teleport spell. Returns what was done,
