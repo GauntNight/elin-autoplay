@@ -98,6 +98,14 @@ def wanted(card, extra):
         return False
     if any(k in c for k in DUMP):
         return True
+    # run 58: "a potion of salt water" is in packcheck's JUNK and not in DUMP, so packcheck routed it here at every sort and this
+    # list left it: one arrival after another with 1 out of place. What packcheck routes to the can goes in the can
+    try:
+        import packcheck
+        if packcheck.route(raw)[0] == "trash":
+            return True
+    except Exception:  # noqa: BLE001 - the lists below still decide
+        pass
     # run 54: packcheck routed a paper scrap from the mail here by the game's junk category, and this name list didn't
     # take it, so leave.py refused home on it: the same table decides both (elin-play: a kind from the game's table)
     try:

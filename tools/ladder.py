@@ -470,6 +470,15 @@ def explore_floor(solo):
             stop(f"delve {'refused' if out.rc == 1 else 'failed'} (rc {out.rc}): {last(out)[:120]}")
         if why.startswith("hostile in view"):  # run 26: an explore leg's own stop line ended the pass (rc 0): delve again
             continue
+        # run 58: the grid's 42+ stacks ended five ladders with 20-30 bag slots free, each answered by hand with the same purge:
+        # purge drops the junk and files the grid into the bags; at most four times a ladder, and only while a bag has room
+        if "42+ stacks" in why and getattr(explore_floor, "unclogged", 0) < 4:
+            explore_floor.unclogged = getattr(explore_floor, "unclogged", 0) + 1
+            pg = run("purge.py", "--free", "8", timeout=600)
+            grid = sum(1 for i in data("stock", r=0)["pack"] if not i.get("equipped"))
+            print(f"  42+ stacks: purge rc {pg.rc}, the grid holds {grid} now", flush=True)
+            if pg.rc == 0 and grid <= 36:
+                continue
         if not any(k in why for k in OK_STOPS):
             stop(f"delve ended without a floor end: {why or last(out)[:120]}")
         if "step limit" not in why:
