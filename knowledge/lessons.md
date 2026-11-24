@@ -13,27 +13,23 @@ superseded or dropped at the close-out (hygiene.py flags it). After the 2026-10-
 (34 lines: 11 became facts #751-#761, 17 were already in a skill or a tool, 4 got tool guards the
 same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
-
-
-
-
-- watchlog reads only lines written after it starts: twice a short job (a 30-tile walk, music with no flute) ended before its watcher began and the watcher sat to its --idle line. On a fresh log, start it with `--from-start`. (55)
-- Plan arrivals by the clock: Derphy reached at 12:22 (thefts want night), Willow at 23:08 and Mysilia at 01:13 (shops shut; Chim and Rainof don't answer at night, no guard visible for whereis.py). A walk's steps x ~2.5 game hours a step says when I land; an inn (Tiguen) trades at night. (55)
-- The six-bill reserve is my own convention (G50's How), not the user's: the user's rule is which shops (fact #1025). Bend it for a goal's last step and say so; keep it for routine spending. (55)
 - A max HP that drops mid-run is a drain, a mutation or an ether disease, not damage: look.py's DANGER line names drained attributes and harmful mutations, `bridge.py skills` the ether ones. Run 56 went 453 -> 396 on END -5, CHA -5 (Lonely Soul reads CHA), Tainted Body and Scalding Face before a restore body and a cure mutation from the kit put it back to 435. Read it at the next stop, before the next nefia. (56)
-- Monsters steal from the pack, not only orens: a gnome took a treasure map, fairies took orens (fact #1558); the loop logs cut the line short (fight.py and delve.py now ledger each theft whole: common.note_thefts). Run 55 lost four tools that way, most likely, and shipped the one "protects you from thieves" waist piece in hand before finding out (fact #1559): weigh that line before shipping one (run 55).
 
-- A locked chest blocks `chests.py --field` for every chest of its name (it works by name), and the lockpick won't work
-  Overweight: on a dig tour nine chests held me at burden phase 3 until I dropped the locked one, emptied the rest, then
-  picked it back up (the empties too, by accident: they hold the left-behind junk). Drop only the locked one; open it at home. (57)
 - A <King> (chess piece: summoner, short teleport) on a floor is left by evacuation at once, never by walking off: leave.py
   walked while it summoned pawns beside me, 460 -> 272 in a few steps (fact #1597). Two nefias stopped on one this run. (57)
-- A home shopkeeper's Restock costs home influence and runs out (~13 a visit in run 57): plan each home stop's clear-out as
-  the shipping chest's ~40 stacks plus what Samata takes, and expect her to stop after the influence is gone. (57)
+
 - Fame sales pull the next refill under the gate but near the sale point: the batch after Ishbear's sale lay round Palmia,
   a 125-hour walk from home. Sell fame where the circuit will run, or circuit from the sale's town. (57)
 
+- A floor's golden thing that isn't a shrine, a chest or a person is still worth a Use: `find` by name and trait before walking past (god statues, 58 runs unseen until the user pointed at one). When the user names a thing on screen, look at what it offers first. (58)
+
+- A number by hand is a flag by hand: `speed 1`, `digmap.py 14`: read the usage line of a tool not used this run before passing a bare number. (58)
+
+- Home stop misses came from items that changed after the sort (identified, paid out, taken off by a disease, dropped by a chest): a sort that isn't the last step of the arrival is a guess. (58)
+
 ## Promoted (where the older lessons live now)
+
+- run 55's and 56-57's lines (triaged at run 58's close-out): a watcher started after a short job -> watchlog.py reads a log under two minutes old from its start; arrivals by the clock -> elin-travel (a walk's steps x ~2.5 game hours; shops shut at night, Tiguen's inn trades); the six-bill reserve -> elin-guilds' budget line; a locked chest blocks its name-twins -> chests.py by uid (run 58); Restock runs out -> sell.py, fence.py and facts #1586, #1617, #1622; monsters that steal from the pack -> common.note_thefts and shipstar's thieves guard (fact #1559).
 
 - run 56's own, fixed the same session: enchant scrolls riding unread (run 55's Live line, run 52's before it) -> stock.py's
   ENCHANT rows name every enchant scroll for a worn piece under its cap at the first home stop; Ungogo's near-death at 15

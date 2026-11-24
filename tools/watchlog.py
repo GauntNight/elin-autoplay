@@ -12,7 +12,8 @@ usage: python -I tools/watchlog.py LOG [--match RE] [--until RE] [--max SECONDS=
   --until RE     print the first line that matches and exit 0
   --max SECONDS  exit 3 after this long (never over 3600)
   --idle SECONDS say so once when the log hasn't grown for this long: silence isn't success
-  --from-start   read what the log already holds (default: only what is added from now on)
+  --from-start   read what the log already holds (default: only what is added from now on, but a log under two minutes old is
+                 read from its start: run 55 watched two jobs that had ended before the watcher began)
 exit codes: 0 --until matched, 1 refused (bad arguments), 3 the deadline passed: re-arm if it is still needed.
 """
 import argparse
@@ -23,6 +24,14 @@ from pathlib import Path
 
 CAP = 3600  # seconds: no watch outlives this, whatever it is asked for
 POLL = 1.0
+
+
+def young(log, secs=120):
+    """Run 55: a short job ended before its watcher began. st_ctime is the file's creation on Windows."""
+    try:
+        return time.time() - log.stat().st_ctime < secs
+    except OSError:
+        return False
 
 
 def follow(log, match, until, deadline, idle, start_at_end):
@@ -82,7 +91,7 @@ def main():
         print("--max must be above 0")
         return 1
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    return follow(Path(a.log), match, until, time.time() + min(a.max, CAP), a.idle, not a.from_start)
+    return follow(Path(a.log), match, until, time.time() + min(a.max, CAP), a.idle, not (a.from_start or young(Path(a.log))))
 
 
 if __name__ == "__main__":

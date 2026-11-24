@@ -125,7 +125,7 @@ The notes below are how the ranks were bought.
   trades at night, 01:34; Chim and Rainof don't answer at night); steps at 12-14 cost 4,642 / 5,507 / 6,447; Willow's
   Agasard is level 8. Still unread: Noyel's Ceshed, Oldotta, Teoyan; the rest of Mysilia and Tinker's Camp. Monazess's guild shop takes no investment.
 - **Never a town secretary:** that investment pays the guild nothing (fact #1336).
-- **The budget:** only orens above the six-bill reserve (G58 took what the circuits and the chest brought in until run 55).
+- **The budget:** only orens above the six-bill reserve, my own convention (G50's How), not the user's: it may bend for a goal's last step, said aloud (run 55) (G58 took what the circuits and the chest brought in until run 55).
 - The guild's informers buy fame: `famesale.py` (elin-delve 2: a sale also pulls the nefia refill back under the gate).
 
 ## Mages (G34, G36, G43, G49)
