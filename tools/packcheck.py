@@ -350,6 +350,15 @@ def route(name):
     # (Silent Ruin 13 and Dark Machinarium 7 from two): it is used where it is found, never boxed
     if re.fullmatch(r"(an? |\d+ )?(blessed |cursed )?maps?", low.strip()):
         return "decide", "decide: read it now (item.py NAME Read): a nefia map marks ruins and caves for the circuit"
+    # run 58: "★Blood Of Fallen Angel" is a potion with no "potion" in its name and stood as "no rule": before that answer the
+    # game's own kind (items.kind) picks the box of its kind; gear, food and junk were routed above
+    k = _kind_of(name).split(":")[0]
+    word = {"potion": "potion", "scroll": "scroll", "rod": "rod of", "book": "book", "ancientbook": "book", "dna": "gene of",
+            "currency": "coin", "medal": "medal", "map": "book", "herb": "herb", "_seasoning": "seasoning", "wood": "log", "ore": "ore",
+            "ingot": "ingot", "seed": "seed", "instrument": "book"}.get(k)
+    hit = next(((w, lab) for keys, w, lab in ROUTES if word and word in keys), None)
+    if hit and not unidentified:
+        return hit
     # run 12: the old default was the shipping chest, and a flower crown and the Border Watch plan
     # went in at 02:30, three hours before the 05:00 sale; nothing is shipped without a rule now
     return "decide", "decide: not moved (no rule for it: ship, install, or add a route)"
