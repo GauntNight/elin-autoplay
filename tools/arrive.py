@@ -73,8 +73,8 @@ def sell_step():
         ex = run("sell.py", "Samata", "--excess", "--find", timeout=900)
         return f"sell: nothing keep.py sells in the pack; over the caps: {last(ex)[:200]}"
     out = run("sell.py", "Samata", *uids, "--find", timeout=900)
-    ex = run("sell.py", "Samata", "--excess", "--find", timeout=900) if out.rc == 0 else out  # run 58: the rods over the caps too
-    return f"sell ({len(uids)} stacks to Samata): {last(out) or out.rc}; over the caps: {last(ex)[:200] if ex is not out else 'not tried'}"
+    ex = run("sell.py", "Samata", "--excess", "--find", timeout=900)  # run 58: the rods over the caps too, whatever the first sale did
+    return f"sell ({len(uids)} stacks to Samata): {last(out) or out.rc}; over the caps: {last(ex)[:200]}"
 
 
 def main():
@@ -100,6 +100,11 @@ def main():
         stop("arrive: the Dishes box isn't shared: the residents can't eat while I'm here")
     print(cure())
     print(sell_step())
+    # run 58: a mystic chest from the dig tour rode home with three things in it, and the shipping chest refuses a full
+    # container: one arrival after another with 1 out of place. chests.py empties the carried ones first (a locked one stays)
+    from common import data as _data
+    if any("treasure chest" in i["name"].lower() for i in _data("inv")["items"]):
+        print("chests: " + (str(run("chests.py", timeout=900)).strip().splitlines() or ["?"])[-1][:160])
     p = run("packcheck.py", "--move", timeout=1200)  # run 35: a full unload ran past the 300 s default twice
     print(p.strip())
     home_guard("the arrival, after the unload")
