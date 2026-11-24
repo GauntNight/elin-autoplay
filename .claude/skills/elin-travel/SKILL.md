@@ -110,7 +110,7 @@ never `step`.
   behind walls or in deep water for a deliberate step. knowledge/medals.md lists all 141 by map.
 - **A shop's stock:** `shop.py NAME [--record WHERE --run N] [--keep-open]`; buying and selling by name: elin-pack 6.
   **New skills before upgrades** at any trainer (the user's rule: 5 platinum for an unlearned skill, 1 for an upgrade);
-  the coins must be carried.
+  the coins must be carried. All 62 are learned (run 54's list): the order after that is elin-train's.
 - **Karma below 0 (a criminal):** Mysilia, Olvina and Tinker's Camp refuse to trade and their guards attack; Derphy
   trades. A scroll of incognito read inside the town (not on the world map) opens the shops for a while (run 07); the
   scroll lives at home (packcheck's home-only list): take it out for such a trip.

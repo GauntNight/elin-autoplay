@@ -101,7 +101,8 @@ the current player can change any of them in `player.md`.
 - **Never wait.** Idle hours cost food, money and training for nothing. A shop closed or a tick not due: leave, do something
   else, come back on the way. `tools/wait.py` refuses without `--user-ok`, which needs the player's yes to that wait.
 - **New skills before upgrades.** At a trainer, list the "(Not Learned)" skills first, and save for a new one (5 platinum)
-  rather than spend on upgrades (1) while a useful skill is unlearned: it levels cheaply and adds an ability.
+  rather than spend on upgrades (1) while a useful skill is unlearned: it levels cheaply and adds an ability. Once all are
+  learned, platinum goes where it earns the most run-score points (2026-11-24; elin-train has the order).
 - **A full set of gear.** Every slot holds the best piece in hand, checked at session start and after acid, curses, deaths or
   swaps. The one exception: beside a lone melee weapon the second hand stays empty, which keeps the two-hand style.
 - **Cap the stock.** About 100 casts of a spell (then sell its books), one or two rods of a kind, and limits on potions and

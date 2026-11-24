@@ -37,6 +37,13 @@ burns ~80-90 game days an hour (13 points, a meal and a day's rent each). One sk
 Sword, Axe, Staff, Bow, Polearm, Short Sword, Crossbow, Scythe, Mace). Left: Bow 10, Crossbow 4 (ranged: `--shoot`
 needs arrows), Short Sword 17, Scythe 20.
 
+## What platinum buys, in order (the user, 2026-11-24: "once all skills are learned use what makes most sense next to optimize the points")
+
+1. **An unlearned skill** (5): none left, 62 of 62 (a game update may add one: read `bridge.py skills` after it).
+2. **A Shared Diary** (200, Eligin in Palmia) whenever 200 coins ride and Palmia is on the way: about 1.9 points a coin, no play time
+   (the fact "platinum pays"). Read one, check the exp moved, then the rest; ten in stock, restocked every 360 days. The coins must be carried.
+3. **A trainer's potential** only just before a stretch that uses the skill (1.5 points a coin at skill 10, 0.7 at 50): never to be rid of coins.
+
 ## How to run a training stretch
 
 1. **Food first:** ~1 meal a game day; a 45-minute dummy stretch eats ~100. Buy every dish (`buyfood.py --min-ratio 0`) at

@@ -307,7 +307,7 @@ code's `kamikaze_dist`: **5 cells** (3 until run 40, 4 until run 41).
   get the Ether antibody"): Hoof Transformation's speed (166 -> 215 at Lv45) lost to the boots' PV and DV once G60 (PV 100)
   was the goal. **Run 53:** one antibody (power 100) took 513 -> 313, Thick Neck and Enemy of All Living Things gone (fact
   #1517); with G60 done, Hoof's +39 speed outweighs the boots' PV 8 / DV 12, and a second drink would have crossed 200 too
-  (the Wing's +14 speed): both kept, 4 antibodies carried for the next disease (the carry list keeps them).
+  (the Wing's +14 speed): both kept, 4 antibodies carried for the next disease (the carry list keeps them). **Medals go to antibodies first** (the user, 2026-11-24): five carried and 50 medals kept for five more before a hammer; a CHA disease also costs a Lonely Soul slot (5% HP and speed); at corruption 300 one drink takes the hooves too.
 - Quick-save after a conquest or a big haul (elin-play); every death or near-death gets its cause in the run log and a
   line here or in the table.
 

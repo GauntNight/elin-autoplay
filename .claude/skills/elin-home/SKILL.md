@@ -175,7 +175,7 @@ east, 5 north of home) identifies by the count (`kb.py facts Aliyun`). Spellbook
 (run 04: a tome was Cure Minor Wound, a rod was identify).
 
 **Sell in town:** old tickets (114 orens each in Mysilia, keep 2). At home, Samata (above): any shop that trades for orens
-buys any sellable item at ~91% of the chest's price, +2% a point of Negotiation (fact #1584); not the guest store of Open For
+buys any sellable item at ~91% of the chest's price, +2% x the square root of Negotiation (+6% at 10); not the guest store of Open For
 Business (the user, 2026-11-21). Farris is no longer a resident (run 57's board: Samata is the one shopkeeper).
 
 **Unsure?** `kb.py show ITEM` gives the base value: under about 100 with no recipe use, ship it.
