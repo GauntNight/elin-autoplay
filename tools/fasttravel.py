@@ -49,6 +49,12 @@ def main():
     zid = z.get("full") or z.get("id") or ""
     if "ntyris" not in zid:
         refuse(f"not on the world map ({zid}): leave.py first")
+    # run 58: "costs 3 rations and I carry 0" with eight in the Cooler Box (packcheck keeps them with the food): they come out first
+    import items
+    for it in items.find(pred=lambda i: "travel ration" in i["name"].lower()):
+        if it.get("path"):
+            ok, why = items.to_pack(it)
+            print(f"{it['name']}: out of its container" if ok else f"{it['name']}: could not take it out ({why})", flush=True)
     have = rations()
     rows = open_list()
     if len(sys.argv) < 2:
