@@ -132,6 +132,7 @@ def expire_here():
     return None
 
 
+LEFT_ANY = []  # run 58: the nefias this run of circuit.py has entered and left (candidates() may resume the one underfoot before the first)
 EXPIRY_SKIPS = []  # run 55: the in-band nefias candidates() skipped as expiring before the walk and a conquest
 
 
@@ -182,7 +183,9 @@ def candidates(lo, hi, r, skip=()):
             continue
         # distance 0 is the nefia just left (evac lands on its tile), unless it was never entered: run 37 walked onto
         # Ancient Machinarium's tile by hand and the circuit stopped "no nefia within 5"
-        if lo <= d <= hi and (p["dist"] > 0 or not p.get("known")):
+        # run 58: standing on Isolated Cave's tile after a nap (entered, not conquered), the circuit passed it over, napped again
+        # for 7 hours and stopped "no nefia": before this run's first conquest the tile I stand on is a nefia to resume
+        if lo <= d <= hi and (p["dist"] > 0 or not p.get("known") or not LEFT_ANY):
             out.append((p.get("steps") or p["dist"], d, p))  # run 49: nearest by the route, not the straight line
     return sorted(out, key=lambda t: (t[0], t[1]))  # run 34: a tie compared the place dicts (TypeError)
 
@@ -406,6 +409,7 @@ def main():
                          f"(ladder.chests), clear of the foe (teleport), evac.py, then circuit.py again")
                 stop(f"ladder rc {lad.rc} without a conquest: {last(lad)[:140]}")
             done += 1
+            LEFT_ANY.append(done)
             log_conquest(text)
             # run 34: the boss chest's loot filled the grid after the last floor's purge, and the next nefia's ladder refused
             # at its room check (-2 free cards): free 3 before leaving the conquered floor
