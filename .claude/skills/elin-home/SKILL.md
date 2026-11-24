@@ -15,7 +15,8 @@ organized stuff, clear rules for what to sell and what to keep, a nicer and safe
 Dishes box shared, a drained attribute or harmful mutation cured (run 35), `packcheck.py --move`, the mail
 (`unpack.py --take --pickup`: each package emptied into the pack and grabbed, the spam packages shipped, run 45; a tax
 bill there is paid, run 35), `yardchests.py` (Poppy's chests lying loose, run 43), `trash.py`, `town.py`, and a food
-line. Every step runs `farmday.home_guard` first (section 6).
+line. Every step runs `farmday.home_guard` first (section 6). **Since run 58 (G70 done):** Samata buys first (`sell.py --excess`; no shop at
+some hours: the step says so), chests emptied by uid, a nefia map read, a closing pass with `shipstar.py`; its last line is the measure (0 out of place).
 
 0. **`packcheck.py --move` is the sort** (the user, run 11: "on entering base you organize your packs... when leaving
    base you must clean your packs of useless inventory... it is a loss of treasure by not having those slots free"). It
@@ -346,5 +347,4 @@ New in run 04; the town in runs 11-18 (G12); the big containers in runs 42-45 (G
 in the home domain, the orens per real hour of home time (stats.csv), and the free slots a route can reach
 (`boxcount.py`). Enforced by tools: `common.ready` stops a loop at Hungry and on a failed meal, sleep.py refuses at
 home without `--home-ok`, the dishes go private when I leave, `farmday.home_guard` guards every long walk (run 41),
-and every packcheck chain ends at a big container (run 45). The review of 2026-11-11 rewrote sections 1 and 2 from
-`tools/home.py` and moved the day loops to the reference tail.
+and every packcheck chain ends at a big container (run 45). The review of 2026-11-11 rewrote sections 1-2 from `tools/home.py`.

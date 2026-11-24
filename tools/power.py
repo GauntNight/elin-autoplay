@@ -118,12 +118,26 @@ def threat_fit():
                 pts.append((lv, pv + 3, lost / ((n + 1) / 2 * t)))
     if len({q[0] for q in pts}) < 3:
         return 3.0, 1.0, len(pts), "prior"
+    # run 58: 23,000+ fights times 4,941 grid points ran past two minutes (the close-out's card printed nothing in 110 s). Fights of one
+    # foe level and one protection share the prediction, so each such cell counts once, by its mean and its size (the same least squares)
+    cells_ = {}
+    for lv, prot, obs in pts:
+        c = cells_.setdefault((lv, prot), [0, 0.0])
+        c[0] += 1
+        c[1] += obs
+    cells_ = [(lv, prot, n, tot / n) for (lv, prot), (n, tot) in cells_.items()]
+    hit = {lv: foe_hit(lv, 40) for lv, _p, _n, _m in cells_}
     best = None
     for ai in range(0, 81):
         a = ai * 0.25
         for bi in range(0, 61):
             b = bi * 0.05
-            err = sum((loss_per_foe_turn(a + b * lv, prot, 40, lv) - obs) ** 2 for lv, prot, obs in pts)
+            err = 0.0
+            for lv, prot, n, mean in cells_:
+                d = after_armour(a + b * lv, prot, 0) * hit[lv] - mean
+                err += n * d * d
+                if best is not None and err > best[0]:
+                    break
             if best is None or err < best[0]:
                 best = (err, a, b)
     return best[1], best[2], len(pts), "fit"

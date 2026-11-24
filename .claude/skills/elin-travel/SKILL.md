@@ -24,7 +24,8 @@ and people before trusting the reference at the end.
 - **The bed is the sleeping bag** (packcheck's kit; Quick Craft makes one: elin-build). `sleep.py` uses the F-key "Use bed
   in inventory" slot on the world map or any local map outside a nefia, and refuses hungry. **No bed carried: `sleep.py`
   falls back to the Rest ability** (run 44: the sleeping bag left the pack at a home sort; Rest slept me on the world map
-  and in a village). A real bed sleeps better but weighs 28 (Burden).
+  and in a village; run 58: the ability window's tab must list it, and sleep.py presses the Ability tab). A real bed sleeps better but
+  weighs 28 (Burden); run 58 carries a makeshift bed (4.8) from a boss chest.
 - **Travel rations are the Fast Travel fare** (1 + hours/24), not food. You can't eat on the world map: enter a local map.
 - **Rent runs whatever I do** (the review of 2026-10-23): ~70 orens a game day; a 3-day walk costs ~200. Price a long
   walk in rent and prefer Fast Travel when rations are carried.
@@ -80,7 +81,7 @@ never `step`.
 ## 4. Fast Travel, and going home
 
 - **`python -I tools/fasttravel.py [NAME]`** (run 25) from my own world-map tile: a button per visited place with its
-  ration cost and days; it refuses a fare over the rations carried, clicks by name, and reports the new zone. No
+  ration cost and days; it takes rations out of the Cooler Box or a bag first (run 58), refuses a fare over them, clicks by name, and reports the new zone. No
   ambushes, no confirmation, autosaved on arrival. The fare is 1 + hours/24 rations (from Mysilia: Meadow 3 / 2 days,
   Palmia 6 / 5 days, fact #876; from Port Kapul: Vernis 3, Meadow 5, fact #708). The time passes the same as a walk.
 - **Rations are bought** (the user, 2026-11-14, dropping G14: "at our current wealth level we just buy rations unless

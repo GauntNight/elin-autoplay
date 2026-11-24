@@ -109,7 +109,7 @@ as Duponne on the Sunken Temple's B5). Per floor: `delve.py` until the floor is 
 with the Putit as opener, soaks exploders, stops on the HP rules), `loot.py`, a QuickSave, then the stairway that isn't the
 way in. The gate covers every floor here (delve's own gate covers nefias only: Lesimas and Nymelle aren't).
 
-**It does these itself** (runs 20-43): uses every golden god statue (run 58, the user: "What is that fancy golden statue": once, free; Mani's is a decision, fact #1619) and every safe shrine (replenish, armor (the picker gets the worn piece with the
+**It does these itself** (runs 20-43): uses every golden god statue (run 58, the user: "What is that fancy golden statue": once, free; Mani's offers three synthetic genes: the ladder takes the one with the most feat points, to sell (181 and 299 to Samata), facts #1619-#1620) and every safe shrine (replenish, armor (the picker gets the worn piece with the
 lowest plus), knowledge, enlightenment, invention, wheel; never strife or material); opens every treasure chest (a locked
 one with the lockpick, never pried) and a boss chest is emptied completely (elin-pack 4); ends on "conquered" when the
 zone's name carries the mark; clears a wanderer in view before looting; frees 3 grid cards a floor (`purge.py --free 3`:
@@ -198,6 +198,10 @@ most floors sit far under the gate.
   kind is already adjacent, the sword** (run 56: a named Lich Lv34's Putit round cost 20%, one melee round killed it for 6%):
   delve.py melees it; slimes, drones, exploders and floating eyes keep the ranged branch. The throw loop stops at the
   table's drink line (70%), not 55% (run 56: a named Mercenary mage's slide to 44% in rounds under 15%).
+- **Mimics get the sword at once** (run 58, fact #1625): a mimic answers every round, the Putit's opener included, with a barrage of poison
+  missiles at any distance (a Lv15 391 -> 316, a Lv22 master 504 -> 322 in two rounds) and dies to about three rounds of the sword (the same
+  master for 0 HP at full health): delve.py throws nothing at one. Disguised ("murky potion", no act on its cell, auto-combat does nothing)
+  it is bumped: `fight.py` steps into it, which breaks the disguise.
 - **A boss that out-trades the sword is no gate question** (run 56, fact #1573: Ungogo Lv32, Critical 100 and Cleave 42,
   took 40% and 61% in single rounds at Lv47 while my blows took ~1%): `threat.avoid` now reads a recorded fight that cost
   30%+ at my level before the 15-levels-under exception, so fight.py refuses such a kind without `--force`.
