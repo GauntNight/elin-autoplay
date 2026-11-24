@@ -383,7 +383,10 @@ def main():
                     run("throw.py", tname, pot, "1", "50")
             # Open at range with the Putit In Amber (2d8+3, cold + lightning: my best ranged hit;
             # the user, run 04), then switch to the sword; loot.py after the fight brings it back.
-            if t["dist"] >= 2 and "Putit In Amber" in inv_names():
+            # run 58: a mimic answers every round with a barrage of poison missiles, at any distance: the Putit rounds took 391 -> 316 (a Lv15,
+            # Chilly Forest) and 504 -> 416 -> 322 (a Lv22, Historic Ruin B3) while it stood at 94%; the sword ends it in about three
+            mimic = "mimic" in (t.get("id") or "").lower() or "mimic" in tname.lower()
+            if t["dist"] >= 2 and "Putit In Amber" in inv_names() and not mimic:
                 run("throw.py", tname, "Putit In Amber", "1", "70")
             # floating eyes paralyse in melee: always from range (elin-play). Drones shoot hard (run 07:
             # 26-37 HP each when meleed) but die to 3-5 Putit throws with no damage: throw until dead.
@@ -399,7 +402,7 @@ def main():
             frail_adjacent = (t["dist"] <= 1 and prof.get("group") == "kill first" and not exploder
                               and not any(k in tname.lower() for k in ("slime", "drone")) and t.get("id") not in ("robot", "drone"))
             if (any(k in tname.lower() for k in THROW_AT) or t.get("id") in ("robot", "drone") or ranged_foe or exploder) \
-                    and "Putit In Amber" in inv and not frail_adjacent:
+                    and "Putit In Amber" in inv and not frail_adjacent and not mimic:
                 # run 56 (Bewitching Cave B2): a named Mercenary mage's slide in rounds under 15% took 444 -> 198 while this
                 # loop stopped only at 55%, under the table's drink line: the throw loop stops at that line (HP_FLOOR) now
                 tool, out = "throw.py", run("throw.py", tname, "Putit In Amber", "10", str(HP_FLOOR))

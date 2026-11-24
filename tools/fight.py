@@ -25,7 +25,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bridge import call  # noqa: E402
-from common import THRESHOLDS, grab, last, named, note_thefts, refuse, run, stop, walk_beside  # noqa: E402
+from common import THRESHOLDS, grab, last, named, note_thefts, refuse, run, stop, wait_until, walk_beside  # noqa: E402
 
 NET_HP = 10  # at or under this percent after a round the next hit kills: teleport now
 LAST_SWING = False  # run 37: the one extra round against a lone foe at 10% or less has been taken
@@ -226,7 +226,7 @@ def _fight(trk):
         i = argv.index("--until")
         argv = argv[:i] + argv[i + 2:]
     # run 38: "--melee" (read from sys.argv below) was left in the positional args and crashed int(args[1])
-    args = [a for a in argv if a not in ("--force", "--single", "--melee", "--town-ok", "--acid-ok")]
+    args = [a for a in argv if a not in ("--force", "--single", "--melee", "--town-ok", "--acid-ok", "--bumped")]
     hits = []  # the target's HP lost to each of my attacks, in percent (--until)
     name = args[0].lower()
     min_hp = int(args[1]) if len(args) > 1 else 60
@@ -405,6 +405,18 @@ def _fight(trk):
     # did nothing: that is a decision, not a round
     left = [c for c in end.get("nearby") or [] if match(c, name, force)]
     if left and turn0 is not None and end["pc"].get("turn") == turn0:
+        # run 58 (Historic Ruin B3): a mimic disguised as "murky potion" beside me takes no auto-combat and its cell offers no act; a step into
+        # it broke the disguise, and the sword killed the master 『Mimic』 for 0 HP
+        m = left[0]
+        if "mimic" in (m.get("id") or "") and m.get("dist", 9) <= 1 and "--bumped" not in sys.argv:
+            call("step", dx=m["dx"], dz=m["dz"])
+            wait_until("frames", n=20, timeout=3000)
+            now = next((c for c in call("state")["data"].get("nearby") or [] if c.get("uid") == m.get("uid")), None)
+            if now:
+                print(f"{m['name']}: bumped, now {now['name']}", flush=True)
+                r = run("fight.py", now["name"], str(min_hp), "--bumped", timeout=300)
+                print(r.strip()[-300:])
+                sys.exit(r.rc)
         stop(f"no round landed on {left[0]['name']} (d{left[0]['dist']}, {left[0]['hpPct']}%): the turn counter "
              f"is still at {turn0}; look.py, then by hand")
 
