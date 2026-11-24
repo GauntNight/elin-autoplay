@@ -218,6 +218,13 @@ def main():
         if not carried(lambda n: "shovel" in n.lower()):
             refuse("leaving home refused: no shovel in the pack (box.py \"Farm\" --take shovel; "
                    "--shovel-ok to leave without one)")
+    # run 58: the ☆/★ pieces worn at the door, by their own names (runs/worn.txt): one a disease, a curse or a shrine takes off on the
+    # trip stays mine (shipstar.py keeps it; the next leave writes the list again)
+    if at_base:
+        import items as _inv
+        mine = [m.group(0) for i in _inv.inventory() if i.get("equipped") and i["name"][:1] in "☆★"
+                for m in [re.search(r"[『《].+?[』》]", i["name"])] if m]
+        (Path(__file__).resolve().parent.parent / "runs" / "worn.txt").write_text("\n".join(mine) + "\n", encoding="utf-8")
     # the user, run 58: "All tools (Shovel, Axe, etc) should be palced in the 'hot bar' area where the cooler is so they are
     # never lost/removed again": the carried tools go on the hotbar before the door; one left over is a refusal
     if at_base:

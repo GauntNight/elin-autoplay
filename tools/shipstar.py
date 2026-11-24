@@ -23,7 +23,9 @@ CHEST_MAX = 40  # fact #1001: the shipping chest's stacks
 # negated) on a floor whose foes blind
 # Run 55: ☆The Rigid Ring 『Cheating Bleed』 (worn) negates blindness, so Bad West's swap shipped; 『The Evening』 (thieves'
 # protection and Pickpocket, no PV loss) is the Derphy ring beside the Fighting Bull
-KEPT = ("The Fighting Bull", "Queen's Victory", "The Evening")
+# Run 58: Hoof Transformation took ☆The Queen boots off mid-floor and purge bagged them; shipstar, run by the arrival now, was one free
+# card from shipping them. What I wore at the run's start or since (runs/worn.txt, written by leave.py) is mine and never ships from here
+KEPT = ("Queen's Victory", "The Evening")
 
 
 def pieces(keep):
@@ -54,6 +56,8 @@ def main():
     # `gearcheck.py weapon` read recorded it and this tool knew only KEPT. What I chose to carry never ships from here.
     import items
     keep += [ln for ln in items.carry_list() if ":" not in ln]
+    worn = JOBS.parent / "worn.txt"
+    keep += [ln for ln in worn.read_text(encoding="utf-8").splitlines() if ln.strip()] if worn.exists() else []
     if not (data("state").get("zone") or {}).get("full", "").startswith("Zone_startSite"):
         refuse("not on the home map")
     # run 40 (the user: "how often do you look at current equipment versus new?"): this tool made shipping unread pieces easy, and 14

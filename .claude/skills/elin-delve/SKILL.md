@@ -109,7 +109,7 @@ as Duponne on the Sunken Temple's B5). Per floor: `delve.py` until the floor is 
 with the Putit as opener, soaks exploders, stops on the HP rules), `loot.py`, a QuickSave, then the stairway that isn't the
 way in. The gate covers every floor here (delve's own gate covers nefias only: Lesimas and Nymelle aren't).
 
-**It does these itself** (runs 20-43): uses every safe shrine (replenish, armor (the picker gets the worn piece with the
+**It does these itself** (runs 20-43): uses every golden god statue (run 58, the user: "What is that fancy golden statue": once, free; Mani's is a decision, fact #1619) and every safe shrine (replenish, armor (the picker gets the worn piece with the
 lowest plus), knowledge, enlightenment, invention, wheel; never strife or material); opens every treasure chest (a locked
 one with the lockpick, never pried) and a boss chest is emptied completely (elin-pack 4); ends on "conquered" when the
 zone's name carries the mark; clears a wanderer in view before looting; frees 3 grid cards a floor (`purge.py --free 3`:

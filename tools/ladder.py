@@ -844,7 +844,41 @@ def descend_at_x1(h, solo):
 SAFE_SHRINES = ("replenish", "armor", "knowledge", "enlightenment", "invention", "wheel")
 
 
+def god_statues():
+    """The user, run 58 (watching Savage Forest B2): "What is that fancy golden statue in the middle of this floor?" A god's
+    statue (TraitGodStatue, "\u2605Statue Of Wind"): in gold it can be used once, for nothing, and gives by its god (the game's code):
+    Wind an angel's blood, Luck a wish (well_wish), Healing Jure's feather and rebirth, Harvest Kumiromi's book, Earth and Element a
+    material hammer, Machine a choice of a gene (a window: left for a decision). shrines() knew only "\u2605Shrine" names, so 58
+    runs of floors walked past them. A used one is onyx and offers no Use."""
+    for h in (data("find", name="Statue Of", r=999, n=10) or {}).get("hits") or []:
+        if h.get("trait") != "TraitGodStatue":
+            continue
+        use = []
+        for r in (1, 1, 0):
+            w = walk(h["x"], h["z"], r=r, hp=THRESHOLDS["dungeon_hp"], timeout=30000)
+            if w.get("why") in ("hostile", "stopped") and hostile_near():
+                run("delve.py", "4", "--solo", *GATE, timeout=600)
+                continue
+            p = pc()
+            acts = data("acts", dx=h["x"] - p["x"], dz=h["z"] - p["z"], mode="all").get("acts") or []
+            use = [a for a in acts if a["text"].startswith("Use (") and "tatue" in a["text"]]
+            if use:
+                break
+        if not use:
+            print(f"  statue {h.get('name')} at {h['x']},{h['z']}: no Use act (used already, or not reached)")
+            continue
+        if "machine" in (h.get("name") or "").lower():
+            stop(f"{h.get('name')} at {h['x']},{h['z']}: Mani's statue offers a choice of genes: use it by hand, then go on")
+        call("do", i=use[0]["i"])
+        wait_until("frames", n=60, timeout=6000)
+        if (state().get("layers") or {}).get("top"):
+            stop(f"a window opened over {h.get('name')} ({(state().get('layers') or {}).get('top')}): read it")
+        log = [str(x) for x in (state().get("log") or [])[-6:]]
+        print(f"  statue used: {h.get('name')}: " + " / ".join(log[-4:])[:200], flush=True)
+
+
 def shrines():
+    god_statues()
     hits = (data("find", name="Shrine", r=999, n=10) or {}).get("hits") or []
     for h in hits:
         name = h.get("name") or ""
@@ -891,7 +925,9 @@ def shrines():
                     and re.search(r"\[-?\d+, ?-?\d+\]", b["card"]) and not re.search(r"\(\d+d\d+", b["card"])]
 
             def plus(card):
-                m = re.search(r" ([+-]\d+) \[", card)
+                # run 58: "... \u300eRed Hair Win\u300f +5 (1) [7, 20]" read as +0 (the hit bonus stands between), so the Armor shrine went to
+                # the +5 gloves, which resisted
+                m = re.search(r" ([+-]\d+) (?:\(-?\d+(?:, ?-?\d+)?\) )?\[", card)
                 return int(m.group(1)) if m else 0
             if slot is not None and worn:
                 pick_ = min(worn, key=lambda b: plus(b["card"]))
