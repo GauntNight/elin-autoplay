@@ -8,8 +8,8 @@ description: Guild work in Elin - the user's guild rule (every guild keeps risin
 **The rule (the user, 2026-11-01):** "all guilds should keep increasing until they are max rank". Rank 6 is the game's
 cap (FactionRelation.MaxRank = 6 in EA 23.355, fact #1138: QuestGuild's text lists a rank-8 feat that no promotion reaches).
 A guild goal done sets the next rank as a goal at once (elin-goals); the goals and their milestones are in
-`knowledge/goals.md`. **After run 55:** Fighters rank 6 (G40, run 43), Merchants rank 6 (G58, run 55), Thieves rank 5
-(G62 for rank 6: 1,447/2,600), Mages rank 4 (G63 for rank 5: 498/1,700). Only the Thieves and the Mages are left.
+`knowledge/goals.md`. **After run 58:** Fighters rank 6 (G40, run 43), Merchants rank 6 (G58, run 55), Thieves rank 6
+(G62, run 58), Mages rank 4 (G63 for rank 5: 823/1,700). Only the Mages are left.
 The review of 2026-11-11: the three ride along with the circuits and the trips, without a plan slot of their own.
 
 **Read the number:** `python -I tools/journal.py guilds` prints each guild's rank and contribution from the journal

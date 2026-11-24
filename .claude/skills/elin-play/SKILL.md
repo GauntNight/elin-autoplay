@@ -177,6 +177,11 @@ deep water (`why: water`, before the first step). `force=1` bypasses a guard on 
   exits before the harness kills it; re-arm on exit 3 while the loop runs. One per loop, and `--match` must also catch the
   failures (`Traceback|STOP|refused`): silence isn't success. Bash with `run_in_background` already reports a loop's end, so
   a monitor is only for what happens during it.
+- **After a Claude Code low-memory stop** (runs 48, 56, 57: every background task ended, the ladder mid-floor): the character safe first
+  (`look.py`, off the floor by `evac.py`, a quick-save), then the free memory read (read-only), then the loop, its watcher and
+  `pulse.py` again without asking (the user, 2026-11-24: "I agree that you can restart background tasks"; another player's yes
+  goes in `player.md`, and without one, ask). The repo-local Ollama stays off until the close-out. A second stop within the hour:
+  say so, go on with one loop at a time, and log both. The pause isn't play time.
 - **Never leave time passing unwatched.** Bed Pass Time runs until cancelled (21 game hours in run 03, and Loytel died
   meanwhile): `bridge.py cancel` stops a task; `wait.py HH:MM` only with the player's yes.
 - **Names in full.** Tools refuse a name that fits two things ("rod of" fits two rods) and match whole words; a `craft.py

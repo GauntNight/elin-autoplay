@@ -889,7 +889,8 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
       --until RE     print the first line that matches and exit 0
       --max SECONDS  exit 3 after this long (never over 3600)
       --idle SECONDS say so once when the log hasn't grown for this long: silence isn't success
-      --from-start   read what the log already holds (default: only what is added from now on)
+      --from-start   read what the log already holds (default: only what is added from now on, but a log under two minutes old is
+                     read from its start: run 55 watched two jobs that had ended before the watcher began)
     exit codes: 0 --until matched, 1 refused (bad arguments), 3 the deadline passed: re-arm if it is still needed.
 - **`water.py`**: Water the home field once (run 10): take the can from its box if needed, refill it at the lake when it holds fewer charges than the field has cells (TaskWater spends one charge a cell), "Water crops", and put the can back in the tool box. Water after 06:00: the next morning's growth tick is doubled (+10 instead of +5) on watered cells, and the flag clears after each tick.
     usage: python -I tools/water.py [--keep] [--extra X,Z [X,Z ...]]   (--keep leaves the can in the pack)
