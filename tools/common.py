@@ -286,6 +286,13 @@ def crawl_up(word="Onward"):
 def wait_until(until="idle", n=1, timeout=15000, **kw):
     """The bridge's deferred wait. Returns the reply data (done, why, x, z, hp, zone, top, ai)."""
     reply = call("wait", until=until, n=n, timeout=timeout, **kw)
+    # run 58: the game's main thread stalled 2 s on the home map's load (recall.py's traceback) and 16 s on a floor (a ladder's end,
+    # rc 2) with the game at 60 fps before and after: the wait was dropped unrun, so it is asked again, twice at most
+    for _ in range(2):
+        if reply.get("ok") or "main thread" not in (reply.get("error") or ""):
+            break
+        time.sleep(4)
+        reply = call("wait", until=until, n=n, timeout=timeout, **kw)
     if reply.get("ok"):
         return reply["data"]
     if "unknown op" in (reply.get("error") or ""):  # a mod older than 0.23.0: poll
