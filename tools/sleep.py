@@ -68,6 +68,19 @@ def main():
     for attempt in range(3):
         btns = call("buttons", all=True)["data"]["buttons"]
         rest = [b for b in btns if "ButtonAbility" in (b.get("name") or "") and b.get("card") == "Rest"]
+        if not beds and not rest:
+            # run 58: the ability window was left on its "Atk" tab, which lists no Rest, and a circuit entered Isolated Cave at
+            # Very Sleepy: the tab that lists it is pressed first
+            for name in ("Ability", "All"):
+                tab = [b for b in btns if "ButtonTab Ability" in (b.get("name") or "") and b.get("text") == name]
+                if not tab:
+                    continue
+                call("click", i=tab[0]["i"], expect=name)
+                wait_until("frames", n=20, timeout=3000)
+                btns = call("buttons", all=True)["data"]["buttons"]
+                rest = [b for b in btns if "ButtonAbility" in (b.get("name") or "") and b.get("card") == "Rest"]
+                if rest:
+                    break
         slot = [b for b in btns if b.get("hot") == "HotItemActionSleep"]
         if not beds and rest:
             if attempt == 0:
