@@ -851,7 +851,7 @@ def god_statues():
     material hammer, Machine a choice of a gene (a window: left for a decision). shrines() knew only "\u2605Shrine" names, so 58
     runs of floors walked past them. A used one is onyx and offers no Use."""
     for h in (data("find", name="Statue Of", r=999, n=10) or {}).get("hits") or []:
-        if h.get("trait") != "TraitGodStatue":
+        if h.get("trait") != "TraitGodStatue" or not (h.get("name") or "").startswith("★"):  # a used one is "a statue of ..."
             continue
         use = []
         for r in (1, 1, 0):
@@ -867,10 +867,24 @@ def god_statues():
         if not use:
             print(f"  statue {h.get('name')} at {h['x']},{h['z']}: no Use act (used already, or not reached)")
             continue
-        if "machine" in (h.get("name") or "").lower():
-            stop(f"{h.get('name')} at {h['x']},{h['z']}: Mani's statue offers a choice of genes: use it by hand, then go on")
         call("do", i=use[0]["i"])
         wait_until("frames", n=60, timeout=6000)
+        if "machine" in (h.get("name") or "").lower():
+            # run 58 (Ruined Cave B1, by hand): Mani's statue opens a grid of three synthetic genes and a click takes one. Genes are for
+            # allies, who wait at home, so the dearest (the most feat points) is taken to sell
+            best, most = None, -1
+            for b in data("buttons", all=True).get("buttons") or []:
+                if "gene of Mani" not in (b.get("card") or ""):
+                    continue
+                tip = " ".join(((call("hover", i=b["i"]).get("data") or {}).get("texts")) or [])
+                m = re.search(r"uses (\d+) feat points", tip)
+                pts = int(m.group(1)) if m else 0
+                if pts > most:
+                    best, most = b, pts
+            if best is not None:
+                call("click", i=best["i"])
+                wait_until("frames", n=40, timeout=4000)
+                print(f"  Mani's statue: took the gene of {most} feat points", flush=True)
         if (state().get("layers") or {}).get("top"):
             stop(f"a window opened over {h.get('name')} ({(state().get('layers') or {}).get('top')}): read it")
         log = [str(x) for x in (state().get("log") or [])[-6:]]
