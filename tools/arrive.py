@@ -105,6 +105,10 @@ def main():
     from common import data as _data
     if any("treasure chest" in i["name"].lower() for i in _data("inv")["items"]):
         print("chests: " + (str(run("chests.py", timeout=900)).strip().splitlines() or ["?"])[-1][:160])
+    # run 58 (home stop 16, the last thing out of place): packcheck wants a nefia map read at once, by hand; it is read here
+    for it in _data("inv")["items"]:
+        if re.fullmatch(r"(an? |\d+ )?(blessed )?maps?", it["name"].lower().strip()):
+            print("map: " + last(run("item.py", f"uid:{it['uid']}" if it.get("uid") else it["name"], "Read", timeout=120))[:120])
     p = run("packcheck.py", "--move", timeout=1200)  # run 35: a full unload ran past the 300 s default twice
     print(p.strip())
     home_guard("the arrival, after the unload")
