@@ -42,6 +42,13 @@ never `step`.
   since run 44; on home's own tile it steps one tile off first, run 56: the home map's departure checks stranded a
   circuit there), sleeps at Very Sleepy, and closes the morning shipping report itself (run 21). An Enter after a refused
   or stopped wgo.py walks back into the place just left (run 21, twice): gate the next step on its exit code.
+- **A walk to a nefia is reckoned against its life** (run 59: Guiding Machinarium, 45 tiles, went 63 steps round water in
+  ten game days and expired on the way): wgo.py refuses one whose route (`route_steps` x 3 h) outlasts it (`--late-ok`).
+- **Bloated forbids every world-map move** (run 59: "You are too full to move now!", leaving a town included; Fast Travel
+  works and digests nothing): the meal stop eats no further meal under hunger 55 now. Stuck anyway: a sleep is +20 hunger
+  (Chara.OnSleep); get SP under ~20% (the home dummy, `train.py 24`) so `sleep.py` takes, or read a return scroll first.
+- **A weak follower can freeze the walk** (run 59: a kobold Lv7 sat on my own world-map tile, untargetable, and every
+  walkto ended at 0 steps): wgo.py then tries the plain goto once, which walks on (its gang of 16 came as an ambush).
 - **`--ambush`** handles the ambush map itself by the table's rules (the swarm row, 3+ levels above me: stop), then
   `fight.py` one foe at a time, `loot.py 20`, `purge.py --free 3`, `leave.py`, and walks on (the review of 2026-10-23:
   travel was the largest real-time sink). `--weak-ok` keeps walking past hostiles 3+ levels below me.

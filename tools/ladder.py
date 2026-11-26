@@ -282,7 +282,10 @@ def condition_wait():
             fights += 1
             if fight_nearest(3):
                 continue
-        if foes or p["hp"] * 100 < 70 * p["maxHp"]:
+        # run 59: ConDim stopped three circuits with only weak foes in view that fight_nearest couldn't reach (a master yeek Lv9 at 6, a
+        # carbuncle Lv22); foes 10+ levels under me don't end the wait, a stronger one or HP under 70% still does
+        weak = foes and all((c.get("lv") or 99) <= p["lv"] - 10 for c in foes)
+        if (foes and not weak) or p["hp"] * 100 < 70 * p["maxHp"]:
             return False
         waits += 1
         call("act", action="Wait")  # queued: the turn passes over the next frames

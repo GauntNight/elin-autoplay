@@ -219,6 +219,14 @@ def swarm_round(t, s):
     return bool(r.get("ok") and (r.get("data") or {}).get("cast"))
 
 
+def swarm_may(t, s):
+    """Swarm rounds on an avoid kind (run 59): 3+ hostiles within 3 cells, SP over the ability's floor and HP at the heal-to line."""
+    pc = s["pc"]
+    near = [c for c in s.get("nearby") or [] if c.get("hostile") and c["dist"] <= 3]
+    return (t["dist"] <= 3 and len(near) >= THRESHOLDS["swarm_ability_min"] and pc.get("sp", 0) >= THRESHOLDS["swarm_ability_sp"]
+            and pc["hp"] * 100 >= THRESHOLDS["heal_to"] * pc["maxHp"])
+
+
 def _fight(trk):
     force = "--force" in sys.argv
     argv = sys.argv[1:]
@@ -266,6 +274,7 @@ def _fight(trk):
             if "steals" in (prof.get("flags") or []) or "steals" in seen:
                 refuse(f"{t0['name']} is neutral and its kind steals (threat.py; run 53: 3,249 orens gone): leave it, "
                        "or --thief-ok with the gold boxed")
+    avoid_swarm = False
     if foes0 and not force:
         t0 = min(foes0, key=lambda c: c["dist"])
         if t0["lv"] > s0["pc"]["lv"] + 2:
@@ -274,7 +283,12 @@ def _fight(trk):
         # run 17: two lizardmen (threat.py "avoid", Lv12 against my Lv18) took 125 -> 69 in two
         # turns of melee: an avoid-group kind within 8 levels is ranged or left, never meleed
         import threat
-        if threat.avoid(t0, s0["pc"]["lv"]):  # run 33: within the window, or a recorded fight that cost 30%
+        if threat.avoid(t0, s0["pc"]["lv"]) and swarm_may(t0, s0):
+            # run 59, the crypt's B1: six sound hounds Lv45 and Y'golonac (avoid kinds) beside me; eight Swarm casts by hand killed
+            # them all for 18 HP where this refusal left only a teleport. Swarm rounds only: the round it can't cast any more stops
+            avoid_swarm = True
+            print(f"{t0['name']} Lv{t0['lv']} is an avoid-group kind: Swarm rounds only (3+ in range, SP and HP over the floors)")
+        elif threat.avoid(t0, s0["pc"]["lv"]):  # run 33: within the window, or a recorded fight that cost 30%
             refuse(f"{t0['name']} Lv{t0['lv']} is an avoid-group kind (threat.py) within {THRESHOLDS['avoid_levels']} "
                    f"levels or with a recorded {THRESHOLDS['avoid_seen_pct']}% fight: range it (cast.py, throw.py, "
                    "shoot.py) or leave; --force only if it is restrained")
@@ -320,6 +334,20 @@ def _fight(trk):
         # they get the ranged opener too. Run 37: the check read 『』, which the state never shows, so it never ran; with
         # common.named it does, as an opener only (2+ cells): adjacent, an arrow (1-2% a cast on run 37's named foes)
         # is a lost round under a 25-35% hitter
+        if UNTIL is None and "--single" not in sys.argv:
+            # run 59, the crypt's B4: 『Pursuer』 stood at 3 cells behind Y'golonac and six lightning hounds, so the named opener below cast
+            # arrows at it (MP 262 -> 20) while the pack took 504 -> 334; three Swarm casts then killed the pack for 0 HP. With 3+
+            # hostiles within 3 cells the Swarm round comes before any ranged round, aimed at the nearest
+            hp0 = pc["hp"]
+            near = min((c for c in s.get("nearby") or [] if c.get("hostile")), key=lambda c: c["dist"], default=None)
+            if near and swarm_round(near, s):
+                trk.engage(t, s)
+                time.sleep(0.8)
+                s2 = after_round(hp0, pc["maxHp"], min_hp, near["name"])
+                trk.see(s2)
+                left = sum(1 for c in s2.get("nearby") or [] if c.get("hostile") and c["dist"] <= 3)
+                print(f"HP {s2['pc']['hp']}/{s2['pc']['maxHp']}  {near['name']} (swarm: SP {s2['pc'].get('sp')}, {left} left in range)")
+                continue
         if UNTIL is None and "--melee" not in sys.argv and (evasive(t) or (named(t) and t["dist"] >= 2)):
             hp0 = pc["hp"]
             trk.engage(t, s)
@@ -343,6 +371,9 @@ def _fight(trk):
                 print(f"HP {s2['pc']['hp']}/{s2['pc']['maxHp']}  {t['name']} {tt[0]['hpPct'] if tt else 0}% "
                       f"(swarm: SP {s2['pc'].get('sp')}, {left} left in range)")
                 continue
+        if avoid_swarm and threat.avoid(t, pc["lv"]):
+            stop(f"{t['name']} Lv{t['lv']} ({t['hpPct']}%), an avoid kind, and no Swarm round any more (3+ in range, SP "
+                 f"{THRESHOLDS['swarm_ability_sp']}+, HP {THRESHOLDS['heal_to']}%+): cast.py from range, or leave")
         acts = call("acts", dx=t["dx"], dz=t["dz"], mode="all")["data"]["acts"]
         atk = [a for a in acts if a["text"].startswith("Attack")]
         if UNTIL is not None and not atk and t["dist"] > 1 and approach.get(t["uid"], 0) >= 3:
@@ -412,6 +443,22 @@ def _fight(trk):
             call("step", dx=m["dx"], dz=m["dz"])
             wait_until("frames", n=20, timeout=3000)
             now = next((c for c in call("state")["data"].get("nearby") or [] if c.get("uid") == m.get("uid")), None)
+            if now and now["name"] == m["name"]:
+                # run 59 (Forgotten Forest B1): a diagonal step came back as an axis move and the "treasure chest" stayed disguised; an
+                # ice arrow by its uid lands on a disguised mimic (91% after one), and twelve killed it
+                print(f"{m['name']}: the bump did not break the disguise: ice arrows", flush=True)
+                r = run("cast.py", "arrow_Cold", m["name"], "20", "--mp-floor", "60", timeout=300)
+                print(r.strip()[-300:])
+                if r.rc == 1:
+                    # run 59 (Tangled Ruin): a greater mimic's disguise refused every spell; the Putit thrown at it broke the disguise
+                    # ("A treasure chest reveals his true form!") and the sword went on
+                    t = run("throw.py", m["name"], "Putit In Amber", "1", timeout=120)
+                    print(t.strip()[-200:])
+                    now2 = next((c for c in call("state")["data"].get("nearby") or [] if c.get("uid") == m.get("uid")), None)
+                    if now2 and now2["name"] != m["name"]:
+                        r = run("fight.py", now2["name"], str(min_hp), "--bumped", "--melee", timeout=300)
+                        print(r.strip()[-300:])
+                sys.exit(r.rc)
             if now:
                 print(f"{m['name']}: bumped, now {now['name']}", flush=True)
                 r = run("fight.py", now["name"], str(min_hp), "--bumped", timeout=300)

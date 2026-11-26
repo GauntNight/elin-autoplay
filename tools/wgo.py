@@ -94,7 +94,9 @@ def meal_stop():
                 continue
             if foes:
                 break
-        if call("state")["data"]["pc"]["hunger"] < THRESHOLDS["eat_at"] - 15:
+        # run 59: the old mark (eat_at - 15 = 30) let a second caramel miso cake go in at 32: hunger 0, Bloated, and Bloated forbids every
+        # world-map move (about 30 real minutes to digest: a sleep is +20). A meal is 26-43, so no further meal under eat_at + 10
+        if call("state")["data"]["pc"]["hunger"] < THRESHOLDS["eat_at"] + 10:
             break
     if any(c.get("hostile") for c in call("state")["data"].get("nearby") or []):
         run("leave.py", "--force", "--riding-ok", timeout=300)
@@ -350,6 +352,23 @@ def tile_danger():
     return worst
 
 
+def walk_on(tx, tz, pos, secs=25):
+    """The game's plain goto when walkto ends at 0 steps (run 59). True when I moved or the zone changed (an ambush) within secs."""
+    import time
+    if not call("goto", x=tx, z=tz).get("ok"):
+        return False
+    t0 = time.time()
+    while time.time() - t0 < secs:
+        time.sleep(1.0)
+        s = call("state")["data"]
+        p = s["pc"]
+        if (p["x"], p["z"]) != tuple(pos) or not (s.get("zone") or {}).get("region", True):
+            print(f"  walkto would not start at {pos[0]},{pos[1]}: the plain goto moved me", flush=True)
+            return True
+    call("cancel")
+    return False
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     weak_ok = "--weak-ok" in sys.argv
@@ -398,6 +417,15 @@ def main():
         if ("underwater" in p["name"].lower() or "water" in str(p.get("id") or "")) and "--breathe" not in sys.argv:
             refuse(f"{p['name']} is an underwater dungeon: suffocation (the user, run 17); --breathe only with water breathing")
         tx, tz, label = mx + p["dx"], mz + p["dz"], p["name"]
+        # run 59: a walk by hand to Guiding Machinarium (45 tiles, 137 h of life) went round water by 52,121 and 43,140: 63 steps and ten game
+        # days, and the nefia had expired on arrival. circuit.py reckoned routes (run 49); a walk by hand to a nefia does too now
+        life = p.get("expireH")
+        if life is not None and life > 0 and "--late-ok" not in sys.argv:
+            steps = route_steps(p["dx"], p["dz"])
+            hours = (steps if steps is not None else 2 * p["dist"]) * 3.0
+            if hours > life:
+                refuse(f"{p['name']} lives {life} h and the walk is ~{hours:.0f} h ({steps} steps round blocked tiles at ~3 h): "
+                       "it expires on the way (--late-ok to walk anyway)")
     # run 49: a walk home from 24,149 went by 47,133 and 49,128 round fields over the route limit, ten ambushes and 17 game
     # days in all with the nefia it chased, while a scroll of return takes ~15 turns. Home over 10 tiles away is a recall
     # (enter any local map, recall.py), never a walk, unless --walk-ok (no return scroll, or the walk is the point)
@@ -544,6 +572,12 @@ def main():
             call("cancel")
             log_leg(start, frm, label, steps, f"stopped at {pos[0]},{pos[1]}: hunger, sleep or SP")
             stop(f"SP {p['sp']} / hunger {p.get('hungerText')}: eat or sleep first (a bed in the pack: sleep.py)")
+        if why == "stopped" and not getattr(walk_on, "tried", False):
+            # run 59: a kobold Lv7 that followed me over the world map (it sat on my own tile, untargetable) made every walkto with
+            # weakOk end at 0 steps, four times; the plain goto walked 12 game hours at once. One goto, then the loop reads where it ended
+            walk_on.tried = walk_on(tx, tz, pos)
+            if walk_on.tried:
+                continue
         if why == "stopped":
             log_leg(start, frm, label, steps, f"stopped at {pos[0]},{pos[1]}: not moving")
             stop(f"not moving at {pos}")

@@ -94,13 +94,32 @@ def setup():
             pass
 
 
+LAST_REFUSAL = TOOLS.parent / "runs" / "jobs" / "last_refusal.json"
+
+
+def note_refusal(rc, msg):
+    """Run 59: three times a circuit was sent in the same message as a call that refused (evac.py with a hostile in view, eat.py's
+    "no meal", leave.py beside a reindeer) and ran anyway. Every refusal and stop is noted here with its time; circuit.py won't
+    start within LAST_REFUSAL_S seconds of one (circuit.after_refusal)."""
+    try:
+        import json
+        import time as _t
+        LAST_REFUSAL.parent.mkdir(parents=True, exist_ok=True)
+        LAST_REFUSAL.write_text(json.dumps({"tool": Path(sys.argv[0]).name, "rc": rc, "msg": str(msg)[:200], "t": _t.time()}),
+                                encoding="utf-8")
+    except Exception:  # noqa: BLE001 (a note never decides an exit)
+        pass
+
+
 def refuse(msg):
     print("refused: " + msg, file=sys.stderr)
+    note_refusal(1, msg)
     sys.exit(1)
 
 
 def stop(msg):
     print("stop: " + msg)
+    note_refusal(3, msg)
     sys.exit(3)
 
 
@@ -448,6 +467,9 @@ THRESHOLDS = {
     "swarm_ignore_below": 25,  # run 43: twelve Lv4 geese at Lv37, PV 82 stopped a walk as a swarm of 6; this far under mine they don't count
                             # (two stops on Lv1-7 crowds at Lv21; "HP decides, not the count", run 04)
     "swarm_ability_min": 3, # run 40: the Swarm ability (a 0.9x blow on every hostile within 3 cells) replaces a swing from this many
+    "tough_defense": 3.0,    # run 59: threat.py defense from which a caster or ranged kind is meleed, not thrown at (a red dragon reads 7.9)
+    "avoid_bolt_below": 20, # run 59: an avoid kind this many levels under mine gets ice bolts from range in delve.py instead of a stop
+    "buff_below": 12,       # run 59: a foe within this many levels of mine (or named, or an avoid kind) gets buff.fight_set's Holy Shield and Hero first
     "swarm_ability_sp": 40, # run 40: SP comes back only from sleep; Swarm costs 12 and never spends the last of it
     "avoid_levels": 8,      # an "avoid" kind within this many levels of mine stops delve and fight
     "avoid_seen_pct": 30,   # run 33: an "avoid" kind at ANY level once a recorded fight cost this % of my HP (aliens Lv18 at Lv30, runs 32-33)

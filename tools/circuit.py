@@ -219,6 +219,20 @@ def main():
     if {"-h", "--help"} & set(args):  # run 34: `circuit.py --help` started a 4-nefia circuit
         print(__doc__)
         return
+    # run 59: three circuits went out in the same message as a call that had just refused (they ran on a floor, in a field, beside
+    # a hostile): a refusal or stop in the last LAST_REFUSAL_S seconds by another tool holds this one (--after-refusal-ok)
+    import json
+    import time as _t
+    from common import LAST_REFUSAL
+    if LAST_REFUSAL.exists() and "--after-refusal-ok" not in args:
+        try:
+            last_r = json.loads(LAST_REFUSAL.read_text(encoding="utf-8"))
+        except ValueError:
+            last_r = {}
+        age = _t.time() - (last_r.get("t") or 0)
+        if age < 5 and last_r.get("tool") != "circuit.py":  # calls sent in one message start back to back; 20 s caught a refusal already read
+            refuse(f"{last_r.get('tool')} ended rc {last_r.get('rc')} {age:.0f} s ago ({last_r.get('msg', '')[:90]}): read it first; "
+                   "--after-refusal-ok when this circuit is meant to follow it")
     n = next((int(a) for a in args if re.fullmatch(r"\d+", a)), 4)
     lo, hi = 3, 7
     if "--danger" in args:

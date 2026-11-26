@@ -44,7 +44,7 @@ layers stand in this order: `knowledge/risk.md` (the user, run 16). Kit: **elin-
   random points of the whole region, so walking the world map spawns nothing and nothing spawns "around me". Level: 1 in 3
   from my level (the danger 16-31 ones), 2 in 3 from FameLv x 75-124% - 3 + a little. Random nefias expire within days
   (run 20: two were gone after 3-4 day walks): look again on arrival.
-- **Refills come in batches** (runs 51, 54, fact #1538; Region.CheckRandomSites): a check tops the region up to 70 sites at once, at most once a game day on a world-map entry, and every site lives 7 days, so a batch dies in the same hour: when every near nefia reads the same hours left, take the near ones first, fill the gap (a home stop, a map, a guild night) and be on the move a game day after the last check; the next batch is a full one (run 54: 12 left in the region, then 39 and 52).
+- **Refills come in batches** (runs 51, 54, fact #1538; Region.CheckRandomSites): a check tops the region up to 70 sites at once, at most once a game day on a world-map entry, and every site lives 7 days, so a batch dies in the same hour: when every near nefia reads the same hours left, take the near ones first, fill the gap (a home stop, a map, a guild night) and be on the move a game day after the last check; the next batch is a full one (run 54: 12 left in the region, then 39 and 52). **The day's check is spent by the first world-map entry, whatever the batch's state** (run 59, fact #1650): an arrival three hours before the batch's expiry, and an entry minutes after it (sites listed at -2 h, not yet removed), each used the check and added nothing, and conquered sites keep their places among the 70 until they expire (10 unconquered left in the whole region). So from a day before the expiry stay on local maps (home, a town, a dig on one tile) and step onto the world map just after it; a dummy-and-sleep cycle at home passes ~13 game hours for about a real minute.
 - **When the near ones run over the gate, sell fame** (runs 27, 32-42): `famesale.py NAME [TIMES=3] [MIN=140]` beside an
   informer of the Merchants Guild (Gizon, Ishbear; `whereis.py any NAME` first). A sale takes 20% of fame (run 27 at
   Ishbear in Palmia: ~1,040 -> ~665 brought danger 3-7; run 42: 263 + 210 + 168 and 191 + 153 orens), half the tax bill is
@@ -155,32 +155,7 @@ kept by hand and stops at run 40). Read that table before changing the gate. One
 only after a floor at the limit was cleared without a drink; one step down after a near-death at or under the limit.
 Each change goes into the `THRESHOLDS` comment and a fact (fact #1047 and its successors).
 
-The steps so far: danger 4 at Lv7 (run 05), 5 at Lv9 (07), 8 at Lv12-16 (run 12; risk.md), 8 -> 9 at Lv23 (run 24: run
-21's danger-8 den, 0 HP lost, no drink), 9 -> 10 at Lv26 (run 27: the Rustic Ruin's danger-9 B2, 6 HP lost, no drink), up
-to 14 by run 34 (Vernis Mine B5-B7 at 10-12 in run 33; Chilly Cave B3 at 13), **down to 13 at Lv33** (run 36: a
-near-death, 218 -> 0 in one round on Dark Ruin B5 at danger 12 under the unattended 13), 14 at Lv35 (run 40: two
-danger-12 floors at the unattended limit cleared without a drink), 15 at Lv38 (run 43: Traditional Cave B4 at danger 13,
-12 HP lost, no drink), 16 at Lv39 (run 45: Ruined Grassland B2, Mossy Grassland B3 and Warped Machinarium B3, all danger
-14, cleared at full HP with no drink), 17 at Lv41 (run 46: Warped Ruin B3 at danger 15, the unattended limit, lowest HP
-86%, no drink; the first raise read from runs/conquests.csv), **back to 16 at Lv42** the same run (Guiding Cave B4 at
-danger 13: HP 354 -> 42 on a mine its master, a mine dog, had laid; the rule's step down, though the mine and not the
-floor's danger was the cause), and **17 again** by the user's call after the run (2026-11-13: "we can try 16+ again"; a
-mine is a threat flag now, not a reason to lower the gate), **18 at Lv44** (run 51: run 50's Arcane Forest B4 at danger
-16, the unattended limit, lowest HP 97%, no drink; PV 74 -> ~88 from seven enchant scrolls the same day), **19 at Lv45** the
-same run (G59 M1: Old Grassland B3 at danger 17, the unattended limit, 25 fights at a lowest 100%, no drink; Mystical
-Grassland B3 at 17 the same day fell to 67% on the chip of ~30 fights and was not counted: a clear under the drink line is
-not evidence), and **20** an hour later (G59 M2: Old Grassland B4 at danger 18, the new unattended limit, its master killed in
-24 fights at a lowest 82%, no drink; run 46's precedent counted 86%), and **21** by the user's call after the run
-(2026-11-17: "Let's step to 21"; Chilly Cave B4 at danger 19, the unattended limit at 20, 30 fights at a lowest 81%, no
-drink: the evidence the run held back for the user, fact #1499), and **22** in run 52 (G61 M1: Traditional Ruin B1 at
-danger 20, the unattended limit, explored at full HP with no drink: an asura Lv22 and kamikaze yeeks, few fights, fact #1506), and **23** the same
-night (G61 M2: its B2 at danger 21, 8 fights, lowest 94%, no drink, explored after tunnel.py opened a wall, fact #1507), and **24** (G61 M3: its B3 at danger 22, explored at full HP, no
-drink: a king scorpion Lv21, a living armor, fact #1508), and **25** (G61 M4, G61 done: its B4 at danger 23, the master
-『Stalker』 Lv34 killed in ~15 fights at a lowest 100%, no drink, fact #1509), and **26** in run 54 (G64 M1: Unknown Cave, a base-20 nefia, B5 at danger 24, the unattended limit, its master 『Asura』 Lv36 on it, lowest 91%, no drink; B1 had needed a drink at danger 20 against a Santa Claus Lv40, not the evidence floor), and **27** in run 55 (G64 M2: Dangerous Ruin, a base-21 nefia east of the Village of Atonement, B5 at danger 25, the unattended limit, its master 『Monster mushroom』 Lv37 killed, lowest 76% on the floor, no drink; the conquest row's 64% was B4's iron-maiden bleed and yellow bits: the evidence is the limit floor's own lowest), and **28** the same night (G64 M3: the Sunken Temple of Lurie's B2 at danger 26, underwater with the Forest Gloves' water breathing (`ladder.py --breathe`), ~35 fights at a lowest 90%, no drink), and **29** (G64 M4: its B3 at danger 27, 22 fights at a lowest 90%, no drink), and **30** (G64 M5, **G64 done**: its B4 at danger 28, 27 fights at a lowest 80% from a deep jellyfish and a trooper Lv28, no drink: four steps in one night, a story dungeon's floors one per step), and **back to 29** after the run (the step
-rule: the Minotaur's Nest B4 at danger 29, 453 -> 113 under Gravity; the user's guess, 2026-11-20: the Nest and its boss
-Ungogo may be harder than their floors' numbers, as other floors have been). The circuits take `--danger 2-15` once the unattended
-limit is 17+ (a base-15 nefia's B3 is the limit), `2-16` at 19, `2-17` at 20, `2-18` at 21 (a base-20 nefia's B1 or a base-18's B3 is the limit then), `2-19` at 22, `2-20` at 23, `2-22` at 24 (run 52: base-23 nefias, Capricious Ruin and Warded Forest, kept their masters past B2 at 24: explored, not conquered). The review of 2026-11-11: recorded base danger averaged 5-7 through run 40, so
-most floors sit far under the gate.
+The steps so far (each with its floor, lowest HP and fact in the run logs and `runs/conquests.csv`): 4 at Lv7 (run 05) up to 14 by run 34; **13** after run 36's near-death; 14-17 in runs 40-46 and **16** after run 46's mine; 17-21 by run 51 (G59); 22-25 in run 52 (G61); 26-30 in runs 54-55 (G64, the Sunken Temple's floors one a step) and **29** after the Minotaur's Nest; 30-34 in run 56 (G67); 35-39 in runs 57-58 (G71). A floor under the drink line is never the evidence (run 51's Mystical Grassland at 67%, run 59's Chilly Cave B1 at 52%). The circuit's band follows the unattended limit (a base-N nefia's B3 is N+2); since run 59 named foes from Lv50 hold most base 30+ nefias, so `--danger 2-28` gave the steadier conquests.
 
 ## 6. Fights on a floor
 
@@ -221,6 +196,24 @@ most floors sit far under the gate.
   before it ships (elin-gear).
 - **The Swarm ability** (run 40, 50 platinum at Eligin): `fight.py` casts it in place of a swing by the table's row
   (3+ hostiles within 3 cells, SP 40+), never beside an exploder or a slime (12 SP; a 0.9x melee blow on each: ActSwarm).
+  **Swarm comes first, before any ranged round, and it is the answer to a summoner's pack** (run 59, fact #1642): the crypt's
+  Pursuer called Y'golonac and six sound hounds Lv45 beside me; eight Swarm casts killed the pack for 18 HP and took the
+  Pursuer to 56%, where run 57's four approaches had lost a third of my HP each. `fight.py` now Swarms first when 3+ stand
+  within 3 cells, and takes Swarm rounds on an avoid kind in such a pack (SP 40+, HP 80%+) instead of refusing. Full SP
+  matters more than full HP before a known pack: sleep first.
+- **Buffs in front of a hard foe** (run 59, `buff.py`; the stats table: Holy Shield p/3+10 turns and PV +15 and more, Hero
+  p/4+10, Elemental Shield p/15+8 and +5 fire, cold and lightning): cast at a floor's door they ran out before the fight,
+  so `delve.py` casts them (`buff.fight_set`) at a foe within 12 levels of mine (20 for a named or avoid kind): Holy Shield
+  and Hero, and Elemental Shield first against a fire, cold or lightning breather. **My fire resistance is 0 without it**
+  (the Heat Sensitivity mutation cancels the girdle's fire rank, fact #1647): a red dragon Lv40 took 480 -> 261.
+- **A tough caster gets the sword** (run 59): a dragon (threat.py defense 7.9) got Putit rounds, a fifth of the sword's
+  damage, while its breath landed; from defense 3 (`tough_defense`) delve melees a caster.
+- **An avoid kind 20+ levels under me is bolted, not a stop** (run 59: two <King> Lv22 died to ice bolts for 0 HP,
+  `avoid_bolt_below`). **A <King> nearer my level is left at once** (runs 57 and 59: 20 ice bolts did 5% to a Lv40 one
+  while its Bishop, Knight and Pawn took 34%): teleport, then evacuate.
+- **Named foes from Lv50 end a nefia** (G72's risk rule, run 59: a 『Trooper』 Lv51, a Golden armor Lv51, a Chaos imp Lv52,
+  a Vampire spider Lv52, a Bomb rock (named exploder) on floors of danger 31-35): teleport, evacuate, `--skip` it. At my
+  Lv50 they turn up on most base 30+ nefias; `--danger 2-28` gave steadier conquests.
 - HP decides, not the count: weak foes in numbers are a normal fight while HP holds (04); the table's swarm row counts
   far weaker hostiles half or not at all (runs 21, 43).
 - **The auto-combat net** (bridge 0.26.0, run 16): `fight.py` fights in the game's GoalAutoCombat: a lethal hit on anyone

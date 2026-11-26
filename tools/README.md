@@ -145,6 +145,10 @@ Shared rules are in `.claude/skills/elin-play/SKILL.md` (the thresholds, the har
     Exit code 1 when the bridge answers ok=false, 2 when it is not reachable.
     World ops (goto, move, step, do, walkto) are refused by the bridge while a dialog or pop-up is
     open ("window open: LayerX"); read it with talk.py, or read.py then close.py.
+- **`buff.py`**: Cast self buffs before a hard floor or fight (run 59: ~100-270 casts each of Hero, Holy Veil, Resist Element, Holy Shield and Speed sat unused while floors at the gate fell to 71% HP; no tool cast them). Each spell is cast until its condition shows in `state` (or, for a spell with no condition such as Magic Map, until a cast spends MP), at most 4 tries, never under the MP floor that keeps the heals, and never with a hostile in view (the turns belong to the fight then) unless --fight-ok.
+    usage: python -I tools/buff.py [--mp-floor N=110] [--fight-ok] [SPELL ...]
+      SPELL  an ability alias (power.py lists them); default: the GATE set below, what a gate floor gets at its door
+    Exit 0 all on (or already on), 1 refused (no such spell), 2 the bridge, 3 stopped (MP at the floor, a hostile, a window).
 - **`butcher.py`**: Butcher every corpse in the pack and the Cooler Box with the butcher's tool (run 13, G6).
     usage: python -I tools/butcher.py [--dry] [NAME ...]   (NAME: only corpses matching these words)
 - **`buyfood.py`**: Turn gold into food at an open or named shop in one step (Start Run 3: five inn visits of hand-reading tooltips in two hours): sell every old ticket, read each food's nutrition from its tooltip, and buy by food per oren until the budget is gone. Meals earlyday.py doesn't know yet go in runs/foods.txt, one word a line, for it to eat.

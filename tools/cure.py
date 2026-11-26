@@ -79,10 +79,18 @@ def main():
                                           and (c.get("dist") or 0) >= 2)] if isinstance(hs, list) else hs
         if not fight_ok and blocking:
             stop(f"hostile in view at HP {hp}/{mx} after {casts} casts: fight or leave first")
-        i = button()
+        i = button() if ALIAS == "SpHealLight" else None  # run 59: the loop clicked the empty Cure Minor button after the switch
         mp_before = mp
         if i is None:
             r = call("cast", spell=ALIAS)
+            if (not r.get("ok") or not (r.get("data") or {}).get("cast")) and ALIAS == "SpHealLight":
+                # run 59: Cure Minor Wound's stock ran out mid-heal (stock 0 -> 0, refused); Cure Critical Wound held 93 casts
+                spells = {s["spell"]: s["stock"] for s in call("power")["data"]["party"][0].get("spells") or []}
+                nxt = next((a for a in ("SpHealTouch", "SpHealHeavy", "SpHealCritical") if spells.get(a, 0) > 0), None)
+                if nxt:
+                    print(f"  {ALIAS} is out of stock: {nxt} from here", flush=True)
+                    ALIAS = nxt
+                    r = call("cast", spell=ALIAS)
             if not r.get("ok") or not (r.get("data") or {}).get("cast"):
                 stop(f"cast op refused after {casts} casts: {r.get('error') or r.get('data')}")
         else:

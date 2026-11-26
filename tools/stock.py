@@ -23,12 +23,12 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import data, last, refuse, run, setup, stop  # noqa: E402
+from common import _key, data, last, refuse, run, setup, stop  # noqa: E402
 from home import SHIPPING, SPARES, BOX_STR  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SPELL_CAP = 100  # casts a spell (the user's ~100)
-NEVER_SELLS = re.compile(r"recipe of .*\(Learned|statue of Creator|casino chip", re.I)  # run 42: unsold through two mornings' payouts (fact: shipping chest)
+NEVER_SELLS = re.compile(r"recipe of .*\(Learned|statue of Creator|casino chip|Tax Bill Of [\d,]+ Orens|Wrapped Wooden Statue", re.I)  # run 42: unsold through two mornings' payouts (fact: shipping chest); run 59: six old tax bills and a wrapped statue held 7 of its 40 slots since run 45 (facts #1444, #1445)
 
 # Rods by kind: how many to keep (the most charges). Heals and escapes keep every charged one.
 # run 40: teleport and cure minor wound 99 -> 4: twelve and eleven rods rode in the bags, a quarter of their slots, with the bags full
@@ -278,7 +278,26 @@ def ship(plan, d, limit):
                 # run 51 (twice): two rods of one name in a batch, the second "not in the bag", and the stop here left the
                 # taken ones stranded in the pack (34 stacks): ship what came out, stop only when nothing did
                 if r.rc != 0 and ": moved" not in str(r):
+                    if not bag and "none in the box" in str(r):
+                        # run 59 (twice): the stock listing named a plastic claw and a grass skull bow the yard chest no longer
+                        # held, and the whole shipment stopped on them: a box's stale names are skipped, the rest go on
+                        print(f"  {where}: not in the box any more, skipped: {', '.join(batch)}")
+                        names = names[len(batch):]
+                        continue
                     stop(f"{'bag.py ' + bag if bag else 'box.py ' + where} --take refused (rc {r.rc})")
+                if not bag:
+                    # run 59: a box's 15 potions of nightmare merged into the spoils bag's 13 on the take, box.py found "none
+                    # in the pack", and the whole shipment of 106 stacks stopped on it: a merged stack is left in its bag
+                    carried = inventory()[1]
+                    loose = {_key(i["name"]) for i in carried if i["where"] == "pack" and not i["bag"]}
+                    bagged = {_key(i["name"]): i["bag"] for i in carried if i["where"] == "pack" and i["bag"]}
+                    merged = [n for n in batch if _key(n) not in loose and _key(n) in bagged]
+                    for n in merged:
+                        print(f"  {n}: merged into {bagged[_key(n)]}, left there")
+                    names = [n for n in names if n not in merged]
+                    batch = [n for n in batch if n not in merged]
+                    if not batch:
+                        continue
             else:
                 batch = names[:limit - moved]
             r = run("box.py", dest, *batch)

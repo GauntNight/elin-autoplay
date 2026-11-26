@@ -287,6 +287,16 @@ def main():
             if seen:
                 halt(f"{seen['name']} Lv{seen.get('lv')} in view at {seen.get('dist')} (spared: --spare {spare}): decide by hand")
         why = check(s, p, foes, kab, kab_seen)
+        if why and why.startswith("avoid-group foe"):
+            # run 59: two <King> Lv22 at my Lv50 stopped two circuits; ice bolts from range killed each for 0 HP (run 57 did the same by
+            # hand). An avoid kind 20+ levels under mine gets the bolts here; nearer ones, or a bolt that fails, still stop
+            far_under = [c for c in foes if c["dist"] <= 6 and threat.avoid(c, p["lv"]) and c["lv"] <= p["lv"] - THRESHOLDS["avoid_bolt_below"]]
+            if far_under and len(far_under) == len([c for c in foes if c["dist"] <= 6 and threat.avoid(c, p["lv"])]):
+                t = min(far_under, key=lambda c: c["dist"])
+                out = run("cast.py", "bolt_Cold", t["name"], "15", "--mp-floor", "80", timeout=300)
+                print(f"  {t['name']} Lv{t['lv']}, an avoid kind {p['lv'] - t['lv']} levels under me: ice bolts: {last(out)[:90]}", flush=True)
+                if out.rc == 0:
+                    continue
         if why:
             halt(why)
         if (s.get("layers") or {}).get("top") == "LayerShippingResult":
@@ -363,6 +373,10 @@ def main():
             if exploder and named(t):
                 halt(f"{t['name']} is a NAMED exploder at {t['dist']}: its death blast killed me in runs 33 and 37; "
                      "kill it from 5+ cells with cast.py, teleport if it closes within 4, never throw or melee near it")
+            if not exploder and t.get("hostile"):
+                import buff
+                for line in buff.fight_set(t, prof.get("group")):
+                    print(f"  buff: {line}", flush=True)
             if exploder:
                 items = inv_items()
                 pot = next((n for n in SOAK if pick(n, items, key="name", quiet=True)), None)
@@ -401,7 +415,10 @@ def main():
             # already beside me gets the sword; slimes (acid on gear), drones and exploders keep the throw
             frail_adjacent = (t["dist"] <= 1 and prof.get("group") == "kill first" and not exploder
                               and not any(k in tname.lower() for k in ("slime", "drone")) and t.get("id") not in ("robot", "drone"))
-            if (any(k in tname.lower() for k in THROW_AT) or t.get("id") in ("robot", "drone") or ranged_foe or exploder) \
+            # run 59, Chilly Cave B1: a red dragon Lv40 (threat.py: caster, defense 7.9) got Putit rounds (a fifth of the sword's damage)
+            # while its breath took 480 -> 336; four melee rounds then took it 77% -> 20%. A tough caster gets the sword
+            tough = (prof.get("defense") or 0) >= THRESHOLDS["tough_defense"] and "slime" not in tname.lower()
+            if (any(k in tname.lower() for k in THROW_AT) or t.get("id") in ("robot", "drone") or (ranged_foe and not tough) or exploder) \
                     and "Putit In Amber" in inv and not frail_adjacent and not mimic:
                 # run 56 (Bewitching Cave B2): a named Mercenary mage's slide in rounds under 15% took 444 -> 198 while this
                 # loop stopped only at 55%, under the table's drink line: the throw loop stops at that line (HP_FLOOR) now

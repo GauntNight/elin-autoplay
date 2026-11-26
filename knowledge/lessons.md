@@ -13,11 +13,6 @@ superseded or dropped at the close-out (hygiene.py flags it). After the 2026-10-
 (34 lines: 11 became facts #751-#761, 17 were already in a skill or a tool, 4 got tool guards the
 same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
-- A max HP that drops mid-run is a drain, a mutation or an ether disease, not damage: look.py's DANGER line names drained attributes and harmful mutations, `bridge.py skills` the ether ones. Run 56 went 453 -> 396 on END -5, CHA -5 (Lonely Soul reads CHA), Tainted Body and Scalding Face before a restore body and a cure mutation from the kit put it back to 435. Read it at the next stop, before the next nefia. (56)
-
-- A <King> (chess piece: summoner, short teleport) on a floor is left by evacuation at once, never by walking off: leave.py
-  walked while it summoned pawns beside me, 460 -> 272 in a few steps (fact #1597). Two nefias stopped on one this run. (57)
-
 - Fame sales pull the next refill under the gate but near the sale point: the batch after Ishbear's sale lay round Palmia,
   a 125-hour walk from home. Sell fame where the circuit will run, or circuit from the sale's town. (57)
 
@@ -27,7 +22,21 @@ same day, 2 were empty headings) Live holds only what nothing enforces yet.
 
 - Home stop misses came from items that changed after the sort (identified, paid out, taken off by a disease, dropped by a chest): a sort that isn't the last step of the arrival is a guess. (58)
 
+- Two acting tool calls sent in one message both run: the second doesn't see the first refuse. Three times in run 59 a circuit
+  went out beside a refusal (evac.py with a hostile in view, eat.py's "no meal", leave.py beside a reindeer). One acting call a
+  message when the next depends on it, or `seq.py`. (59)
+
+- A goal floor far away is a walk that can outlast it: run 59 lost Forgotten Underwater Ruin (Bloated) and Guiding
+  Machinarium (a ten-day detour) on G72. Take a gate floor near the current batch's centre, or by Fast Travel to a town
+  beside it, before the circuit's ordinary targets. (59)
+
 ## Promoted (where the older lessons live now)
+
+- run 56's max-HP line and run 57's <King> line (triaged at run 59's close-out): a drain, mutation or ether disease -> look.py's
+  DANGER line and `bridge.py skills`; a <King> -> elin-delve 6 (left at once near my level; bolted 20+ levels under, delve.py's
+  avoid_bolt_below). Run 59's own, fixed the same session: a second meal at hunger 32 left me Bloated -> wgo.meal_stop eats none
+  under 55; a walk by hand outlasting a nefia -> wgo.py reckons the route against its life; a pack beside a named summoner ->
+  fight.py Swarms first; buffs at the door -> delve's buff.fight_set at the foe.
 
 - run 55's and 56-57's lines (triaged at run 58's close-out): a watcher started after a short job -> watchlog.py reads a log under two minutes old from its start; arrivals by the clock -> elin-travel (a walk's steps x ~2.5 game hours; shops shut at night, Tiguen's inn trades); the six-bill reserve -> elin-guilds' budget line; a locked chest blocks its name-twins -> chests.py by uid (run 58); Restock runs out -> sell.py, fence.py and facts #1586, #1617, #1622; monsters that steal from the pack -> common.note_thefts and shipstar's thieves guard (fact #1559).
 
