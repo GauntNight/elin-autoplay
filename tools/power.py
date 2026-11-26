@@ -204,7 +204,9 @@ def kit():
                 except (TypeError, ValueError):
                     stock = 0
                 mp = int((call("state")["data"].get("pc") or {}).get("mp") or 0)
-                heal_casts = min(stock, mp // 5) if stock else mp // 5
+                # run 59: the button stayed on the bar at stock 0 and counted MP / 5 casts of nothing: an empty one counts
+                # none, and the heavier spells below count instead
+                heal_casts = min(stock, mp // 6) if stock else 0
             if not b.get("card") or "ButtonGrid inventory" not in (b.get("name") or ""):
                 continue
             path = b.get("path") or ""
@@ -222,7 +224,8 @@ def kit():
         try:
             spells = {sp["spell"]: sp["stock"] for sp in call("power")["data"]["party"][0].get("spells") or []}
             mp = int((call("state")["data"].get("pc") or {}).get("mp") or 0)
-            for alias, cost in (("SpHealTouch", 5), ("SpHealHeavy", 10), ("SpHealCritical", 15)):
+            # the game's own costs (knowledge/game/elements.json): Cure Minor 6, Cure Major 10, Healing Touch 12, Cure Critical 14
+            for alias, cost in (("SpHealTouch", 12), ("SpHealHeavy", 10), ("SpHealCritical", 14)):
                 if spells.get(alias, 0) > 0:
                     heal_casts = min(spells[alias], mp // cost)
                     break

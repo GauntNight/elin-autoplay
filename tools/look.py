@@ -112,9 +112,12 @@ def main():
             if sk.get("drains"):
                 warn.append("drained " + ", ".join(f"{k} {v}" for k, v in sk["drains"].items())
                             + " (restore body: STR DEX END CHA; restore mind: PER LER WIL MAG)")
-            bad = [m["name"] for m in (sk.get("mutations") or {}).values() if m.get("neg")]
+            from common import mutation_split
+            bad, good = mutation_split(sk)
             if bad:
-                warn.append("harmful mutation: " + ", ".join(bad) + " (a potion of cure mutation)")
+                warn.append("harmful mutation: " + ", ".join(m["name"] for m in bad.values()) + " (a potion of cure mutation"
+                            + (f"; a plain one may take {', '.join(m['name'] for m in good.values())} instead" if good else "")
+                            + ")")
             # run 57: Weakening (max HP -20%, melee halved) rode through a dig tour unseen: look.py named drains and
             # mutations but no ether disease. ladder.ether_check's allowed list says which ones are kept on purpose
             try:

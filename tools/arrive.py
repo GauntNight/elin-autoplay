@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import base_ready, last, refuse, run, setup, state, stop, threat  # noqa: E402
+from common import base_ready, last, mutation_split, refuse, run, setup, state, stop, threat  # noqa: E402
 
 
 BODY, MIND = ("STR", "DEX", "END", "CHA"), ("PER", "LER", "WIL", "MAG")  # Element.List_Body / List_Mind
@@ -39,10 +39,17 @@ def cure():
     # run 57: "restore mind" matched a spellbook of restore mind riding in the pack as well as 6 potions: name the potion
     need = [n for n, attrs in (("potion of restore body", BODY), ("potion of restore mind", MIND))
             if any(a in drains for a in attrs)]
-    if any(m.get("neg") for m in (sk.get("mutations") or {}).values()):
-        need.append("potion of cure mutation")
+    bad, good = mutation_split(sk)
+    held = ""
+    if bad and good:
+        # run 59: a plain potion takes one level of a random mutation, so with a good one held it may take that instead
+        held = (f"; {', '.join(m['name'] for m in bad.values())} NOT cured: a plain potion of cure mutation may take "
+                f"{', '.join(m['name'] for m in good.values())} instead (a blessed one takes only the tagged-harmful kind)")
+    elif bad:
+        # one level a potion (Heat Sensitivity is max 1; Albino up to 3)
+        need += ["potion of cure mutation"] * min(4, sum(int(m.get("lv") or 1) for m in bad.values()))
     if not need:
-        return "drains and mutations: none"
+        return "drains and mutations: none" + held
     done = []
     for what in need:
         r = run("item.py", what, "Drink")
@@ -56,7 +63,7 @@ def cure():
         done.append(f"{what} drunk" if r.rc == 0 else f"{what} NOT DRUNK (rc {r.rc}: {last(r)[:80]}; none carried? buy at Minron, Mysilia)")
     after = data("skills")
     return (f"drains {drains} -> {after.get('drains') or 'none'}; " + "; ".join(done)
-            + f"; mutations left: {[m['name'] for m in (after.get('mutations') or {}).values() if m.get('neg')] or 'none'}")
+            + f"; mutations left: {[m['name'] for m in mutation_split(after)[0].values()] or 'none'}" + held)
 
 
 def sell_step():

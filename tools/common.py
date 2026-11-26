@@ -501,6 +501,22 @@ def bad_conditions(p):
     return bad
 
 
+# Run 59 (fact #1656): the game tags only one of each mutation pair "neg", and Heat Sensitivity (mutationCold, fire -5,
+# cold +5) is the untagged one; it cancelled the girdle's fire rank from run 54 on (arrive.py called it harmless) and a
+# red dragon's breath took 480 -> 261 at fire resistance 0. These are cured whatever the tag says.
+CURE_ANYWAY = ("mutationCold",)
+
+
+def mutation_split(sk):
+    """(to cure, to keep) from the bridge's `skills` mutations: aliases and names. A potion of cure mutation is
+    MutateRandom(-1): ONE level of ONE random mutation of any kind (blessed: "neg" ones only; cursed: the others only;
+    the ribbon's mutation guard blocks gains only), so a plain potion is safe only while nothing worth keeping is held."""
+    muts = sk.get("mutations") or {}
+    bad = {a: m for a, m in muts.items() if m.get("neg") or a in CURE_ANYWAY}
+    good = {a: m for a, m in muts.items() if a not in bad}
+    return bad, good
+
+
 def ready(s=None, *, hp=60, hunger=70, sp=None, idle=True, world_ok=False, nefia_ok=True,
           hostile_r=None, weak_ok=False, allow=("LayerInventory",), burden=3, returning_ok=True,
           hostiles=True):
